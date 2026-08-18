@@ -1,1 +1,35 @@
-
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NightInk Comics</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#101217;color:#fff}
+    header{padding:18px 28px;background:#181b22;border-bottom:1px solid #2d313b;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:24px;font-weight:700}
+    .badge{background:#7f5af0;padding:7px 11px;border-radius:999px;font-size:12px}
+    main{max-width:1100px;margin:auto;padding:70px 22px}
+    .hero{background:#1b1f27;border:1px solid #303642;border-radius:18px;padding:42px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+    h1{font-size:44px;margin:0 0 16px}
+    p{color:#aeb5c1;line-height:1.7;font-size:17px;max-width:760px}
+    .btn{display:inline-block;margin-top:18px;padding:12px 18px;border-radius:12px;background:#7f5af0;color:#fff;text-decoration:none;font-weight:700}
+    .status{margin-top:28px;padding:14px 16px;background:#151820;border-radius:12px;color:#b9c0cc;border:1px solid #2b303b}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">NightInk Comics</div>
+    <div class="badge">CLEAN BUILD</div>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>NightInk está funcionando.</h1>
+      <p>Esta es la base limpia del proyecto. La página pública se sirve desde <strong>public/</strong> y el backend de Cloudflare Worker vive en <strong>src/</strong>. Cuando esta versión despliegue bien, añadiremos D1, R2 y el Admin sobre esta misma estructura.</p>
+      <a class="btn" href="/api/health">Probar API</a>
+      <div class="status">Estado esperado: web pública + Worker funcionando.</div>
+    </section>
+  </main>
+</body>
+</html>

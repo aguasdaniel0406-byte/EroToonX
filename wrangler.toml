@@ -1,11 +1,12 @@
 name = "nightink-app"
 main = "src/index.js"
-compatibility_date = "2026-08-18"
+compatibility_date = "2026-08-21"
 
 [assets]
 directory = "./public"
 binding = "ASSETS"
-run_worker_first = ["/api/*"]
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*", "/media/*"]
 
 [[d1_databases]]
 binding = "DB"

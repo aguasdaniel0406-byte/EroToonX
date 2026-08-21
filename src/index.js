@@ -44,19 +44,30 @@ function safeName(value = "file") {
 async function touchComic(env, comicId) {
   await env.DB.prepare(
     "UPDATE comics SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-  ).bind(comicId).run();
+  )
+    .bind(comicId)
+    .run();
 }
 
 async function touchChapter(env, chapterId) {
   await env.DB.prepare(
     "UPDATE chapters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-  ).bind(chapterId).run();
+  )
+    .bind(chapterId)
+    .run();
 }
 
 async function renumberPages(env, chapterId) {
   const rows = await env.DB.prepare(
-    "SELECT id FROM pages WHERE chapter_id = ? ORDER BY page_number ASC, id ASC"
-  ).bind(chapterId).all();
+    `
+    SELECT id
+    FROM pages
+    WHERE chapter_id = ?
+    ORDER BY page_number ASC, id ASC
+    `
+  )
+    .bind(chapterId)
+    .all();
 
   const pages = rows.results || [];
 
@@ -67,27 +78,42 @@ async function renumberPages(env, chapterId) {
   for (let i = 0; i < pages.length; i++) {
     await env.DB.prepare(
       "UPDATE pages SET page_number = ? WHERE id = ?"
-    ).bind(-(i + 1), pages[i].id).run();
+    )
+      .bind(-(i + 1), pages[i].id)
+      .run();
   }
 
   for (let i = 0; i < pages.length; i++) {
     await env.DB.prepare(
       "UPDATE pages SET page_number = ? WHERE id = ?"
-    ).bind(i + 1, pages[i].id).run();
+    )
+      .bind(i + 1, pages[i].id)
+      .run();
   }
 }
 
 async function deleteComicMedia(env, comicId) {
   const comic = await env.DB.prepare(
-    "SELECT cover_key FROM comics WHERE id = ?"
-  ).bind(comicId).first();
+    `
+    SELECT cover_key
+    FROM comics
+    WHERE id = ?
+    `
+  )
+    .bind(comicId)
+    .first();
 
-  const rows = await env.DB.prepare(`
+  const rows = await env.DB.prepare(
+    `
     SELECT p.object_key
     FROM pages p
-    JOIN chapters ch ON ch.id = p.chapter_id
+    JOIN chapters ch
+      ON ch.id = p.chapter_id
     WHERE ch.comic_id = ?
-  `).bind(comicId).all();
+    `
+  )
+    .bind(comicId)
+    .all();
 
   const keys = [];
 
@@ -109,14 +135,18 @@ async function deleteComicMedia(env, comicId) {
 async function publicComics(env, url) {
   const page = Math.max(
     1,
-    Number(url.searchParams.get("page") || 1)
+    Number(
+      url.searchParams.get("page") || 1
+    )
   );
 
   const limit = Math.min(
     50,
     Math.max(
       1,
-      Number(url.searchParams.get("limit") || 10)
+      Number(
+        url.searchParams.get("limit") || 10
+      )
     )
   );
 
@@ -139,7 +169,13 @@ async function publicComics(env, url) {
 
   if (q) {
     where.push(
-      "(LOWER(c.title) LIKE LOWER(?) OR LOWER(c.author) LIKE LOWER(?) OR LOWER(c.description) LIKE LOWER(?))"
+      `
+      (
+        LOWER(c.title) LIKE LOWER(?)
+        OR LOWER(c.author) LIKE LOWER(?)
+        OR LOWER(c.description) LIKE LOWER(?)
+      )
+      `
     );
 
     const like = `%${q}%`;
@@ -164,12 +200,13 @@ async function publicComics(env, url) {
   const whereSql =
     where.join(" AND ");
 
-  const countRow =
-    await env.DB.prepare(
-      `SELECT COUNT(*) AS total
-       FROM comics c
-       WHERE ${whereSql}`
-    )
+  const countRow = await env.DB.prepare(
+    `
+    SELECT COUNT(*) AS total
+    FROM comics c
+    WHERE ${whereSql}
+    `
+  )
     .bind(...binds)
     .first();
 
@@ -198,34 +235,35 @@ async function publicComics(env, url) {
       ? "c.views DESC, c.updated_at DESC, c.id DESC"
       : "c.updated_at DESC, c.id DESC";
 
-  const rows =
-    await env.DB.prepare(`
-      SELECT
-        c.*,
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.*,
 
-        (
-          SELECT COUNT(*)
-          FROM chapters ch
-          WHERE ch.comic_id = c.id
-          AND ch.is_published = 1
-        ) AS part_count,
+      (
+        SELECT COUNT(*)
+        FROM chapters ch
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS part_count,
 
-        CASE
-          WHEN c.cover_key IS NOT NULL
-          AND c.cover_key != ''
-          THEN '/media/' || c.cover_key
-          ELSE NULL
-        END AS cover_url
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url
 
-      FROM comics c
+    FROM comics c
 
-      WHERE ${whereSql}
+    WHERE ${whereSql}
 
-      ORDER BY ${orderSql}
+    ORDER BY ${orderSql}
 
-      LIMIT ?
-      OFFSET ?
-    `)
+    LIMIT ?
+    OFFSET ?
+    `
+  )
     .bind(
       ...binds,
       limit,
@@ -249,31 +287,31 @@ async function publicComics(env, url) {
 }
 
 async function adminComics(env) {
-  const rows =
-    await env.DB.prepare(`
-      SELECT
-        c.*,
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.*,
 
-        (
-          SELECT COUNT(*)
-          FROM chapters ch
-          WHERE ch.comic_id = c.id
-        ) AS part_count,
+      (
+        SELECT COUNT(*)
+        FROM chapters ch
+        WHERE ch.comic_id = c.id
+      ) AS part_count,
 
-        CASE
-          WHEN c.cover_key IS NOT NULL
-          AND c.cover_key != ''
-          THEN '/media/' || c.cover_key
-          ELSE NULL
-        END AS cover_url
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url
 
-      FROM comics c
+    FROM comics c
 
-      ORDER BY
-        c.updated_at DESC,
-        c.id DESC
-    `)
-    .all();
+    ORDER BY
+      c.updated_at DESC,
+      c.id DESC
+    `
+  ).all();
 
   return json({
     ok: true,
@@ -283,16 +321,12 @@ async function adminComics(env) {
 }
 
 export default {
-
   async fetch(
     request,
     env
   ) {
-
     const url =
-      new URL(
-        request.url
-      );
+      new URL(request.url);
 
     const path =
       url.pathname;
@@ -303,16 +337,15 @@ export default {
     try {
 
       /*
-      =========================
+      ========================================
       HEALTH
-      =========================
+      ========================================
       */
 
       if (
         method === "GET" &&
         path === "/api/health"
       ) {
-
         let databaseConnected =
           false;
 
@@ -320,30 +353,24 @@ export default {
           false;
 
         try {
-
           await env.DB.prepare(
             "SELECT 1 AS ok"
           ).first();
 
           databaseConnected =
             true;
-
         } catch {}
 
         try {
-
           await env.MEDIA.list({
             limit: 1
           });
 
           mediaConnected =
             true;
-
         } catch {}
 
-
         return json({
-
           ok: true,
 
           app:
@@ -357,40 +384,30 @@ export default {
           mediaConnected,
 
           adminConfigured:
-            Boolean(
-              env.ADMIN_TOKEN
-            )
-
+            Boolean(env.ADMIN_TOKEN)
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       ADMIN LOGIN
-      =========================
+      ========================================
       */
 
       if (
         method === "POST" &&
         path === "/api/admin/login"
       ) {
-
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         if (
           !env.ADMIN_TOKEN ||
-          body.password !==
-          env.ADMIN_TOKEN
+          body.password !== env.ADMIN_TOKEN
         ) {
-
           return json(
             {
               ok: false,
@@ -399,143 +416,118 @@ export default {
             },
             401
           );
-
         }
-
 
         return json({
           ok: true
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       PUBLIC COMICS
-      =========================
+      ========================================
       */
 
       if (
         method === "GET" &&
         path === "/api/comics"
       ) {
-
         return publicComics(
           env,
           url
         );
-
       }
 
 
       /*
-      =========================
-      UPDATES
-      =========================
+      ========================================
+      PUBLIC UPDATES
+      ========================================
       */
 
       if (
         method === "GET" &&
         path === "/api/updates"
       ) {
-
         const limit =
           Math.min(
             30,
             Math.max(
               1,
               Number(
-                url.searchParams
-                  .get("limit") ||
-                8
+                url.searchParams.get("limit") || 8
               )
             )
           );
 
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            ch.id AS chapter_id,
+            ch.chapter_number,
+            ch.title AS chapter_title,
+            ch.updated_at,
 
-        const rows =
-          await env.DB.prepare(`
-            SELECT
+            c.id AS comic_id,
+            c.slug,
+            c.title AS comic_title,
+            c.genre,
+            c.cover_key,
 
-              ch.id
-                AS chapter_id,
+            CASE
+              WHEN c.cover_key IS NOT NULL
+              AND c.cover_key != ''
+              THEN '/media/' || c.cover_key
+              ELSE NULL
+            END AS cover_url,
 
-              ch.chapter_number,
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
 
-              ch.title
-                AS chapter_title,
+          FROM chapters ch
 
-              ch.updated_at,
+          JOIN comics c
+            ON c.id = ch.comic_id
 
-              c.id
-                AS comic_id,
+          WHERE
+            ch.is_published = 1
 
-              c.slug,
+          AND
+            c.is_published = 1
 
-              c.title
-                AS comic_title,
+          AND EXISTS (
+            SELECT 1
+            FROM pages p2
+            WHERE p2.chapter_id = ch.id
+          )
 
-              c.genre,
+          ORDER BY
+            ch.updated_at DESC,
+            ch.id DESC
 
-              c.cover_key,
-
-              CASE
-                WHEN c.cover_key IS NOT NULL
-                AND c.cover_key != ''
-                THEN '/media/' || c.cover_key
-                ELSE NULL
-              END AS cover_url,
-
-              (
-                SELECT COUNT(*)
-                FROM pages p
-                WHERE p.chapter_id = ch.id
-              ) AS page_count
-
-            FROM chapters ch
-
-            JOIN comics c
-              ON c.id = ch.comic_id
-
-            WHERE
-              ch.is_published = 1
-
-            AND
-              c.is_published = 1
-
-            AND EXISTS (
-              SELECT 1
-              FROM pages p2
-              WHERE p2.chapter_id = ch.id
-            )
-
-            ORDER BY
-              ch.updated_at DESC,
-              ch.id DESC
-
-            LIMIT ?
-          `)
+          LIMIT ?
+          `
+        )
           .bind(limit)
           .all();
 
-
         return json({
-
           ok: true,
-
           updates:
             rows.results || []
-
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       PUBLIC COMIC DETAIL
-      =========================
+      ========================================
       */
 
       const comicPublicMatch =
@@ -543,45 +535,40 @@ export default {
           /^\/api\/comics\/([^/]+)$/
         );
 
-
       if (
         method === "GET" &&
         comicPublicMatch
       ) {
-
         const slug =
           decodeURIComponent(
             comicPublicMatch[1]
           );
 
+        const comic = await env.DB.prepare(
+          `
+          SELECT
+            c.*,
 
-        const comic =
-          await env.DB.prepare(`
-            SELECT
+            CASE
+              WHEN c.cover_key IS NOT NULL
+              AND c.cover_key != ''
+              THEN '/media/' || c.cover_key
+              ELSE NULL
+            END AS cover_url
 
-              c.*,
+          FROM comics c
 
-              CASE
-                WHEN c.cover_key IS NOT NULL
-                AND c.cover_key != ''
-                THEN '/media/' || c.cover_key
-                ELSE NULL
-              END AS cover_url
+          WHERE
+            c.slug = ?
 
-            FROM comics c
-
-            WHERE
-              c.slug = ?
-
-            AND
-              c.is_published = 1
-          `)
+          AND
+            c.is_published = 1
+          `
+        )
           .bind(slug)
           .first();
 
-
         if (!comic) {
-
           return json(
             {
               ok: false,
@@ -590,73 +577,63 @@ export default {
             },
             404
           );
-
         }
 
-
         await env.DB.prepare(
-          "UPDATE comics SET views = views + 1 WHERE id = ?"
+          `
+          UPDATE comics
+          SET views = views + 1
+          WHERE id = ?
+          `
         )
-        .bind(
-          comic.id
-        )
-        .run();
-
+          .bind(comic.id)
+          .run();
 
         comic.views =
           Number(
             comic.views || 0
           ) + 1;
 
+        const chapters = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
 
-        const chapters =
-          await env.DB.prepare(`
-            SELECT
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
 
-              ch.*,
+          FROM chapters ch
 
-              (
-                SELECT COUNT(*)
-                FROM pages p
-                WHERE p.chapter_id = ch.id
-              ) AS page_count
+          WHERE
+            ch.comic_id = ?
 
-            FROM chapters ch
+          AND
+            ch.is_published = 1
 
-            WHERE
-              ch.comic_id = ?
-
-            AND
-              ch.is_published = 1
-
-            ORDER BY
-              ch.chapter_number ASC,
-              ch.id ASC
-          `)
-          .bind(
-            comic.id
-          )
+          ORDER BY
+            ch.chapter_number ASC,
+            ch.id ASC
+          `
+        )
+          .bind(comic.id)
           .all();
 
-
         return json({
-
           ok: true,
-
           comic,
-
           chapters:
             chapters.results || []
-
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       PUBLIC READER
-      =========================
+      ========================================
       */
 
       const chapterPagesPublicMatch =
@@ -664,52 +641,41 @@ export default {
           /^\/api\/chapters\/(\d+)\/pages$/
         );
 
-
       if (
         method === "GET" &&
         chapterPagesPublicMatch
       ) {
-
         const chapterId =
           Number(
             chapterPagesPublicMatch[1]
           );
 
+        const chapter = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
+            c.title AS comic_title,
+            c.slug AS comic_slug
 
-        const chapter =
-          await env.DB.prepare(`
-            SELECT
+          FROM chapters ch
 
-              ch.*,
+          JOIN comics c
+            ON c.id = ch.comic_id
 
-              c.title
-                AS comic_title,
+          WHERE
+            ch.id = ?
 
-              c.slug
-                AS comic_slug
+          AND
+            ch.is_published = 1
 
-            FROM chapters ch
-
-            JOIN comics c
-              ON c.id = ch.comic_id
-
-            WHERE
-              ch.id = ?
-
-            AND
-              ch.is_published = 1
-
-            AND
-              c.is_published = 1
-          `)
-          .bind(
-            chapterId
-          )
+          AND
+            c.is_published = 1
+          `
+        )
+          .bind(chapterId)
           .first();
 
-
         if (!chapter) {
-
           return json(
             {
               ok: false,
@@ -718,67 +684,49 @@ export default {
             },
             404
           );
-
         }
 
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            chapter_id,
+            page_number,
+            object_key,
+            '/media/' || object_key AS url
 
-        const rows =
-          await env.DB.prepare(`
-            SELECT
+          FROM pages
 
-              id,
+          WHERE
+            chapter_id = ?
 
-              chapter_id,
-
-              page_number,
-
-              object_key,
-
-              '/media/' || object_key
-                AS url
-
-            FROM pages
-
-            WHERE
-              chapter_id = ?
-
-            ORDER BY
-              page_number ASC,
-              id ASC
-          `)
-          .bind(
-            chapterId
-          )
+          ORDER BY
+            page_number ASC,
+            id ASC
+          `
+        )
+          .bind(chapterId)
           .all();
 
-
         return json({
-
           ok: true,
-
           chapter,
-
           pages:
             rows.results || []
-
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       R2 MEDIA
-      =========================
+      ========================================
       */
 
       if (
         method === "GET" &&
-        path.startsWith(
-          "/media/"
-        )
+        path.startsWith("/media/")
       ) {
-
         const key =
           decodeURIComponent(
             path.slice(
@@ -786,57 +734,43 @@ export default {
             )
           );
 
-
         if (!key) {
-
           return new Response(
             "Not found",
             {
               status: 404
             }
           );
-
         }
-
 
         const object =
-          await env.MEDIA.get(
-            key
-          );
-
+          await env.MEDIA.get(key);
 
         if (!object) {
-
           return new Response(
             "Not found",
             {
               status: 404
             }
           );
-
         }
-
 
         const headers =
           new Headers();
 
-
         object.writeHttpMetadata(
           headers
         );
-
 
         headers.set(
           "ETag",
           object.httpEtag
         );
 
-
         headers.set(
           "Cache-Control",
           "public, max-age=31536000, immutable"
         );
-
 
         return new Response(
           object.body,
@@ -844,26 +778,19 @@ export default {
             headers
           }
         );
-
       }
 
 
       /*
-      =========================
-      PROTECT ADMIN API
-      =========================
+      ========================================
+      PROTECT ADMIN ROUTES
+      ========================================
       */
 
       if (
-        path.startsWith(
-          "/api/admin/"
-        ) &&
-        !isAdmin(
-          request,
-          env
-        )
+        path.startsWith("/api/admin/") &&
+        !isAdmin(request, env)
       ) {
-
         return json(
           {
             ok: false,
@@ -872,54 +799,50 @@ export default {
           },
           401
         );
-
       }
 
 
       /*
-      =========================
+      ========================================
       ADMIN STATS
-      =========================
+      ========================================
       */
 
       if (
         method === "GET" &&
         path === "/api/admin/stats"
       ) {
+        const row = await env.DB.prepare(
+          `
+          SELECT
 
-        const row =
-          await env.DB.prepare(`
-            SELECT
+            (
+              SELECT COUNT(*)
+              FROM comics
+            ) AS comics,
 
-              (
-                SELECT COUNT(*)
-                FROM comics
-              ) AS comics,
+            (
+              SELECT COUNT(*)
+              FROM chapters
+            ) AS chapters,
 
-              (
-                SELECT COUNT(*)
-                FROM chapters
-              ) AS chapters,
+            (
+              SELECT COUNT(*)
+              FROM pages
+            ) AS pages,
 
-              (
-                SELECT COUNT(*)
-                FROM pages
-              ) AS pages,
-
-              (
-                SELECT
-                  COALESCE(
-                    SUM(views),
-                    0
-                  )
-                FROM comics
-              ) AS views
-          `)
-          .first();
-
+            (
+              SELECT
+                COALESCE(
+                  SUM(views),
+                  0
+                )
+              FROM comics
+            ) AS views
+          `
+        ).first();
 
         return json({
-
           ok: true,
 
           stats:
@@ -929,57 +852,45 @@ export default {
               pages: 0,
               views: 0
             }
-
         });
-
       }
 
 
       /*
-      =========================
-      ADMIN COMICS LIST
-      =========================
+      ========================================
+      ADMIN COMICS
+      ========================================
       */
 
       if (
         method === "GET" &&
         path === "/api/admin/comics"
       ) {
-
-        return adminComics(
-          env
-        );
-
+        return adminComics(env);
       }
 
 
       /*
-      =========================
+      ========================================
       CREATE COMIC
-      =========================
+      ========================================
       */
 
       if (
         method === "POST" &&
         path === "/api/admin/comics"
       ) {
-
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         const title =
           String(
             body.title || ""
           ).trim();
 
-
         if (!title) {
-
           return json(
             {
               ok: false,
@@ -988,9 +899,7 @@ export default {
             },
             400
           );
-
         }
-
 
         const slug =
           slugify(
@@ -998,9 +907,7 @@ export default {
             title
           );
 
-
         if (!slug) {
-
           return json(
             {
               ok: false,
@@ -1009,94 +916,77 @@ export default {
             },
             400
           );
-
         }
 
-
         try {
-
-          const result =
-            await env.DB.prepare(`
-              INSERT INTO comics (
-                slug,
-                title,
-                description,
-                genre,
-                author,
-                status,
-                is_published,
-                created_at,
-                updated_at
-              )
-
-              VALUES (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                CURRENT_TIMESTAMP,
-                CURRENT_TIMESTAMP
-              )
-            `)
-            .bind(
-
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO comics (
               slug,
-
               title,
+              description,
+              genre,
+              author,
+              status,
+              is_published,
+              created_at,
+              updated_at
+            )
 
+            VALUES (
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
+            .bind(
+              slug,
+              title,
               String(
                 body.description || ""
               ),
-
               String(
                 body.genre || ""
               ),
-
               String(
                 body.author || ""
               ),
-
               String(
                 body.status ||
                 "En emisión"
               ),
-
               toBool(
                 body.is_published
               )
                 ? 1
                 : 0
-
             )
             .run();
-
 
           return json(
             {
               ok: true,
-
               id:
-                result.meta
-                  .last_row_id,
-
+                result.meta.last_row_id,
               slug
             },
             201
           );
-
         }
 
         catch(error) {
-
           if (
             String(error)
               .toLowerCase()
               .includes("unique")
           ) {
-
             return json(
               {
                 ok: false,
@@ -1105,21 +995,17 @@ export default {
               },
               409
             );
-
           }
 
-
           throw error;
-
         }
-
       }
 
 
       /*
-      =========================
+      ========================================
       UPDATE / DELETE COMIC
-      =========================
+      ========================================
       */
 
       const adminComicMatch =
@@ -1127,34 +1013,26 @@ export default {
           /^\/api\/admin\/comics\/(\d+)$/
         );
 
-
       if (
         adminComicMatch &&
         method === "PUT"
       ) {
-
         const id =
           Number(
             adminComicMatch[1]
           );
 
-
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         const title =
           String(
             body.title || ""
           ).trim();
 
-
         if (!title) {
-
           return json(
             {
               ok: false,
@@ -1163,9 +1041,7 @@ export default {
             },
             400
           );
-
         }
-
 
         const slug =
           slugify(
@@ -1173,10 +1049,9 @@ export default {
             title
           );
 
-
         try {
-
-          await env.DB.prepare(`
+          await env.DB.prepare(
+            `
             UPDATE comics
 
             SET
@@ -1191,58 +1066,46 @@ export default {
 
             WHERE
               id = ?
-          `)
-          .bind(
-
-            slug,
-
-            title,
-
-            String(
-              body.description || ""
-            ),
-
-            String(
-              body.genre || ""
-            ),
-
-            String(
-              body.author || ""
-            ),
-
-            String(
-              body.status ||
-              "En emisión"
-            ),
-
-            toBool(
-              body.is_published
-            )
-              ? 1
-              : 0,
-
-            id
-
+            `
           )
-          .run();
-
+            .bind(
+              slug,
+              title,
+              String(
+                body.description || ""
+              ),
+              String(
+                body.genre || ""
+              ),
+              String(
+                body.author || ""
+              ),
+              String(
+                body.status ||
+                "En emisión"
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0,
+              id
+            )
+            .run();
 
           return json({
             ok: true,
             id,
             slug
           });
-
         }
 
         catch(error) {
-
           if (
             String(error)
               .toLowerCase()
               .includes("unique")
           ) {
-
             return json(
               {
                 ok: false,
@@ -1251,52 +1114,45 @@ export default {
               },
               409
             );
-
           }
 
-
           throw error;
-
         }
-
       }
-
 
       if (
         adminComicMatch &&
         method === "DELETE"
       ) {
-
         const id =
           Number(
             adminComicMatch[1]
           );
-
 
         await deleteComicMedia(
           env,
           id
         );
 
-
         await env.DB.prepare(
-          "DELETE FROM comics WHERE id = ?"
+          `
+          DELETE FROM comics
+          WHERE id = ?
+          `
         )
-        .bind(id)
-        .run();
-
+          .bind(id)
+          .run();
 
         return json({
           ok: true
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       COVER
-      =========================
+      ========================================
       */
 
       const coverMatch =
@@ -1304,30 +1160,30 @@ export default {
           /^\/api\/admin\/comics\/(\d+)\/cover$/
         );
 
-
       if (
         coverMatch &&
         method === "POST"
       ) {
-
         const comicId =
           Number(
             coverMatch[1]
           );
 
+        const comic = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            cover_key
 
-        const comic =
-          await env.DB.prepare(
-            "SELECT id, cover_key FROM comics WHERE id = ?"
-          )
-          .bind(
-            comicId
-          )
+          FROM comics
+
+          WHERE id = ?
+          `
+        )
+          .bind(comicId)
           .first();
 
-
         if (!comic) {
-
           return json(
             {
               ok: false,
@@ -1336,25 +1192,18 @@ export default {
             },
             404
           );
-
         }
-
 
         const form =
           await request.formData();
 
-
         const file =
-          form.get(
-            "cover"
-          );
-
+          form.get("cover");
 
         if (
           !file ||
           typeof file === "string"
         ) {
-
           return json(
             {
               ok: false,
@@ -1363,13 +1212,10 @@ export default {
             },
             400
           );
-
         }
-
 
         const key =
           `covers/${comicId}/${crypto.randomUUID()}-${safeName(file.name)}`;
-
 
         await env.MEDIA.put(
           key,
@@ -1383,45 +1229,42 @@ export default {
           }
         );
 
-
         if (
           comic.cover_key &&
           comic.cover_key !== key
         ) {
-
           await env.MEDIA.delete(
             comic.cover_key
           );
-
         }
 
-
         await env.DB.prepare(
-          "UPDATE comics SET cover_key = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+          `
+          UPDATE comics
+          SET
+            cover_key = ?,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+          `
         )
-        .bind(
-          key,
-          comicId
-        )
-        .run();
-
+          .bind(
+            key,
+            comicId
+          )
+          .run();
 
         return json({
-
           ok: true,
-
           cover_url:
             `/media/${key}`
-
         });
-
       }
 
 
       /*
-      =========================
-      COMIC CHAPTERS
-      =========================
+      ========================================
+      ADMIN COMIC CHAPTERS
+      ========================================
       */
 
       const comicChaptersMatch =
@@ -1429,88 +1272,70 @@ export default {
           /^\/api\/admin\/comics\/(\d+)\/chapters$/
         );
 
-
       if (
         comicChaptersMatch &&
         method === "GET"
       ) {
-
         const comicId =
           Number(
             comicChaptersMatch[1]
           );
 
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
 
-        const rows =
-          await env.DB.prepare(`
-            SELECT
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
 
-              ch.*,
+          FROM chapters ch
 
-              (
-                SELECT COUNT(*)
-                FROM pages p
-                WHERE p.chapter_id = ch.id
-              ) AS page_count
+          WHERE
+            ch.comic_id = ?
 
-            FROM chapters ch
-
-            WHERE
-              ch.comic_id = ?
-
-            ORDER BY
-              ch.chapter_number ASC,
-              ch.id ASC
-          `)
-          .bind(
-            comicId
-          )
+          ORDER BY
+            ch.chapter_number ASC,
+            ch.id ASC
+          `
+        )
+          .bind(comicId)
           .all();
 
-
         return json({
-
           ok: true,
-
           chapters:
             rows.results || []
-
         });
-
       }
-
 
       if (
         comicChaptersMatch &&
         method === "POST"
       ) {
-
         const comicId =
           Number(
             comicChaptersMatch[1]
           );
 
-
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         const chapterNumber =
           Number(
             body.chapter_number
           );
 
-
         if (
           !Number.isFinite(
             chapterNumber
           )
         ) {
-
           return json(
             {
               ok: false,
@@ -1519,78 +1344,65 @@ export default {
             },
             400
           );
-
         }
 
-
         try {
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO chapters (
+              comic_id,
+              chapter_number,
+              title,
+              is_published,
+              created_at,
+              updated_at
+            )
 
-          const result =
-            await env.DB.prepare(`
-              INSERT INTO chapters (
-                comic_id,
-                chapter_number,
-                title,
-                is_published,
-                created_at,
-                updated_at
-              )
-
-              VALUES (
-                ?,
-                ?,
-                ?,
-                ?,
-                CURRENT_TIMESTAMP,
-                CURRENT_TIMESTAMP
-              )
-            `)
+            VALUES (
+              ?,
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
             .bind(
-
               comicId,
-
               chapterNumber,
-
               String(
                 body.title || ""
               ),
-
               toBool(
                 body.is_published
               )
                 ? 1
                 : 0
-
             )
             .run();
-
 
           await touchComic(
             env,
             comicId
           );
 
-
           return json(
             {
               ok: true,
               id:
-                result.meta
-                  .last_row_id
+                result.meta.last_row_id
             },
             201
           );
-
         }
 
         catch(error) {
-
           if (
             String(error)
               .toLowerCase()
               .includes("unique")
           ) {
-
             return json(
               {
                 ok: false,
@@ -1599,21 +1411,17 @@ export default {
               },
               409
             );
-
           }
 
-
           throw error;
-
         }
-
       }
 
 
       /*
-      =========================
+      ========================================
       UPDATE / DELETE CHAPTER
-      =========================
+      ========================================
       */
 
       const adminChapterMatch =
@@ -1621,28 +1429,26 @@ export default {
           /^\/api\/admin\/chapters\/(\d+)$/
         );
 
-
       if (
         adminChapterMatch &&
         method === "PUT"
       ) {
-
         const id =
           Number(
             adminChapterMatch[1]
           );
 
-
-        const old =
-          await env.DB.prepare(
-            "SELECT comic_id FROM chapters WHERE id = ?"
-          )
+        const old = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
           .bind(id)
           .first();
 
-
         if (!old) {
-
           return json(
             {
               ok: false,
@@ -1651,30 +1457,23 @@ export default {
             },
             404
           );
-
         }
-
 
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         const chapterNumber =
           Number(
             body.chapter_number
           );
 
-
         if (
           !Number.isFinite(
             chapterNumber
           )
         ) {
-
           return json(
             {
               ok: false,
@@ -1683,13 +1482,11 @@ export default {
             },
             400
           );
-
         }
 
-
         try {
-
-          await env.DB.prepare(`
+          await env.DB.prepare(
+            `
             UPDATE chapters
 
             SET
@@ -1700,47 +1497,38 @@ export default {
 
             WHERE
               id = ?
-          `)
-          .bind(
-
-            chapterNumber,
-
-            String(
-              body.title || ""
-            ),
-
-            toBool(
-              body.is_published
-            )
-              ? 1
-              : 0,
-
-            id
-
+            `
           )
-          .run();
-
+            .bind(
+              chapterNumber,
+              String(
+                body.title || ""
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0,
+              id
+            )
+            .run();
 
           await touchComic(
             env,
             old.comic_id
           );
 
-
           return json({
             ok: true
           });
-
         }
 
         catch(error) {
-
           if (
             String(error)
               .toLowerCase()
               .includes("unique")
           ) {
-
             return json(
               {
                 ok: false,
@@ -1749,38 +1537,32 @@ export default {
               },
               409
             );
-
           }
 
-
           throw error;
-
         }
-
       }
-
 
       if (
         adminChapterMatch &&
         method === "DELETE"
       ) {
-
         const id =
           Number(
             adminChapterMatch[1]
           );
 
-
-        const chapter =
-          await env.DB.prepare(
-            "SELECT comic_id FROM chapters WHERE id = ?"
-          )
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
           .bind(id)
           .first();
 
-
         if (!chapter) {
-
           return json(
             {
               ok: false,
@@ -1789,62 +1571,56 @@ export default {
             },
             404
           );
-
         }
 
-
-        const pages =
-          await env.DB.prepare(
-            "SELECT object_key FROM pages WHERE chapter_id = ?"
-          )
+        const pages = await env.DB.prepare(
+          `
+          SELECT object_key
+          FROM pages
+          WHERE chapter_id = ?
+          `
+        )
           .bind(id)
           .all();
 
-
         const keys =
-          (
-            pages.results || []
-          )
-          .map(
-            row =>
-              row.object_key
-          )
-          .filter(Boolean);
-
+          (pages.results || [])
+            .map(
+              row =>
+                row.object_key
+            )
+            .filter(Boolean);
 
         if (keys.length) {
-
           await env.MEDIA.delete(
             keys
           );
-
         }
 
-
         await env.DB.prepare(
-          "DELETE FROM chapters WHERE id = ?"
+          `
+          DELETE FROM chapters
+          WHERE id = ?
+          `
         )
-        .bind(id)
-        .run();
-
+          .bind(id)
+          .run();
 
         await touchComic(
           env,
           chapter.comic_id
         );
 
-
         return json({
           ok: true
         });
-
       }
 
 
       /*
-      =========================
-      ADMIN PAGES
-      =========================
+      ========================================
+      ADMIN CHAPTER PAGES
+      ========================================
       */
 
       const adminChapterPagesMatch =
@@ -1852,83 +1628,64 @@ export default {
           /^\/api\/admin\/chapters\/(\d+)\/pages$/
         );
 
-
       if (
         adminChapterPagesMatch &&
         method === "GET"
       ) {
-
         const chapterId =
           Number(
             adminChapterPagesMatch[1]
           );
 
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            chapter_id,
+            page_number,
+            object_key,
+            '/media/' || object_key AS url
 
-        const rows =
-          await env.DB.prepare(`
-            SELECT
+          FROM pages
 
-              id,
+          WHERE
+            chapter_id = ?
 
-              chapter_id,
-
-              page_number,
-
-              object_key,
-
-              '/media/' || object_key
-                AS url
-
-            FROM pages
-
-            WHERE
-              chapter_id = ?
-
-            ORDER BY
-              page_number ASC,
-              id ASC
-          `)
-          .bind(
-            chapterId
-          )
+          ORDER BY
+            page_number ASC,
+            id ASC
+          `
+        )
+          .bind(chapterId)
           .all();
 
-
         return json({
-
           ok: true,
-
           pages:
             rows.results || []
-
         });
-
       }
-
 
       if (
         adminChapterPagesMatch &&
         method === "POST"
       ) {
-
         const chapterId =
           Number(
             adminChapterPagesMatch[1]
           );
 
-
-        const chapter =
-          await env.DB.prepare(
-            "SELECT comic_id FROM chapters WHERE id = ?"
-          )
-          .bind(
-            chapterId
-          )
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(chapterId)
           .first();
 
-
         if (!chapter) {
-
           return json(
             {
               ok: false,
@@ -1937,27 +1694,20 @@ export default {
             },
             404
           );
-
         }
-
 
         const form =
           await request.formData();
 
-
         const files =
-          form.getAll(
-            "pages"
-          )
-          .filter(
-            file =>
-              file &&
-              typeof file !== "string"
-          );
-
+          form.getAll("pages")
+            .filter(
+              file =>
+                file &&
+                typeof file !== "string"
+            );
 
         if (!files.length) {
-
           return json(
             {
               ok: false,
@@ -1966,39 +1716,37 @@ export default {
             },
             400
           );
-
         }
 
+        const maxRow = await env.DB.prepare(
+          `
+          SELECT
+            COALESCE(
+              MAX(page_number),
+              0
+            ) AS max_page
 
-        const maxRow =
-          await env.DB.prepare(
-            "SELECT COALESCE(MAX(page_number), 0) AS max_page FROM pages WHERE chapter_id = ?"
-          )
-          .bind(
-            chapterId
-          )
+          FROM pages
+
+          WHERE
+            chapter_id = ?
+          `
+        )
+          .bind(chapterId)
           .first();
-
 
         let pageNumber =
           Number(
             maxRow?.max_page || 0
           );
 
-
         const uploaded = [];
 
-
-        for (
-          const file of files
-        ) {
-
+        for (const file of files) {
           pageNumber += 1;
-
 
           const key =
             `comics/${chapter.comic_id}/chapters/${chapterId}/${crypto.randomUUID()}-${safeName(file.name)}`;
-
 
           await env.MEDIA.put(
             key,
@@ -2012,23 +1760,23 @@ export default {
             }
           );
 
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO pages (
+              chapter_id,
+              page_number,
+              object_key,
+              created_at
+            )
 
-          const result =
-            await env.DB.prepare(`
-              INSERT INTO pages (
-                chapter_id,
-                page_number,
-                object_key,
-                created_at
-              )
-
-              VALUES (
-                ?,
-                ?,
-                ?,
-                CURRENT_TIMESTAMP
-              )
-            `)
+            VALUES (
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
             .bind(
               chapterId,
               pageNumber,
@@ -2036,35 +1784,27 @@ export default {
             )
             .run();
 
-
           uploaded.push({
-
             id:
-              result.meta
-                .last_row_id,
+              result.meta.last_row_id,
 
             page_number:
               pageNumber,
 
             url:
               `/media/${key}`
-
           });
-
         }
-
 
         await touchChapter(
           env,
           chapterId
         );
 
-
         await touchComic(
           env,
           chapter.comic_id
         );
-
 
         return json(
           {
@@ -2073,14 +1813,13 @@ export default {
           },
           201
         );
-
       }
 
 
       /*
-      =========================
+      ========================================
       REORDER PAGES
-      =========================
+      ========================================
       */
 
       const reorderMatch =
@@ -2088,25 +1827,19 @@ export default {
           /^\/api\/admin\/chapters\/(\d+)\/pages\/reorder$/
         );
 
-
       if (
         reorderMatch &&
         method === "POST"
       ) {
-
         const chapterId =
           Number(
             reorderMatch[1]
           );
 
-
         const body =
           await request
             .json()
-            .catch(
-              () => ({})
-            );
-
+            .catch(() => ({}));
 
         const ids =
           Array.isArray(
@@ -2119,46 +1852,44 @@ export default {
                 )
             : [];
 
-
-        const current =
-          await env.DB.prepare(
-            "SELECT id FROM pages WHERE chapter_id = ? ORDER BY page_number ASC"
-          )
-          .bind(
-            chapterId
-          )
+        const current = await env.DB.prepare(
+          `
+          SELECT id
+          FROM pages
+          WHERE chapter_id = ?
+          ORDER BY page_number ASC
+          `
+        )
+          .bind(chapterId)
           .all();
 
-
         const currentIds =
-          (
-            current.results || []
-          )
-          .map(
-            row =>
-              Number(row.id)
-          );
+          (current.results || [])
+            .map(
+              row =>
+                Number(row.id)
+            );
 
-
-        if (
-          ids.length !==
-          currentIds.length ||
-
+        const requestedSorted =
           [...ids]
             .sort(
-              (a,b) =>
+              (a, b) =>
                 a - b
             )
-            .join(",")
-          !==
+            .join(",");
+
+        const currentSorted =
           [...currentIds]
             .sort(
-              (a,b) =>
+              (a, b) =>
                 a - b
             )
-            .join(",")
-        ) {
+            .join(",");
 
+        if (
+          ids.length !== currentIds.length ||
+          requestedSorted !== currentSorted
+        ) {
           return json(
             {
               ok: false,
@@ -2167,85 +1898,82 @@ export default {
             },
             400
           );
-
         }
-
 
         for (
           let i = 0;
           i < ids.length;
           i++
         ) {
-
           await env.DB.prepare(
-            "UPDATE pages SET page_number = ? WHERE id = ? AND chapter_id = ?"
+            `
+            UPDATE pages
+            SET page_number = ?
+            WHERE id = ?
+            AND chapter_id = ?
+            `
           )
-          .bind(
-            -(i + 1),
-            ids[i],
-            chapterId
-          )
-          .run();
-
+            .bind(
+              -(i + 1),
+              ids[i],
+              chapterId
+            )
+            .run();
         }
-
 
         for (
           let i = 0;
           i < ids.length;
           i++
         ) {
-
           await env.DB.prepare(
-            "UPDATE pages SET page_number = ? WHERE id = ? AND chapter_id = ?"
+            `
+            UPDATE pages
+            SET page_number = ?
+            WHERE id = ?
+            AND chapter_id = ?
+            `
           )
-          .bind(
-            i + 1,
-            ids[i],
-            chapterId
-          )
-          .run();
-
+            .bind(
+              i + 1,
+              ids[i],
+              chapterId
+            )
+            .run();
         }
 
-
-        const chapter =
-          await env.DB.prepare(
-            "SELECT comic_id FROM chapters WHERE id = ?"
-          )
-          .bind(
-            chapterId
-          )
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(chapterId)
           .first();
-
 
         await touchChapter(
           env,
           chapterId
         );
 
-
         if (chapter) {
-
           await touchComic(
             env,
             chapter.comic_id
           );
-
         }
-
 
         return json({
           ok: true
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       DELETE PAGE
-      =========================
+      ========================================
       */
 
       const pageDeleteMatch =
@@ -2253,42 +1981,35 @@ export default {
           /^\/api\/admin\/pages\/(\d+)$/
         );
 
-
       if (
         pageDeleteMatch &&
         method === "DELETE"
       ) {
-
         const id =
           Number(
             pageDeleteMatch[1]
           );
 
+        const page = await env.DB.prepare(
+          `
+          SELECT
+            p.object_key,
+            p.chapter_id,
+            ch.comic_id
 
-        const page =
-          await env.DB.prepare(`
-            SELECT
+          FROM pages p
 
-              p.object_key,
+          JOIN chapters ch
+            ON ch.id = p.chapter_id
 
-              p.chapter_id,
-
-              ch.comic_id
-
-            FROM pages p
-
-            JOIN chapters ch
-              ON ch.id = p.chapter_id
-
-            WHERE
-              p.id = ?
-          `)
+          WHERE
+            p.id = ?
+          `
+        )
           .bind(id)
           .first();
 
-
         if (!page) {
-
           return json(
             {
               ok: false,
@@ -2297,63 +2018,53 @@ export default {
             },
             404
           );
-
         }
 
-
         if (page.object_key) {
-
           await env.MEDIA.delete(
             page.object_key
           );
-
         }
 
-
         await env.DB.prepare(
-          "DELETE FROM pages WHERE id = ?"
+          `
+          DELETE FROM pages
+          WHERE id = ?
+          `
         )
-        .bind(id)
-        .run();
-
+          .bind(id)
+          .run();
 
         await renumberPages(
           env,
           page.chapter_id
         );
 
-
         await touchChapter(
           env,
           page.chapter_id
         );
-
 
         await touchComic(
           env,
           page.comic_id
         );
 
-
         return json({
           ok: true
         });
-
       }
 
 
       /*
-      =========================
+      ========================================
       UNKNOWN API
-      =========================
+      ========================================
       */
 
       if (
-        path.startsWith(
-          "/api/"
-        )
+        path.startsWith("/api/")
       ) {
-
         return json(
           {
             ok: false,
@@ -2362,14 +2073,13 @@ export default {
           },
           404
         );
-
       }
 
 
       /*
-      =========================
+      ========================================
       STATIC SITE
-      =========================
+      ========================================
       */
 
       return env.ASSETS.fetch(
@@ -2379,11 +2089,10 @@ export default {
     }
 
     catch(error) {
-
       console.error(
+        "NightInk Worker error:",
         error
       );
-
 
       return json(
         {
@@ -2393,9 +2102,8 @@ export default {
         },
         500
       );
-
     }
-
   }
-
 };
+
+// deploy refresh 2026-08-21

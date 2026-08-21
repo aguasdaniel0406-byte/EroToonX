@@ -24,6 +24,7 @@
   --accent2:#ef476f;
   --danger:#d94b62;
   --green:#2cb67d;
+  --warning:#f1ad45;
 }
 
 *{
@@ -67,7 +68,118 @@ button{
 }
 
 
-/* TOP */
+/* =========================
+   AGE GATE
+========================= */
+
+.age-gate{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:
+    radial-gradient(
+      circle at 50% 25%,
+      rgba(124,77,255,.18),
+      transparent 35%
+    ),
+    #090a0d;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.age-gate.open{
+  display:flex;
+}
+
+.age-card{
+  width:min(500px,100%);
+  background:#181a21;
+  border:1px solid #373b48;
+  border-radius:18px;
+  padding:34px 30px;
+  text-align:center;
+  box-shadow:0 30px 100px rgba(0,0,0,.55);
+}
+
+.age-logo{
+  width:72px;
+  height:72px;
+  margin:0 auto 20px;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
+  font-size:22px;
+  font-weight:900;
+  box-shadow:0 14px 35px rgba(124,77,255,.24);
+}
+
+.age-card h1{
+  margin:0 0 12px;
+  font-size:30px;
+}
+
+.age-card p{
+  color:var(--muted);
+  line-height:1.65;
+  margin:0 auto 22px;
+  max-width:410px;
+}
+
+.age-warning{
+  margin:18px 0;
+  padding:12px;
+  border-radius:9px;
+  border:1px solid #3a3f4d;
+  background:#20232b;
+  color:#d8dbe1;
+  font-size:12px;
+  line-height:1.55;
+}
+
+.age-actions{
+  display:grid;
+  gap:9px;
+}
+
+.age-enter{
+  min-height:48px;
+  border:0;
+  border-radius:10px;
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
+  color:white;
+  font-weight:800;
+}
+
+.age-exit{
+  min-height:44px;
+  border:1px solid #3b404d;
+  border-radius:10px;
+  background:#252832;
+  color:#d9dce2;
+}
+
+.age-note{
+  color:#737987;
+  font-size:10px;
+  margin-top:17px;
+  line-height:1.5;
+}
+
+
+/* =========================
+   TOP
+========================= */
 
 .topline{
   background:#090a0d;
@@ -85,7 +197,9 @@ button{
 }
 
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 header{
   position:sticky;
@@ -118,7 +232,11 @@ header{
   display:grid;
   place-items:center;
   border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
   font-size:14px;
 }
 
@@ -162,20 +280,28 @@ header{
   border:0;
   border-radius:9px;
   padding:0 14px;
-  background:linear-gradient(135deg,var(--accent),#5d35c8);
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    #5d35c8
+  );
   color:white;
   font-weight:700;
 }
 
 
-/* MAIN */
+/* =========================
+   MAIN
+========================= */
 
 main{
   padding:18px 0 45px;
 }
 
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero{
   display:grid;
@@ -267,22 +393,40 @@ main{
 }
 
 .mini-cover:nth-child(1){
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background:linear-gradient(
+    150deg,
+    #4b3ca6,
+    #211a4d 60%,
+    #11101a
+  );
 }
 
 .mini-cover:nth-child(2){
-  background:linear-gradient(150deg,#9d355e,#401527 60%,#160c12);
+  background:linear-gradient(
+    150deg,
+    #9d355e,
+    #401527 60%,
+    #160c12
+  );
 }
 
 .mini-cover:nth-child(3){
-  background:linear-gradient(150deg,#3e6175,#172b37 60%,#0c151b);
+  background:linear-gradient(
+    150deg,
+    #3e6175,
+    #172b37 60%,
+    #0c151b
+  );
 }
 
 .mini-cover:after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.88));
+  background:linear-gradient(
+    transparent 35%,
+    rgba(0,0,0,.88)
+  );
 }
 
 .mini-cover span{
@@ -292,7 +436,9 @@ main{
 }
 
 
-/* LAYOUT */
+/* =========================
+   LAYOUT
+========================= */
 
 .layout{
   display:grid;
@@ -347,7 +493,9 @@ main{
 }
 
 
-/* POPULAR */
+/* =========================
+   POPULAR
+========================= */
 
 .popular-list{
   display:grid;
@@ -397,7 +545,9 @@ main{
 }
 
 
-/* SECTION */
+/* =========================
+   SECTION
+========================= */
 
 .section{
   padding:14px;
@@ -429,11 +579,16 @@ main{
 }
 
 
-/* COMICS */
+/* =========================
+   COMICS
+========================= */
 
 .comic-grid{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(
+    5,
+    minmax(0,1fr)
+  );
   gap:12px;
 }
 
@@ -458,7 +613,12 @@ main{
   display:flex;
   align-items:flex-end;
   padding:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background:linear-gradient(
+    150deg,
+    #4b3ca6,
+    #211a4d 60%,
+    #11101a
+  );
   background-size:cover;
   background-position:center;
 }
@@ -467,7 +627,10 @@ main{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.9));
+  background:linear-gradient(
+    transparent 35%,
+    rgba(0,0,0,.9)
+  );
 }
 
 .cover-title{
@@ -518,7 +681,9 @@ main{
 }
 
 
-/* PAGINATION */
+/* =========================
+   PAGINATION
+========================= */
 
 .pagination{
   display:flex;
@@ -550,7 +715,9 @@ main{
 }
 
 
-/* UPDATES */
+/* =========================
+   UPDATES
+========================= */
 
 .updates-list{
   display:grid;
@@ -603,7 +770,9 @@ main{
 }
 
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
 
 .btn{
   border:0;
@@ -613,7 +782,11 @@ main{
 }
 
 .btn.primary{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
   color:white;
 }
 
@@ -635,7 +808,9 @@ main{
 }
 
 
-/* ADMIN */
+/* =========================
+   ADMIN
+========================= */
 
 .admin-shell{
   display:none;
@@ -685,23 +860,35 @@ main{
 
 .admin-list{
   display:grid;
-  gap:8px;
+  gap:10px;
 }
 
 .admin-row{
   display:grid;
-  grid-template-columns:55px 1fr auto;
+  grid-template-columns:65px 1fr auto;
   align-items:center;
-  gap:10px;
-  padding:10px;
+  gap:12px;
+  padding:12px;
   background:#20232b;
   border:1px solid #323744;
-  border-radius:9px;
+  border-radius:10px;
+}
+
+.admin-row.ready{
+  border-color:rgba(44,182,125,.5);
+}
+
+.admin-row.warning{
+  border-color:rgba(241,173,69,.45);
+}
+
+.admin-row.draft{
+  opacity:.78;
 }
 
 .admin-cover{
-  width:55px;
-  height:72px;
+  width:65px;
+  height:86px;
   border-radius:7px;
   background:#15171c;
   background-size:cover;
@@ -711,8 +898,61 @@ main{
 
 .admin-row small{
   display:block;
-  margin-top:4px;
+  margin-top:5px;
   color:var(--muted);
+}
+
+.admin-title-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.readiness{
+  margin-top:8px;
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.ready-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 9px;
+  border-radius:7px;
+  font-size:10px;
+  font-weight:800;
+}
+
+.ready-badge.ok{
+  background:rgba(44,182,125,.14);
+  border:1px solid rgba(44,182,125,.45);
+  color:#78e5b4;
+}
+
+.ready-badge.warn{
+  background:rgba(241,173,69,.13);
+  border:1px solid rgba(241,173,69,.42);
+  color:#ffc86d;
+}
+
+.ready-badge.draft{
+  background:#282c35;
+  border:1px solid #404552;
+  color:#b5bac5;
+}
+
+.ready-badge.loading{
+  background:#242735;
+  border:1px solid #383d49;
+  color:#a9afbb;
+}
+
+.readiness-detail{
+  color:#8f96a4;
+  font-size:10px;
 }
 
 .row-actions{
@@ -731,7 +971,9 @@ main{
 }
 
 
-/* FORMS / MODALS */
+/* =========================
+   MODALS
+========================= */
 
 .modal{
   display:none;
@@ -835,7 +1077,9 @@ main{
 }
 
 
-/* CHAPTERS */
+/* =========================
+   CHAPTERS
+========================= */
 
 .chapters-list{
   display:grid;
@@ -867,7 +1111,9 @@ main{
 }
 
 
-/* PAGE MANAGER */
+/* =========================
+   PAGE MANAGER
+========================= */
 
 .page-manager-info{
   padding:10px 12px;
@@ -940,7 +1186,9 @@ main{
 }
 
 
-/* INFO */
+/* =========================
+   INFO
+========================= */
 
 .detail{
   display:grid;
@@ -951,7 +1199,12 @@ main{
 .detail-cover{
   aspect-ratio:3/4;
   border-radius:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d,#11101a);
+  background:linear-gradient(
+    150deg,
+    #4b3ca6,
+    #211a4d,
+    #11101a
+  );
   background-size:cover;
   background-position:center;
 }
@@ -1052,7 +1305,9 @@ main{
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:1100px){
 
@@ -1139,7 +1394,12 @@ main{
   }
 
   .admin-row{
-    grid-template-columns:45px 1fr;
+    grid-template-columns:52px 1fr;
+  }
+
+  .admin-cover{
+    width:52px;
+    height:70px;
   }
 
   .admin-row .row-actions{
@@ -1179,6 +1439,14 @@ main{
     order:-1;
   }
 
+  .age-card{
+    padding:28px 20px;
+  }
+
+  .age-card h1{
+    font-size:25px;
+  }
+
 }
 </style>
 </head>
@@ -1186,7 +1454,67 @@ main{
 <body>
 
 
+<!-- =========================
+     +18 AGE GATE
+========================= -->
+
+<div
+  id="ageGate"
+  class="age-gate"
+>
+
+  <div class="age-card">
+
+    <div class="age-logo">
+      18+
+    </div>
+
+    <h1>
+      Contenido para adultos
+    </h1>
+
+    <p>
+      NightInk contiene material destinado únicamente
+      a personas mayores de edad.
+    </p>
+
+    <div class="age-warning">
+      Al continuar confirmas que tienes al menos
+      18 años o la edad legal requerida en tu ubicación
+      para acceder a contenido para adultos.
+    </div>
+
+    <div class="age-actions">
+
+      <button
+        id="ageEnter"
+        class="age-enter"
+      >
+        Tengo 18 años o más
+      </button>
+
+      <button
+        id="ageExit"
+        class="age-exit"
+      >
+        Salir
+      </button>
+
+    </div>
+
+    <div class="age-note">
+      NightInk recuerda esta confirmación únicamente
+      en este navegador.
+    </div>
+
+  </div>
+
+</div>
+
+
+
 <div class="topline">
+
   <div class="wrap">
 
     <div>
@@ -1198,7 +1526,9 @@ main{
     </div>
 
   </div>
+
 </div>
+
 
 
 <header>
@@ -1289,10 +1619,21 @@ main{
 
     <div class="hero-tags">
 
-      <span class="pill">+18</span>
-      <span class="pill">One-shots</span>
-      <span class="pill">Series</span>
-      <span class="pill">Actualizaciones</span>
+      <span class="pill">
+        +18
+      </span>
+
+      <span class="pill">
+        One-shots
+      </span>
+
+      <span class="pill">
+        Series
+      </span>
+
+      <span class="pill">
+        Actualizaciones
+      </span>
 
     </div>
 
@@ -1302,15 +1643,21 @@ main{
   <div class="hero-side">
 
     <div class="mini-cover">
-      <span>NightInk</span>
+      <span>
+        NightInk
+      </span>
     </div>
 
     <div class="mini-cover">
-      <span>Leer ahora</span>
+      <span>
+        Leer ahora
+      </span>
     </div>
 
     <div class="mini-cover">
-      <span>Nuevas partes</span>
+      <span>
+        Nuevas partes
+      </span>
     </div>
 
   </div>
@@ -1319,7 +1666,9 @@ main{
 
 
 
-<!-- ADMIN -->
+<!-- =========================
+     ADMIN
+========================= -->
 
 <section
   id="adminShell"
@@ -1404,35 +1753,59 @@ main{
 
   <div class="genre-grid">
 
-    <button class="genre-btn active" data-genre="">
+    <button
+      class="genre-btn active"
+      data-genre=""
+    >
       Todos
     </button>
 
-    <button class="genre-btn" data-genre="Romance">
+    <button
+      class="genre-btn"
+      data-genre="Romance"
+    >
       Romance
     </button>
 
-    <button class="genre-btn" data-genre="Fantasía">
+    <button
+      class="genre-btn"
+      data-genre="Fantasía"
+    >
       Fantasía
     </button>
 
-    <button class="genre-btn" data-genre="Drama">
+    <button
+      class="genre-btn"
+      data-genre="Drama"
+    >
       Drama
     </button>
 
-    <button class="genre-btn" data-genre="Misterio">
+    <button
+      class="genre-btn"
+      data-genre="Misterio"
+    >
       Misterio
     </button>
 
-    <button class="genre-btn" data-genre="Thriller">
+    <button
+      class="genre-btn"
+      data-genre="Thriller"
+    >
       Thriller
     </button>
 
-    <button class="genre-btn" data-genre="Acción">
+    <button
+      class="genre-btn"
+      data-genre="Acción"
+    >
       Acción
     </button>
 
-    <button class="genre-btn" data-genre="Otros">
+    <button
+      class="genre-btn"
+      data-genre="Otros"
+    >
       Otros
     </button>
 
@@ -1569,7 +1942,9 @@ main{
 
 
 
-<!-- LOGIN -->
+<!-- =========================
+     LOGIN
+========================= -->
 
 <div
   id="loginModal"
@@ -1584,7 +1959,6 @@ main{
     <h2>
       Administrador
     </h2>
-
 
     <div class="field">
 
@@ -1627,7 +2001,9 @@ main{
 
 
 
-<!-- COMIC FORM -->
+<!-- =========================
+     COMIC FORM
+========================= -->
 
 <div
   id="comicModal"
@@ -1642,7 +2018,6 @@ main{
 
 
     <form id="comicForm">
-
 
       <input
         id="comicId"
@@ -1775,7 +2150,6 @@ main{
 
         </div>
 
-
       </div>
 
 
@@ -1804,7 +2178,6 @@ main{
 
       </div>
 
-
     </form>
 
   </div>
@@ -1813,7 +2186,9 @@ main{
 
 
 
-<!-- PARTS -->
+<!-- =========================
+     PARTS
+========================= -->
 
 <div
   id="chaptersModal"
@@ -1821,7 +2196,6 @@ main{
 >
 
   <div class="panel wide">
-
 
     <div class="section-head">
 
@@ -1840,7 +2214,6 @@ main{
 
 
     <div class="form-grid">
-
 
       <div class="field">
 
@@ -1888,7 +2261,6 @@ main{
 
       </div>
 
-
     </div>
 
 
@@ -1912,14 +2284,15 @@ main{
       class="chapters-list"
     ></div>
 
-
   </div>
 
 </div>
 
 
 
-<!-- EDIT PART -->
+<!-- =========================
+     EDIT PART
+========================= -->
 
 <div
   id="editChapterModal"
@@ -1943,7 +2316,6 @@ main{
 
 
     <div class="form-grid">
-
 
       <div class="field">
 
@@ -1988,7 +2360,6 @@ main{
 
       </div>
 
-
     </div>
 
 
@@ -2022,7 +2393,9 @@ main{
 
 
 
-<!-- PAGE MANAGER -->
+<!-- =========================
+     PAGE MANAGER
+========================= -->
 
 <div
   id="pagesModal"
@@ -2066,7 +2439,9 @@ main{
 
 
 
-<!-- INFO DEL COMIC -->
+<!-- =========================
+     INFO
+========================= -->
 
 <div
   id="detailModal"
@@ -2093,7 +2468,6 @@ main{
 
 
     <div class="detail">
-
 
       <div
         id="detailCover"
@@ -2163,7 +2537,7 @@ main{
 
 
 <!-- =========================
-     DIRECT READER
+     READER
 ========================= -->
 
 <div
@@ -2171,9 +2545,7 @@ main{
   class="reader"
 >
 
-
   <div class="reader-bar">
-
 
     <div class="reader-left">
 
@@ -2227,7 +2599,6 @@ main{
 
     </div>
 
-
   </div>
 
 
@@ -2242,16 +2613,106 @@ main{
     class="reader-bottom-nav"
   ></div>
 
-
 </div>
 
 
 
 <script>
 
-/* =====================================
+/* =========================
+   AGE GATE
+========================= */
+
+const AGE_STORAGE_KEY =
+  "nightink_age_verified";
+
+
+function showAgeGate(){
+
+  const verified =
+    localStorage.getItem(
+      AGE_STORAGE_KEY
+    );
+
+
+  if(
+    verified !== "yes"
+  ){
+
+    document
+      .querySelector("#ageGate")
+      .classList
+      .add("open");
+
+
+    document.body
+      .classList
+      .add("locked");
+
+  }
+
+}
+
+
+document
+  .querySelector("#ageEnter")
+  .addEventListener(
+    "click",
+    () => {
+
+      localStorage.setItem(
+        AGE_STORAGE_KEY,
+        "yes"
+      );
+
+
+      document
+        .querySelector("#ageGate")
+        .classList
+        .remove("open");
+
+
+      document.body
+        .classList
+        .remove("locked");
+
+    }
+  );
+
+
+document
+  .querySelector("#ageExit")
+  .addEventListener(
+    "click",
+    () => {
+
+      if(
+        window.history.length > 1
+      ){
+
+        window.history.back();
+
+      }
+
+      else{
+
+        window.location.replace(
+          "https://www.google.com/"
+        );
+
+      }
+
+    }
+  );
+
+
+showAgeGate();
+
+
+
+/* =========================
    GLOBAL
-===================================== */
+========================= */
 
 const qs = s =>
   document.querySelector(s);
@@ -2303,9 +2764,9 @@ let readerParts = [];
 let currentReaderIndex = -1;
 
 
-/* =====================================
+/* =========================
    HELPERS
-===================================== */
+========================= */
 
 function esc(value = "") {
 
@@ -2347,9 +2808,10 @@ qsa("[data-close]")
 
   btn.addEventListener(
     "click",
-    () => closeModal(
-      btn.dataset.close
-    )
+    () =>
+      closeModal(
+        btn.dataset.close
+      )
   );
 
 });
@@ -2414,9 +2876,9 @@ async function api(
 }
 
 
-/* =====================================
+/* =========================
    ROUTES
-===================================== */
+========================= */
 
 function getRoute() {
 
@@ -2466,8 +2928,8 @@ function setHomeMetadata() {
 
 
   qs("#metaDescription")
-  .content =
-    "NightInk Comics";
+    .content =
+      "NightInk Comics";
 
 }
 
@@ -2480,19 +2942,22 @@ function setComicMetadata(comic) {
 
 
   qs("#metaDescription")
-  .content =
-    comic.description
-    ?
-    comic.description.slice(0,150)
-    :
-    `Lee ${comic.title} en NightInk Comics`;
+    .content =
+      comic.description
+      ?
+      comic.description.slice(
+        0,
+        150
+      )
+      :
+      `Lee ${comic.title} en NightInk Comics`;
 
 }
 
 
-/* =====================================
-   PUBLIC CATALOG
-===================================== */
+/* =========================
+   CATALOG
+========================= */
 
 async function loadCatalog(
   page = 1
@@ -2576,13 +3041,13 @@ async function loadCatalog(
   catch(error) {
 
     qs("#comicGrid")
-    .innerHTML = `
+      .innerHTML = `
 
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-    `;
+      `;
 
   }
 
@@ -2596,12 +3061,12 @@ function renderCatalog() {
 
 
   qs("#catalogTitle")
-  .textContent =
-    sortMode === "popular"
-    ?
-    "Cómics más populares"
-    :
-    "Últimos cómics";
+    .textContent =
+      sortMode === "popular"
+      ?
+      "Cómics más populares"
+      :
+      "Últimos cómics";
 
 
   if (!catalog.length) {
@@ -2621,7 +3086,6 @@ function renderCatalog() {
 
   grid.innerHTML =
     catalog.map(comic => {
-
 
       const parts =
         Number(
@@ -2715,28 +3179,28 @@ function renderCatalog() {
 
 
   qsa("[data-comic]")
-  .forEach(card => {
+    .forEach(card => {
 
-    card.addEventListener(
-      "click",
-      () => {
+      card.addEventListener(
+        "click",
+        () => {
 
-        openComicDirect(
-          card.dataset.comic,
-          true
-        );
+          openComicDirect(
+            card.dataset.comic,
+            true
+          );
 
-      }
-    );
+        }
+      );
 
-  });
+    });
 
 }
 
 
-/* =====================================
+/* =========================
    PAGINATION
-===================================== */
+========================= */
 
 function renderPagination() {
 
@@ -2797,9 +3261,7 @@ function renderPagination() {
       total > 7 &&
       i !== 1 &&
       i !== total &&
-      Math.abs(
-        i - page
-      ) > 2
+      Math.abs(i - page) > 2
     ) {
 
       continue;
@@ -2852,38 +3314,38 @@ function renderPagination() {
 
 
   qsa("[data-page]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+      button.addEventListener(
+        "click",
+        () => {
 
-        const n =
-          Number(
-            button.dataset.page
-          );
+          const n =
+            Number(
+              button.dataset.page
+            );
 
 
-        if (
-          n >= 1 &&
-          n <= total
-        ) {
+          if (
+            n >= 1 &&
+            n <= total
+          ) {
 
-          loadCatalog(n);
+            loadCatalog(n);
+
+          }
 
         }
+      );
 
-      }
-    );
-
-  });
+    });
 
 }
 
 
-/* =====================================
+/* =========================
    POPULAR
-===================================== */
+========================= */
 
 async function loadPopular() {
 
@@ -2900,86 +3362,86 @@ async function loadPopular() {
 
 
     qs("#popularList")
-    .innerHTML =
-      items.length
-      ?
-      items.map(
-        (comic,index) => `
+      .innerHTML =
+        items.length
+        ?
+        items.map(
+          (comic,index) => `
 
-          <div
-            class="popular-item"
-            data-popular="${esc(comic.slug)}"
-          >
+            <div
+              class="popular-item"
+              data-popular="${esc(comic.slug)}"
+            >
 
-            <div class="popular-rank">
-              ${index + 1}
+              <div class="popular-rank">
+                ${index + 1}
+              </div>
+
+              <div>
+
+                <strong>
+                  ${esc(comic.title)}
+                </strong>
+
+                <small>
+                  ${comic.views}
+                  vistas
+                </small>
+
+              </div>
+
             </div>
 
-            <div>
+          `
+        ).join("")
+        :
+        `
 
-              <strong>
-                ${esc(comic.title)}
-              </strong>
-
-              <small>
-                ${comic.views}
-                vistas
-              </small>
-
-            </div>
-
+          <div class="empty">
+            Sin datos.
           </div>
 
-        `
-      ).join("")
-      :
-      `
-
-        <div class="empty">
-          Sin datos.
-        </div>
-
-      `;
+        `;
 
 
     qsa("[data-popular]")
-    .forEach(item => {
+      .forEach(item => {
 
-      item.addEventListener(
-        "click",
-        () => {
+        item.addEventListener(
+          "click",
+          () => {
 
-          openComicDirect(
-            item.dataset.popular,
-            true
-          );
+            openComicDirect(
+              item.dataset.popular,
+              true
+            );
 
-        }
-      );
+          }
+        );
 
-    });
+      });
 
   }
 
   catch(error) {
 
     qs("#popularList")
-    .innerHTML = `
+      .innerHTML = `
 
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-    `;
+      `;
 
   }
 
 }
 
 
-/* =====================================
+/* =========================
    UPDATES
-===================================== */
+========================= */
 
 async function loadUpdates() {
 
@@ -2996,126 +3458,123 @@ async function loadUpdates() {
 
 
     qs("#updatesList")
-    .innerHTML =
-      updates.length
-      ?
-      updates.map(update => {
+      .innerHTML =
+        updates.length
+        ?
+        updates.map(update => {
+
+          const cover =
+            update.cover_url
+            ?
+            `background-image:url('${update.cover_url}')`
+            :
+            "";
 
 
-        const cover =
-          update.cover_url
-          ?
-          `background-image:url('${update.cover_url}')`
-          :
-          "";
-
-
-        return `
-
-          <div
-            class="update-item"
-            data-update-slug="${esc(update.slug)}"
-            data-update-chapter="${update.chapter_id}"
-          >
+          return `
 
             <div
-              class="update-cover"
-              style="${cover}"
-            ></div>
+              class="update-item"
+              data-update-slug="${esc(update.slug)}"
+              data-update-chapter="${update.chapter_id}"
+            >
+
+              <div
+                class="update-cover"
+                style="${cover}"
+              ></div>
 
 
-            <div>
+              <div>
 
-              <div class="update-title">
+                <div class="update-title">
+                  ${esc(
+                    update.comic_title
+                  )}
+                </div>
 
-                ${esc(
-                  update.comic_title
-                )}
+                <div class="update-meta">
+
+                  ${Number(
+                    update.page_count || 0
+                  )}
+                  páginas
+
+                  ·
+
+                  ${esc(
+                    update.genre ||
+                    "Sin categoría"
+                  )}
+
+                </div>
 
               </div>
 
-              <div class="update-meta">
 
-                ${Number(
-                  update.page_count || 0
-                )}
-                páginas
+              <div class="update-part">
 
-                ·
-
-                ${esc(
-                  update.genre ||
-                  "Sin categoría"
-                )}
+                ▶ Parte
+                ${update.chapter_number}
 
               </div>
 
             </div>
 
+          `;
 
-            <div class="update-part">
+        }).join("")
+        :
+        `
 
-              ▶ Parte
-              ${update.chapter_number}
-
-            </div>
-
+          <div class="empty">
+            Todavía no hay actualizaciones.
           </div>
 
         `;
 
-      }).join("")
-      :
-      `
-
-        <div class="empty">
-          Todavía no hay actualizaciones.
-        </div>
-
-      `;
-
 
     qsa("[data-update-slug]")
-    .forEach(item => {
+      .forEach(item => {
 
-      item.addEventListener(
-        "click",
-        () => {
+        item.addEventListener(
+          "click",
+          () => {
 
-          openComicDirect(
-            item.dataset.updateSlug,
-            true,
-            Number(
-              item.dataset.updateChapter
-            )
-          );
+            openComicDirect(
+              item.dataset.updateSlug,
+              true,
+              Number(
+                item.dataset.updateChapter
+              )
+            );
 
-        }
-      );
+          }
+        );
 
-    });
+      });
 
   }
 
   catch(error) {
 
     qs("#updatesList")
-    .innerHTML = `
+      .innerHTML = `
 
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-    `;
+      `;
 
   }
 
 }
 
 
-/* =====================================
-   DIRECT COMIC OPEN
-===================================== */
+/* =========================
+   DIRECT READER
+========================= */
 
 async function openComicDirect(
   slug,
@@ -3189,7 +3648,8 @@ async function openComicDirect(
     }
 
 
-    let index = -1;
+    let index =
+      -1;
 
 
     if (
@@ -3253,9 +3713,9 @@ async function openComicDirect(
 }
 
 
-/* =====================================
-   COMIC INFORMATION
-===================================== */
+/* =========================
+   INFO
+========================= */
 
 function prepareComicInfo(
   comic,
@@ -3263,38 +3723,38 @@ function prepareComicInfo(
 ) {
 
   qs("#detailTitle")
-  .textContent =
-    comic.title;
+    .textContent =
+      comic.title;
 
 
   qs("#detailMeta")
-  .textContent =
-    [
-      comic.author,
-      comic.genre,
-      comic.status,
-      `${comic.views} vistas`
-    ]
-    .filter(Boolean)
-    .join(" · ");
+    .textContent =
+      [
+        comic.author,
+        comic.genre,
+        comic.status,
+        `${comic.views} vistas`
+      ]
+      .filter(Boolean)
+      .join(" · ");
 
 
   qs("#detailDescription")
-  .textContent =
-    comic.description || "";
+    .textContent =
+      comic.description || "";
 
 
   qs("#detailCover")
-  .style.backgroundImage =
-    comic.cover_url
-    ?
-    `url("${comic.cover_url}")`
-    :
-    "";
+    .style.backgroundImage =
+      comic.cover_url
+      ?
+      `url("${comic.cover_url}")`
+      :
+      "";
 
 
   qs("#shareMessage")
-  .textContent = "";
+    .textContent = "";
 
 
   const parts =
@@ -3350,27 +3810,27 @@ function prepareComicInfo(
 
 
   qsa("[data-info-part]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      async () => {
+      button.addEventListener(
+        "click",
+        async () => {
 
-        closeModal(
-          "detailModal"
-        );
+          closeModal(
+            "detailModal"
+          );
 
 
-        await openReaderByIndex(
-          Number(
-            button.dataset.infoPart
-          )
-        );
+          await openReaderByIndex(
+            Number(
+              button.dataset.infoPart
+            )
+          );
 
-      }
-    );
+        }
+      );
 
-  });
+    });
 
 }
 
@@ -3378,13 +3838,13 @@ function prepareComicInfo(
 function showNoPages() {
 
   qs("#reader")
-  .classList
-  .remove("open");
+    .classList
+    .remove("open");
 
 
   document.body
-  .classList
-  .remove("locked");
+    .classList
+    .remove("locked");
 
 
   openModal(
@@ -3394,9 +3854,9 @@ function showNoPages() {
 }
 
 
-/* =====================================
+/* =========================
    READER
-===================================== */
+========================= */
 
 async function openReaderByIndex(
   index
@@ -3437,53 +3897,53 @@ async function openReaderByIndex(
 
 
     qs("#readerTitle")
-    .textContent =
-      readerParts.length === 1
-      ?
-      chapter.comic_title
-      :
-      `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
+      .textContent =
+        readerParts.length === 1
+        ?
+        chapter.comic_title
+        :
+        `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
 
 
     if (!pages.length) {
 
       qs("#readerPages")
-      .innerHTML = `
+        .innerHTML = `
 
-        <div class="reader-empty">
+          <div class="reader-empty">
 
-          <div>
+            <div>
 
-            <h2>
-              Esta parte todavía no tiene páginas.
-            </h2>
+              <h2>
+                Esta parte todavía no tiene páginas.
+              </h2>
 
-            <p>
-              Selecciona otra parte o vuelve al catálogo.
-            </p>
+              <p>
+                Selecciona otra parte o vuelve al catálogo.
+              </p>
+
+            </div>
 
           </div>
 
-        </div>
-
-      `;
+        `;
 
     }
 
     else {
 
       qs("#readerPages")
-      .innerHTML =
-        pages.map(page => `
+        .innerHTML =
+          pages.map(page => `
 
-          <img
-            src="${page.url}"
-            alt="Página ${page.page_number}"
-            loading="lazy"
-          >
+            <img
+              src="${page.url}"
+              alt="Página ${page.page_number}"
+              loading="lazy"
+            >
 
-        `)
-        .join("");
+          `)
+          .join("");
 
     }
 
@@ -3497,17 +3957,17 @@ async function openReaderByIndex(
 
 
     qs("#reader")
-    .classList
-    .add("open");
+      .classList
+      .add("open");
 
 
     document.body
-    .classList
-    .add("locked");
+      .classList
+      .add("locked");
 
 
     qs("#reader")
-    .scrollTop = 0;
+      .scrollTop = 0;
 
   }
 
@@ -3533,14 +3993,13 @@ function updateReaderNavigation() {
 
 
   qs("#readerPrev")
-  .disabled =
-    previous < 0;
+    .disabled =
+      previous < 0;
 
 
   qs("#readerNext")
-  .disabled =
-    next >=
-    readerParts.length;
+    .disabled =
+      next >= readerParts.length;
 
 
   const bottom =
@@ -3601,7 +4060,74 @@ function updateReaderNavigation() {
 
 
   qs("#bottomInfo")
-  ?.addEventListener(
+    ?.addEventListener(
+      "click",
+      () => {
+
+        openModal(
+          "detailModal"
+        );
+
+      }
+    );
+
+
+  qs("#bottomPrev")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        openReaderByIndex(
+          previous
+        );
+
+      }
+    );
+
+
+  qs("#bottomNext")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        openReaderByIndex(
+          next
+        );
+
+      }
+    );
+
+}
+
+
+qs("#readerPrev")
+  .addEventListener(
+    "click",
+    () => {
+
+      openReaderByIndex(
+        currentReaderIndex - 1
+      );
+
+    }
+  );
+
+
+qs("#readerNext")
+  .addEventListener(
+    "click",
+    () => {
+
+      openReaderByIndex(
+        currentReaderIndex + 1
+      );
+
+    }
+  );
+
+
+qs("#readerInfo")
+  .addEventListener(
     "click",
     () => {
 
@@ -3613,76 +4139,9 @@ function updateReaderNavigation() {
   );
 
 
-  qs("#bottomPrev")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        previous
-      );
-
-    }
-  );
-
-
-  qs("#bottomNext")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        next
-      );
-
-    }
-  );
-
-}
-
-
-qs("#readerPrev")
-.addEventListener(
-  "click",
-  () => {
-
-    openReaderByIndex(
-      currentReaderIndex - 1
-    );
-
-  }
-);
-
-
-qs("#readerNext")
-.addEventListener(
-  "click",
-  () => {
-
-    openReaderByIndex(
-      currentReaderIndex + 1
-    );
-
-  }
-);
-
-
-qs("#readerInfo")
-.addEventListener(
-  "click",
-  () => {
-
-    openModal(
-      "detailModal"
-    );
-
-  }
-);
-
-
-/* =====================================
-   READER SHARE
-===================================== */
+/* =========================
+   SHARE
+========================= */
 
 function comicUrl() {
 
@@ -3716,12 +4175,9 @@ async function shareCurrentComic() {
     ) {
 
       await navigator.share({
-
         title:
           currentPublicComic.title,
-
         url
-
       });
 
 
@@ -3731,7 +4187,7 @@ async function shareCurrentComic() {
 
 
     await navigator.clipboard
-    .writeText(url);
+      .writeText(url);
 
 
     alert(
@@ -3759,90 +4215,86 @@ async function shareCurrentComic() {
 
 
 qs("#readerShare")
-.addEventListener(
-  "click",
-  shareCurrentComic
-);
+  .addEventListener(
+    "click",
+    shareCurrentComic
+  );
 
 
 qs("#shareComicBtn")
-.addEventListener(
-  "click",
-  shareCurrentComic
-);
+  .addEventListener(
+    "click",
+    shareCurrentComic
+  );
 
 
 qs("#copyComicBtn")
-.addEventListener(
-  "click",
-  async () => {
+  .addEventListener(
+    "click",
+    async () => {
 
-    try {
+      try {
 
-      await navigator.clipboard
-      .writeText(
-        comicUrl()
+        await navigator.clipboard
+          .writeText(
+            comicUrl()
+          );
+
+
+        qs("#shareMessage")
+          .textContent =
+            "Enlace copiado.";
+
+      }
+
+      catch {
+
+        qs("#shareMessage")
+          .textContent =
+            comicUrl();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   EXIT
+========================= */
+
+qs("#closeDetailBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      closeModal(
+        "detailModal"
       );
 
 
-      qs("#shareMessage")
-      .textContent =
-        "Enlace copiado.";
+      if (
+        qs("#reader")
+          .classList
+          .contains("open")
+      ) {
+
+        return;
+
+      }
+
+
+      exitComic();
 
     }
+  );
 
-    catch {
-
-      qs("#shareMessage")
-      .textContent =
-        comicUrl();
-
-    }
-
-  }
-);
-
-
-/* =====================================
-   CLOSE INFO
-===================================== */
-
-qs("#closeDetailBtn")
-.addEventListener(
-  "click",
-  () => {
-
-    closeModal(
-      "detailModal"
-    );
-
-
-    if (
-      qs("#reader")
-      .classList
-      .contains("open")
-    ) {
-
-      return;
-
-    }
-
-
-    exitComic();
-
-  }
-);
-
-
-/* =====================================
-   EXIT READER
-===================================== */
 
 function exitComic() {
 
   qs("#reader")
-  .classList
-  .remove("open");
+    .classList
+    .remove("open");
 
 
   closeModal(
@@ -3851,8 +4303,8 @@ function exitComic() {
 
 
   document.body
-  .classList
-  .remove("locked");
+    .classList
+    .remove("locked");
 
 
   currentReaderIndex =
@@ -3901,15 +4353,15 @@ function exitComic() {
 
 
 qs("#closeReader")
-.addEventListener(
-  "click",
-  exitComic
-);
+  .addEventListener(
+    "click",
+    exitComic
+  );
 
 
-/* =====================================
+/* =========================
    HISTORY
-===================================== */
+========================= */
 
 window.addEventListener(
   "popstate",
@@ -3920,8 +4372,8 @@ window.addEventListener(
 
 
     qs("#reader")
-    .classList
-    .remove("open");
+      .classList
+      .remove("open");
 
 
     closeModal(
@@ -3930,8 +4382,8 @@ window.addEventListener(
 
 
     document.body
-    .classList
-    .remove("locked");
+      .classList
+      .remove("locked");
 
 
     if (
@@ -3959,184 +4411,184 @@ window.addEventListener(
 );
 
 
-/* =====================================
+/* =========================
    SEARCH
-===================================== */
+========================= */
 
 qs("#searchInput")
-.addEventListener(
-  "input",
-  event => {
+  .addEventListener(
+    "input",
+    event => {
 
-    clearTimeout(
-      searchTimer
-    );
-
-
-    searchTimer =
-      setTimeout(
-        () => {
-
-          searchQuery =
-            event.target.value
-            .trim();
-
-
-          currentPage = 1;
-
-
-          loadCatalog(1);
-
-        },
-        300
+      clearTimeout(
+        searchTimer
       );
 
-  }
-);
+
+      searchTimer =
+        setTimeout(
+          () => {
+
+            searchQuery =
+              event.target.value
+                .trim();
 
 
-/* =====================================
+            currentPage = 1;
+
+
+            loadCatalog(1);
+
+          },
+          300
+        );
+
+    }
+  );
+
+
+/* =========================
    GENRES
-===================================== */
+========================= */
 
 qsa(".genre-btn")
-.forEach(button => {
+  .forEach(button => {
 
-  button.addEventListener(
-    "click",
-    () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-      selectedGenre =
-        button.dataset.genre;
-
-
-      qsa(".genre-btn")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
+        selectedGenre =
+          button.dataset.genre;
 
 
-      loadCatalog(1);
+        qsa(".genre-btn")
+          .forEach(item => {
 
-    }
-  );
+            item.classList.toggle(
+              "active",
+              item === button
+            );
 
-});
-
-
-/* =====================================
-   SORT
-===================================== */
-
-qsa(".tab")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      sortMode =
-        button.dataset.sort;
+          });
 
 
-      qsa(".tab")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
-
-
-      loadCatalog(1);
-
-    }
-  );
-
-});
-
-
-/* =====================================
-   ADMIN LOGIN
-===================================== */
-
-qs("#openAdmin")
-.addEventListener(
-  "click",
-  async () => {
-
-    if (adminToken) {
-
-      try {
-
-        await showAdmin();
-
-        return;
+        loadCatalog(1);
 
       }
-
-      catch {
-
-        adminToken = "";
-
-
-        sessionStorage.removeItem(
-          "nightink_admin_token"
-        );
-
-      }
-
-    }
-
-
-    openModal(
-      "loginModal"
     );
 
+  });
 
-    qs("#adminPassword")
-    .focus();
 
-  }
-);
+/* =========================
+   SORT
+========================= */
+
+qsa(".tab")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        sortMode =
+          button.dataset.sort;
+
+
+        qsa(".tab")
+          .forEach(item => {
+
+            item.classList.toggle(
+              "active",
+              item === button
+            );
+
+          });
+
+
+        loadCatalog(1);
+
+      }
+    );
+
+  });
+
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+qs("#openAdmin")
+  .addEventListener(
+    "click",
+    async () => {
+
+      if (adminToken) {
+
+        try {
+
+          await showAdmin();
+
+          return;
+
+        }
+
+        catch {
+
+          adminToken = "";
+
+
+          sessionStorage.removeItem(
+            "nightink_admin_token"
+          );
+
+        }
+
+      }
+
+
+      openModal(
+        "loginModal"
+      );
+
+
+      qs("#adminPassword")
+        .focus();
+
+    }
+  );
 
 
 qs("#loginBtn")
-.addEventListener(
-  "click",
-  loginAdmin
-);
+  .addEventListener(
+    "click",
+    loginAdmin
+  );
 
 
 qs("#adminPassword")
-.addEventListener(
-  "keydown",
-  event => {
+  .addEventListener(
+    "keydown",
+    event => {
 
-    if (
-      event.key === "Enter"
-    ) {
+      if (
+        event.key === "Enter"
+      ) {
 
-      loginAdmin();
+        loginAdmin();
+
+      }
 
     }
-
-  }
-);
+  );
 
 
 async function loginAdmin() {
 
   const password =
     qs("#adminPassword")
-    .value;
+      .value;
 
 
   try {
@@ -4181,28 +4633,28 @@ async function loginAdmin() {
   catch(error) {
 
     qs("#loginMsg")
-    .className =
-      "msg error";
+      .className =
+        "msg error";
 
 
     qs("#loginMsg")
-    .textContent =
-      error.message;
+      .textContent =
+        error.message;
 
   }
 
 }
 
 
-/* =====================================
-   ADMIN DASHBOARD
-===================================== */
+/* =========================
+   ADMIN
+========================= */
 
 async function showAdmin() {
 
   qs("#adminShell")
-  .classList
-  .add("visible");
+    .classList
+    .add("visible");
 
 
   await Promise.all([
@@ -4212,32 +4664,32 @@ async function showAdmin() {
 
 
   qs("#adminShell")
-  .scrollIntoView({
-    behavior:"smooth"
-  });
+    .scrollIntoView({
+      behavior:"smooth"
+    });
 
 }
 
 
 qs("#logoutAdminBtn")
-.addEventListener(
-  "click",
-  () => {
+  .addEventListener(
+    "click",
+    () => {
 
-    adminToken = "";
-
-
-    sessionStorage.removeItem(
-      "nightink_admin_token"
-    );
+      adminToken = "";
 
 
-    qs("#adminShell")
-    .classList
-    .remove("visible");
+      sessionStorage.removeItem(
+        "nightink_admin_token"
+      );
 
-  }
-);
+
+      qs("#adminShell")
+        .classList
+        .remove("visible");
+
+    }
+  );
 
 
 async function loadStats() {
@@ -4253,36 +4705,180 @@ async function loadStats() {
 
 
   qs("#stats")
-  .innerHTML = `
+    .innerHTML = `
 
-    <div class="stat">
-      <strong>${s.comics}</strong>
-      <small>Cómics</small>
-    </div>
+      <div class="stat">
 
-    <div class="stat">
-      <strong>${s.chapters}</strong>
-      <small>Partes</small>
-    </div>
+        <strong>
+          ${s.comics}
+        </strong>
 
-    <div class="stat">
-      <strong>${s.pages}</strong>
-      <small>Páginas</small>
-    </div>
+        <small>
+          Cómics
+        </small>
 
-    <div class="stat">
-      <strong>${s.views}</strong>
-      <small>Vistas</small>
-    </div>
+      </div>
 
-  `;
+
+      <div class="stat">
+
+        <strong>
+          ${s.chapters}
+        </strong>
+
+        <small>
+          Partes
+        </small>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong>
+          ${s.pages}
+        </strong>
+
+        <small>
+          Páginas
+        </small>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong>
+          ${s.views}
+        </strong>
+
+        <small>
+          Vistas
+        </small>
+
+      </div>
+
+    `;
 
 }
 
 
-/* =====================================
+/* =========================
+   READINESS
+========================= */
+
+function calculateReadiness(
+  comic,
+  chapters
+) {
+
+  const all =
+    chapters || [];
+
+
+  const published =
+    all.filter(
+      chapter =>
+        Boolean(
+          chapter.is_published
+        )
+    );
+
+
+  const readable =
+    published.filter(
+      chapter =>
+        Number(
+          chapter.page_count || 0
+        ) > 0
+    );
+
+
+  const totalPages =
+    readable.reduce(
+      (sum,chapter) =>
+        sum +
+        Number(
+          chapter.page_count || 0
+        ),
+      0
+    );
+
+
+  if (
+    !comic.is_published
+  ) {
+
+    return {
+      rowClass:"draft",
+      badgeClass:"draft",
+      label:"BORRADOR",
+      detail:
+        "El cómic no aparece para los lectores."
+    };
+
+  }
+
+
+  if (
+    all.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTA CREAR UNA PARTE",
+      detail:
+        "Pulsa Partes y crea la Parte 1."
+    };
+
+  }
+
+
+  if (
+    published.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTA PUBLICAR UNA PARTE",
+      detail:
+        "La obra tiene partes, pero ninguna está publicada."
+    };
+
+  }
+
+
+  if (
+    readable.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTAN PÁGINAS",
+      detail:
+        "La parte está publicada, pero todavía no tiene imágenes."
+    };
+
+  }
+
+
+  return {
+    rowClass:"ready",
+    badgeClass:"ok",
+    label:"✓ LISTO PARA LEER",
+    detail:
+      `${readable.length} parte(s) disponible(s) · ${totalPages} páginas`
+  };
+
+}
+
+
+/* =========================
    ADMIN COMICS
-===================================== */
+========================= */
 
 async function loadAdminComics() {
 
@@ -4296,12 +4892,27 @@ async function loadAdminComics() {
     data.comics || [];
 
 
-  qs("#adminList")
-  .innerHTML =
-    comics.length
-    ?
-    comics.map(comic => {
+  const box =
+    qs("#adminList");
 
+
+  if (!comics.length) {
+
+    box.innerHTML = `
+
+      <div class="empty">
+        No hay cómics.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    comics.map(comic => {
 
       const cover =
         comic.cover_url
@@ -4313,8 +4924,10 @@ async function loadAdminComics() {
 
       return `
 
-        <div class="admin-row">
-
+        <div
+          class="admin-row"
+          id="adminComic-${comic.id}"
+        >
 
           <div
             class="admin-cover"
@@ -4324,11 +4937,23 @@ async function loadAdminComics() {
 
           <div>
 
-            <strong>
-              ${esc(comic.title)}
-            </strong>
+            <div class="admin-title-line">
+
+              <strong>
+                ${esc(comic.title)}
+              </strong>
+
+            </div>
+
 
             <small>
+
+              ${esc(
+                comic.genre ||
+                "Sin género"
+              )}
+
+              ·
 
               ${comic.part_count}
               parte(s)
@@ -4344,6 +4969,20 @@ async function loadAdminComics() {
               }
 
             </small>
+
+
+            <div
+              class="readiness"
+              id="readiness-${comic.id}"
+            >
+
+              <span
+                class="ready-badge loading"
+              >
+                Comprobando contenido...
+              </span>
+
+            </div>
 
           </div>
 
@@ -4370,137 +5009,226 @@ async function loadAdminComics() {
 
           </div>
 
-
         </div>
 
       `;
 
-    }).join("")
-    :
-    `
-
-      <div class="empty">
-        No hay cómics.
-      </div>
-
-    `;
+    })
+    .join("");
 
 
   qsa("[data-edit]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+      button.addEventListener(
+        "click",
+        () => {
 
-        editComic(
-          Number(
-            button.dataset.edit
-          ),
-          comics
-        );
+          editComic(
+            Number(
+              button.dataset.edit
+            ),
+            comics
+          );
 
-      }
-    );
+        }
+      );
 
-  });
+    });
 
 
   qsa("[data-parts]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+      button.addEventListener(
+        "click",
+        () => {
 
-        manageParts(
-          Number(
-            button.dataset.parts
-          ),
-          comics
-        );
+          manageParts(
+            Number(
+              button.dataset.parts
+            ),
+            comics
+          );
 
-      }
-    );
+        }
+      );
 
-  });
+    });
 
 
   qsa("[data-delete]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+      button.addEventListener(
+        "click",
+        () => {
 
-        deleteComic(
-          Number(
-            button.dataset.delete
-          )
-        );
+          deleteComic(
+            Number(
+              button.dataset.delete
+            )
+          );
+
+        }
+      );
+
+    });
+
+
+  await Promise.all(
+
+    comics.map(
+      async comic => {
+
+        try {
+
+          const result =
+            await api(
+              `/api/admin/comics/${comic.id}/chapters`
+            );
+
+
+          const status =
+            calculateReadiness(
+              comic,
+              result.chapters || []
+            );
+
+
+          const row =
+            qs(
+              `#adminComic-${comic.id}`
+            );
+
+
+          if (row) {
+
+            row.classList.add(
+              status.rowClass
+            );
+
+          }
+
+
+          const indicator =
+            qs(
+              `#readiness-${comic.id}`
+            );
+
+
+          if (indicator) {
+
+            indicator.innerHTML = `
+
+              <span
+                class="ready-badge ${status.badgeClass}"
+              >
+                ${status.label}
+              </span>
+
+              <span
+                class="readiness-detail"
+              >
+                ${esc(status.detail)}
+              </span>
+
+            `;
+
+          }
+
+        }
+
+        catch {
+
+          const indicator =
+            qs(
+              `#readiness-${comic.id}`
+            );
+
+
+          if (indicator) {
+
+            indicator.innerHTML = `
+
+              <span
+                class="ready-badge warn"
+              >
+                Estado no disponible
+              </span>
+
+            `;
+
+          }
+
+        }
 
       }
-    );
+    )
 
-  });
+  );
 
 }
 
 
 qs("#refreshAdminBtn")
-.addEventListener(
-  "click",
-  async () => {
+  .addEventListener(
+    "click",
+    async () => {
 
-    await Promise.all([
-      loadStats(),
-      loadAdminComics(),
-      loadCatalog(currentPage),
-      loadPopular(),
-      loadUpdates()
-    ]);
+      await Promise.all([
+        loadStats(),
+        loadAdminComics(),
+        loadCatalog(currentPage),
+        loadPopular(),
+        loadUpdates()
+      ]);
 
-  }
-);
+    }
+  );
 
 
-/* =====================================
+/* =========================
    NEW COMIC
-===================================== */
+========================= */
 
 qs("#newComicBtn")
-.addEventListener(
-  "click",
-  () => {
+  .addEventListener(
+    "click",
+    () => {
 
-    qs("#comicForm")
-    .reset();
-
-
-    qs("#comicId")
-    .value = "";
+      qs("#comicForm")
+        .reset();
 
 
-    qs("#comicPublished")
-    .checked = true;
+      qs("#comicId")
+        .value = "";
 
 
-    qs("#comicFormTitle")
-    .textContent =
-      "Nuevo cómic";
+      qs("#comicPublished")
+        .checked = true;
 
 
-    openModal(
-      "comicModal"
-    );
-
-  }
-);
+      qs("#comicFormTitle")
+        .textContent =
+          "Nuevo cómic";
 
 
-/* =====================================
+      qs("#comicMsg")
+        .textContent = "";
+
+
+      openModal(
+        "comicModal"
+      );
+
+    }
+  );
+
+
+/* =========================
    EDIT COMIC
-===================================== */
+========================= */
 
 function editComic(
   id,
@@ -4514,42 +5242,67 @@ function editComic(
     );
 
 
-  if (!comic) return;
+  if (!comic) {
+
+    return;
+
+  }
 
 
-  qs("#comicId").value =
-    comic.id;
+  qs("#comicId")
+    .value =
+      comic.id;
 
-  qs("#comicTitle").value =
-    comic.title || "";
 
-  qs("#comicSlug").value =
-    comic.slug || "";
+  qs("#comicTitle")
+    .value =
+      comic.title || "";
 
-  qs("#comicAuthor").value =
-    comic.author || "";
 
-  qs("#comicGenre").value =
-    comic.genre || "";
+  qs("#comicSlug")
+    .value =
+      comic.slug || "";
 
-  qs("#comicStatus").value =
-    comic.status ||
-    "En emisión";
 
-  qs("#comicDescription").value =
-    comic.description || "";
+  qs("#comicAuthor")
+    .value =
+      comic.author || "";
 
-  qs("#comicPublished").checked =
-    Boolean(
-      comic.is_published
-    );
 
-  qs("#comicCover").value =
-    "";
+  qs("#comicGenre")
+    .value =
+      comic.genre || "";
+
+
+  qs("#comicStatus")
+    .value =
+      comic.status ||
+      "En emisión";
+
+
+  qs("#comicDescription")
+    .value =
+      comic.description || "";
+
+
+  qs("#comicPublished")
+    .checked =
+      Boolean(
+        comic.is_published
+      );
+
+
+  qs("#comicCover")
+    .value = "";
+
 
   qs("#comicFormTitle")
-  .textContent =
-    "Editar cómic";
+    .textContent =
+      "Editar cómic";
+
+
+  qs("#comicMsg")
+    .textContent = "";
 
 
   openModal(
@@ -4559,85 +5312,64 @@ function editComic(
 }
 
 
-/* =====================================
+/* =========================
    SAVE COMIC
-===================================== */
+========================= */
 
 qs("#comicForm")
-.addEventListener(
-  "submit",
-  async event => {
+  .addEventListener(
+    "submit",
+    async event => {
 
-    event.preventDefault();
-
-
-    const id =
-      Number(
-        qs("#comicId").value ||
-        0
-      );
+      event.preventDefault();
 
 
-    const payload = {
-
-      title:
-        qs("#comicTitle").value,
-
-      slug:
-        qs("#comicSlug").value,
-
-      author:
-        qs("#comicAuthor").value,
-
-      genre:
-        qs("#comicGenre").value,
-
-      status:
-        qs("#comicStatus").value,
-
-      description:
-        qs("#comicDescription").value,
-
-      is_published:
-        qs("#comicPublished").checked
-
-    };
-
-
-    try {
-
-      let comicId =
-        id;
-
-
-      if (id) {
-
-        await api(
-          `/api/admin/comics/${id}`,
-          {
-            method:"PUT",
-
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-          }
+      const id =
+        Number(
+          qs("#comicId")
+            .value ||
+          0
         );
 
-      }
 
-      else {
+      const payload = {
 
-        const result =
+        title:
+          qs("#comicTitle").value,
+
+        slug:
+          qs("#comicSlug").value,
+
+        author:
+          qs("#comicAuthor").value,
+
+        genre:
+          qs("#comicGenre").value,
+
+        status:
+          qs("#comicStatus").value,
+
+        description:
+          qs("#comicDescription").value,
+
+        is_published:
+          qs("#comicPublished").checked
+
+      };
+
+
+      try {
+
+        let comicId =
+          id;
+
+
+        if (id) {
+
           await api(
-            "/api/admin/comics",
+            `/api/admin/comics/${id}`,
             {
-              method:"POST",
+              method:"PUT",
 
               headers:{
                 "Content-Type":
@@ -4651,75 +5383,98 @@ qs("#comicForm")
             }
           );
 
+        }
 
-        comicId =
-          result.id;
+        else {
+
+          const result =
+            await api(
+              "/api/admin/comics",
+              {
+                method:"POST",
+
+                headers:{
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify(
+                    payload
+                  )
+              }
+            );
+
+
+          comicId =
+            result.id;
+
+        }
+
+
+        const cover =
+          qs("#comicCover")
+            .files[0];
+
+
+        if (cover) {
+
+          const form =
+            new FormData();
+
+
+          form.append(
+            "cover",
+            cover
+          );
+
+
+          await api(
+            `/api/admin/comics/${comicId}/cover`,
+            {
+              method:"POST",
+              body:form
+            }
+          );
+
+        }
+
+
+        await Promise.all([
+          loadAdminComics(),
+          loadStats(),
+          loadCatalog(currentPage),
+          loadPopular(),
+          loadUpdates()
+        ]);
+
+
+        closeModal(
+          "comicModal"
+        );
 
       }
 
+      catch(error) {
 
-      const cover =
-        qs("#comicCover")
-        .files[0];
-
-
-      if (cover) {
-
-        const form =
-          new FormData();
+        qs("#comicMsg")
+          .className =
+            "msg error";
 
 
-        form.append(
-          "cover",
-          cover
-        );
-
-
-        await api(
-          `/api/admin/comics/${comicId}/cover`,
-          {
-            method:"POST",
-            body:form
-          }
-        );
+        qs("#comicMsg")
+          .textContent =
+            error.message;
 
       }
 
-
-      await Promise.all([
-        loadAdminComics(),
-        loadStats(),
-        loadCatalog(currentPage),
-        loadPopular(),
-        loadUpdates()
-      ]);
+    }
+  );
 
 
-      closeModal(
-        "comicModal"
-      );
-
-  }
-
-  catch(error) {
-
-    qs("#comicMsg")
-    .className =
-      "msg error";
-
-
-    qs("#comicMsg")
-    .textContent =
-      error.message;
-
-  }
-
-);
-
-
-/* =====================================
+/* =========================
    DELETE COMIC
-===================================== */
+========================= */
 
 async function deleteComic(id) {
 
@@ -4753,9 +5508,9 @@ async function deleteComic(id) {
 }
 
 
-/* =====================================
+/* =========================
    MANAGE PARTS
-===================================== */
+========================= */
 
 async function manageParts(
   id,
@@ -4774,11 +5529,27 @@ async function manageParts(
 
 
   qs("#chaptersTitle")
-  .textContent =
-    "Partes · " +
-    (
-      comic?.title || ""
-    );
+    .textContent =
+      "Partes · " +
+      (
+        comic?.title || ""
+      );
+
+
+  qs("#chapterNumber")
+    .value = 1;
+
+
+  qs("#chapterTitle")
+    .value = "";
+
+
+  qs("#chapterPublished")
+    .checked = true;
+
+
+  qs("#chapterMsg")
+    .textContent = "";
 
 
   openModal(
@@ -4804,267 +5575,283 @@ async function loadParts() {
 
 
   qs("#chaptersList")
-  .innerHTML =
-    currentAdminChapters.length
-    ?
-    currentAdminChapters.map(
-      chapter => `
+    .innerHTML =
+      currentAdminChapters.length
+      ?
+      currentAdminChapters.map(
+        chapter => `
 
-        <div class="chapter-row">
+          <div class="chapter-row">
 
+            <div>
 
-          <div>
+              <strong>
 
-            <strong>
+                Parte
+                ${chapter.chapter_number}
 
-              Parte
-              ${chapter.chapter_number}
+                ${
+                  chapter.title
+                  ?
+                  " · " +
+                  esc(chapter.title)
+                  :
+                  ""
+                }
 
-              ${
-                chapter.title
-                ?
-                " · " +
-                esc(chapter.title)
-                :
-                ""
-              }
-
-            </strong>
-
-
-            <small>
-
-              ${chapter.page_count}
-              páginas
-
-              ·
-
-              ${
-                chapter.is_published
-                ?
-                "Publicada"
-                :
-                "Borrador"
-              }
-
-            </small>
+              </strong>
 
 
-            <div class="upload-zone">
+              <small>
 
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                data-files="${chapter.id}"
-              >
+                ${chapter.page_count}
+                páginas
 
-              <br><br>
+                ·
+
+                ${
+                  chapter.is_published
+                  ?
+                  "Publicada"
+                  :
+                  "Borrador"
+                }
+
+              </small>
+
+
+              <div class="upload-zone">
+
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  data-files="${chapter.id}"
+                >
+
+                <br><br>
+
+                <button
+                  class="btn secondary small"
+                  data-upload="${chapter.id}"
+                >
+                  Subir páginas
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="row-actions">
 
               <button
-                class="btn secondary small"
-                data-upload="${chapter.id}"
+                data-edit-chapter="${chapter.id}"
               >
-                Subir páginas
+                Editar
+              </button>
+
+              <button
+                data-manage-pages="${chapter.id}"
+              >
+                Páginas
+              </button>
+
+              <button
+                data-delchapter="${chapter.id}"
+              >
+                Eliminar
               </button>
 
             </div>
 
           </div>
 
+        `
+      ).join("")
+      :
+      `
 
-          <div class="row-actions">
-
-            <button
-              data-edit-chapter="${chapter.id}"
-            >
-              Editar
-            </button>
-
-            <button
-              data-manage-pages="${chapter.id}"
-            >
-              Páginas
-            </button>
-
-            <button
-              data-delchapter="${chapter.id}"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
-
+        <div class="empty">
+          Todavía no hay partes.
         </div>
 
-      `
-    ).join("")
-    :
-    `
-
-      <div class="empty">
-        Todavía no hay partes.
-      </div>
-
-    `;
+      `;
 
 
   qsa("[data-upload]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        uploadPages(
-          Number(
-            button.dataset.upload
-          )
-        );
+      button.onclick =
+        () =>
+          uploadPages(
+            Number(
+              button.dataset.upload
+            )
+          );
 
-  });
+    });
 
 
   qsa("[data-edit-chapter]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        openEditChapter(
-          Number(
-            button.dataset.editChapter
-          )
-        );
+      button.onclick =
+        () =>
+          openEditChapter(
+            Number(
+              button.dataset.editChapter
+            )
+          );
 
-  });
+    });
 
 
   qsa("[data-manage-pages]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        openPagesManager(
-          Number(
-            button.dataset.managePages
-          )
-        );
+      button.onclick =
+        () =>
+          openPagesManager(
+            Number(
+              button.dataset.managePages
+            )
+          );
 
-  });
+    });
 
 
   qsa("[data-delchapter]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        deleteChapter(
-          Number(
-            button.dataset.delchapter
-          )
-        );
+      button.onclick =
+        () =>
+          deleteChapter(
+            Number(
+              button.dataset.delchapter
+            )
+          );
 
-  });
+    });
 
 }
 
 
-/* =====================================
+/* =========================
    ADD PART
-===================================== */
+========================= */
 
 qs("#addChapterBtn")
-.addEventListener(
-  "click",
-  async () => {
+  .addEventListener(
+    "click",
+    async () => {
 
-    try {
+      try {
 
-      await api(
-        `/api/admin/comics/${currentComicForChapters}/chapters`,
-        {
-          method:"POST",
+        await api(
+          `/api/admin/comics/${currentComicForChapters}/chapters`,
+          {
+            method:"POST",
 
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
 
-          body:
-            JSON.stringify({
+            body:
+              JSON.stringify({
 
-              chapter_number:
-                Number(
-                  qs("#chapterNumber").value
-                ),
+                chapter_number:
+                  Number(
+                    qs("#chapterNumber")
+                      .value
+                  ),
 
-              title:
-                qs("#chapterTitle").value,
+                title:
+                  qs("#chapterTitle")
+                    .value,
 
-              is_published:
-                qs("#chapterPublished").checked
+                is_published:
+                  qs("#chapterPublished")
+                    .checked
 
-            })
-        }
-      );
+              })
+          }
+        );
 
 
-      await Promise.all([
-        loadParts(),
-        loadAdminComics(),
-        loadStats(),
-        loadCatalog(currentPage),
-        loadUpdates()
-      ]);
+        await Promise.all([
+          loadParts(),
+          loadAdminComics(),
+          loadStats(),
+          loadCatalog(currentPage),
+          loadUpdates()
+        ]);
+
+      }
+
+      catch(error) {
+
+        qs("#chapterMsg")
+          .className =
+            "msg error";
+
+
+        qs("#chapterMsg")
+          .textContent =
+            error.message;
+
+      }
 
     }
-
-    catch(error) {
-
-      qs("#chapterMsg")
-      .className =
-        "msg error";
+  );
 
 
-      qs("#chapterMsg")
-      .textContent =
-        error.message;
-
-    }
-
-  }
-);
-
-
-/* =====================================
+/* =========================
    EDIT PART
-===================================== */
+========================= */
 
 function openEditChapter(id) {
 
   const chapter =
     currentAdminChapters
-    .find(
-      ch =>
-        Number(ch.id) === id
-    );
+      .find(
+        ch =>
+          Number(ch.id) === id
+      );
 
 
-  if (!chapter) return;
+  if (!chapter) {
+
+    return;
+
+  }
 
 
-  qs("#editChapterId").value =
-    chapter.id;
+  qs("#editChapterId")
+    .value =
+      chapter.id;
 
-  qs("#editChapterNumber").value =
-    chapter.chapter_number;
 
-  qs("#editChapterTitle").value =
-    chapter.title || "";
+  qs("#editChapterNumber")
+    .value =
+      chapter.chapter_number;
 
-  qs("#editChapterPublished").checked =
-    Boolean(
-      chapter.is_published
-    );
+
+  qs("#editChapterTitle")
+    .value =
+      chapter.title || "";
+
+
+  qs("#editChapterPublished")
+    .checked =
+      Boolean(
+        chapter.is_published
+      );
+
+
+  qs("#editChapterMsg")
+    .textContent = "";
 
 
   openModal(
@@ -5075,82 +5862,87 @@ function openEditChapter(id) {
 
 
 qs("#saveChapterBtn")
-.addEventListener(
-  "click",
-  async () => {
+  .addEventListener(
+    "click",
+    async () => {
 
-    const id =
-      Number(
-        qs("#editChapterId").value
-      );
-
-
-    try {
-
-      await api(
-        `/api/admin/chapters/${id}`,
-        {
-          method:"PUT",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-
-              chapter_number:
-                Number(
-                  qs("#editChapterNumber").value
-                ),
-
-              title:
-                qs("#editChapterTitle").value,
-
-              is_published:
-                qs("#editChapterPublished").checked
-
-            })
-
-        }
-      );
+      const id =
+        Number(
+          qs("#editChapterId")
+            .value
+        );
 
 
-      await Promise.all([
-        loadParts(),
-        loadCatalog(currentPage),
-        loadUpdates(),
-        loadStats()
-      ]);
+      try {
+
+        await api(
+          `/api/admin/chapters/${id}`,
+          {
+            method:"PUT",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+
+                chapter_number:
+                  Number(
+                    qs("#editChapterNumber")
+                      .value
+                  ),
+
+                title:
+                  qs("#editChapterTitle")
+                    .value,
+
+                is_published:
+                  qs("#editChapterPublished")
+                    .checked
+
+              })
+
+          }
+        );
 
 
-      closeModal(
-        "editChapterModal"
-      );
+        await Promise.all([
+          loadParts(),
+          loadAdminComics(),
+          loadCatalog(currentPage),
+          loadUpdates(),
+          loadStats()
+        ]);
+
+
+        closeModal(
+          "editChapterModal"
+        );
+
+      }
+
+      catch(error) {
+
+        qs("#editChapterMsg")
+          .className =
+            "msg error";
+
+
+        qs("#editChapterMsg")
+          .textContent =
+            error.message;
+
+      }
 
     }
-
-    catch(error) {
-
-      qs("#editChapterMsg")
-      .className =
-        "msg error";
+  );
 
 
-      qs("#editChapterMsg")
-      .textContent =
-        error.message;
-
-    }
-
-  }
-);
-
-
-/* =====================================
-   UPLOAD PAGES
-===================================== */
+/* =========================
+   UPLOAD
+========================= */
 
 async function uploadPages(
   chapterId
@@ -5178,16 +5970,16 @@ async function uploadPages(
 
   const files =
     [...input.files]
-    .sort(
-      (a,b) =>
-        a.name.localeCompare(
-          b.name,
-          undefined,
-          {
-            numeric:true
-          }
-        )
-    );
+      .sort(
+        (a,b) =>
+          a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+              numeric:true
+            }
+          )
+      );
 
 
   const form =
@@ -5219,6 +6011,7 @@ async function uploadPages(
 
     await Promise.all([
       loadParts(),
+      loadAdminComics(),
       loadStats(),
       loadCatalog(currentPage),
       loadUpdates()
@@ -5242,9 +6035,9 @@ async function uploadPages(
 }
 
 
-/* =====================================
+/* =========================
    DELETE PART
-===================================== */
+========================= */
 
 async function deleteChapter(id) {
 
@@ -5269,8 +6062,8 @@ async function deleteChapter(id) {
 
   await Promise.all([
     loadParts(),
-    loadStats(),
     loadAdminComics(),
+    loadStats(),
     loadCatalog(currentPage),
     loadUpdates()
   ]);
@@ -5278,9 +6071,9 @@ async function deleteChapter(id) {
 }
 
 
-/* =====================================
+/* =========================
    PAGE MANAGER
-===================================== */
+========================= */
 
 async function openPagesManager(id) {
 
@@ -5318,129 +6111,127 @@ async function loadManagedPages() {
 function renderManagedPages() {
 
   qs("#pagesGrid")
-  .innerHTML =
-    managedPages.length
-    ?
-    managedPages.map(
-      (page,index) => `
+    .innerHTML =
+      managedPages.length
+      ?
+      managedPages.map(
+        (page,index) => `
 
-        <div class="page-card">
+          <div class="page-card">
 
+            <div class="page-thumb">
 
-          <div class="page-thumb">
+              <img
+                src="${page.url}"
+                alt="Página"
+              >
 
-            <img
-              src="${page.url}"
-              alt="Página"
-            >
-
-          </div>
-
-
-          <div class="page-bottom">
-
-            <div class="page-number">
-              Página ${index + 1}
             </div>
 
 
-            <div class="page-actions">
+            <div class="page-bottom">
 
-              <button
-                data-left="${page.id}"
-                ${
-                  index === 0
-                  ?
-                  "disabled"
-                  :
-                  ""
-                }
-              >
-                ←
-              </button>
+              <div class="page-number">
+                Página ${index + 1}
+              </div>
 
-              <button
-                data-right="${page.id}"
-                ${
-                  index ===
-                  managedPages.length - 1
-                  ?
-                  "disabled"
-                  :
-                  ""
-                }
-              >
-                →
-              </button>
 
-              <button
-                class="delete-page"
-                data-delpage="${page.id}"
-              >
-                Eliminar
-              </button>
+              <div class="page-actions">
+
+                <button
+                  data-left="${page.id}"
+                  ${
+                    index === 0
+                    ?
+                    "disabled"
+                    :
+                    ""
+                  }
+                >
+                  ←
+                </button>
+
+                <button
+                  data-right="${page.id}"
+                  ${
+                    index ===
+                    managedPages.length - 1
+                    ?
+                    "disabled"
+                    :
+                    ""
+                  }
+                >
+                  →
+                </button>
+
+                <button
+                  class="delete-page"
+                  data-delpage="${page.id}"
+                >
+                  Eliminar
+                </button>
+
+              </div>
 
             </div>
 
           </div>
 
+        `
+      ).join("")
+      :
+      `
 
+        <div class="empty">
+          No hay páginas.
         </div>
 
-      `
-    ).join("")
-    :
-    `
-
-      <div class="empty">
-        No hay páginas.
-      </div>
-
-    `;
+      `;
 
 
   qsa("[data-left]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        movePage(
-          Number(
-            button.dataset.left
-          ),
-          -1
-        );
+      button.onclick =
+        () =>
+          movePage(
+            Number(
+              button.dataset.left
+            ),
+            -1
+          );
 
-  });
+    });
 
 
   qsa("[data-right]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        movePage(
-          Number(
-            button.dataset.right
-          ),
-          1
-        );
+      button.onclick =
+        () =>
+          movePage(
+            Number(
+              button.dataset.right
+            ),
+            1
+          );
 
-  });
+    });
 
 
   qsa("[data-delpage]")
-  .forEach(button => {
+    .forEach(button => {
 
-    button.onclick =
-      () =>
-        deletePage(
-          Number(
-            button.dataset.delpage
-          )
-        );
+      button.onclick =
+        () =>
+          deletePage(
+            Number(
+              button.dataset.delpage
+            )
+          );
 
-  });
+    });
 
 }
 
@@ -5563,6 +6354,7 @@ async function deletePage(id) {
   await Promise.all([
     loadManagedPages(),
     loadParts(),
+    loadAdminComics(),
     loadStats(),
     loadCatalog(currentPage),
     loadUpdates()
@@ -5571,9 +6363,9 @@ async function deletePage(id) {
 }
 
 
-/* =====================================
+/* =========================
    START
-===================================== */
+========================= */
 
 async function startNightInk() {
 

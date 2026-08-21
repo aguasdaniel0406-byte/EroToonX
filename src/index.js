@@ -24,15 +24,12 @@
   --accent2:#ef476f;
   --danger:#d94b62;
   --green:#2cb67d;
+  --warning:#f1ad45;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-html{
-  scroll-behavior:smooth;
-}
+html{scroll-behavior:smooth}
 
 body{
   margin:0;
@@ -41,9 +38,7 @@ body{
   font-family:Arial,Helvetica,sans-serif;
 }
 
-body.locked{
-  overflow:hidden;
-}
+body.locked{overflow:hidden}
 
 a{
   color:inherit;
@@ -57,9 +52,7 @@ textarea{
   font:inherit;
 }
 
-button{
-  cursor:pointer;
-}
+button{cursor:pointer}
 
 .wrap{
   width:min(1280px,calc(100% - 24px));
@@ -685,23 +678,35 @@ main{
 
 .admin-list{
   display:grid;
-  gap:8px;
+  gap:10px;
 }
 
 .admin-row{
   display:grid;
-  grid-template-columns:55px 1fr auto;
+  grid-template-columns:65px 1fr auto;
   align-items:center;
-  gap:10px;
-  padding:10px;
+  gap:12px;
+  padding:12px;
   background:#20232b;
   border:1px solid #323744;
-  border-radius:9px;
+  border-radius:10px;
+}
+
+.admin-row.ready{
+  border-color:rgba(44,182,125,.5);
+}
+
+.admin-row.warning{
+  border-color:rgba(241,173,69,.45);
+}
+
+.admin-row.draft{
+  opacity:.78;
 }
 
 .admin-cover{
-  width:55px;
-  height:72px;
+  width:65px;
+  height:86px;
   border-radius:7px;
   background:#15171c;
   background-size:cover;
@@ -711,8 +716,62 @@ main{
 
 .admin-row small{
   display:block;
-  margin-top:4px;
+  margin-top:5px;
   color:var(--muted);
+}
+
+.admin-title-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.readiness{
+  margin-top:8px;
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.ready-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 9px;
+  border-radius:7px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.ready-badge.ok{
+  background:rgba(44,182,125,.14);
+  border:1px solid rgba(44,182,125,.45);
+  color:#78e5b4;
+}
+
+.ready-badge.warn{
+  background:rgba(241,173,69,.13);
+  border:1px solid rgba(241,173,69,.42);
+  color:#ffc86d;
+}
+
+.ready-badge.draft{
+  background:#282c35;
+  border:1px solid #404552;
+  color:#b5bac5;
+}
+
+.ready-badge.loading{
+  background:#242735;
+  border:1px solid #383d49;
+  color:#a9afbb;
+}
+
+.readiness-detail{
+  color:#8f96a4;
+  font-size:10px;
 }
 
 .row-actions{
@@ -731,7 +790,7 @@ main{
 }
 
 
-/* FORMS / MODALS */
+/* MODALS */
 
 .modal{
   display:none;
@@ -826,13 +885,8 @@ main{
   font-size:12px;
 }
 
-.error{
-  color:#ff7488;
-}
-
-.success{
-  color:#67d99c;
-}
+.error{color:#ff7488}
+.success{color:#67d99c}
 
 
 /* CHAPTERS */
@@ -973,9 +1027,7 @@ main{
 }
 
 
-/* =========================
-   READER
-========================= */
+/* READER */
 
 .reader{
   display:none;
@@ -1139,7 +1191,12 @@ main{
   }
 
   .admin-row{
-    grid-template-columns:45px 1fr;
+    grid-template-columns:52px 1fr;
+  }
+
+  .admin-cover{
+    width:52px;
+    height:70px;
   }
 
   .admin-row .row-actions{
@@ -1210,15 +1267,8 @@ main{
     href="/"
     id="homeLogo"
   >
-
-    <span class="logo-mark">
-      NI
-    </span>
-
-    <span>
-      NightInk
-    </span>
-
+    <span class="logo-mark">NI</span>
+    <span>NightInk</span>
   </a>
 
 
@@ -1263,7 +1313,6 @@ main{
 </div>
 
 </header>
-
 
 
 <main class="wrap">
@@ -1316,7 +1365,6 @@ main{
   </div>
 
 </section>
-
 
 
 <!-- ADMIN -->
@@ -1388,7 +1436,6 @@ main{
 </section>
 
 
-
 <div class="layout">
 
 
@@ -1449,17 +1496,14 @@ main{
       id="popularList"
       class="popular-list"
     >
-
       <div class="empty">
         Cargando...
       </div>
-
     </div>
 
   </div>
 
 </aside>
-
 
 
 <div class="content">
@@ -1475,7 +1519,6 @@ main{
     <h2 id="catalogTitle">
       Últimos cómics
     </h2>
-
 
     <div class="tabs">
 
@@ -1502,11 +1545,9 @@ main{
     id="comicGrid"
     class="comic-grid"
   >
-
     <div class="empty">
       Cargando catálogo...
     </div>
-
   </div>
 
 
@@ -1516,7 +1557,6 @@ main{
   ></div>
 
 </section>
-
 
 
 <section
@@ -1541,11 +1581,9 @@ main{
     id="updatesList"
     class="updates-list"
   >
-
     <div class="empty">
       Cargando...
     </div>
-
   </div>
 
 </section>
@@ -1558,7 +1596,6 @@ main{
 </main>
 
 
-
 <footer>
 
 <div class="wrap">
@@ -1566,7 +1603,6 @@ main{
 </div>
 
 </footer>
-
 
 
 <!-- LOGIN -->
@@ -1584,7 +1620,6 @@ main{
     <h2>
       Administrador
     </h2>
-
 
     <div class="field">
 
@@ -1626,7 +1661,6 @@ main{
 </div>
 
 
-
 <!-- COMIC FORM -->
 
 <div
@@ -1642,7 +1676,6 @@ main{
 
 
     <form id="comicForm">
-
 
       <input
         id="comicId"
@@ -1775,7 +1808,6 @@ main{
 
         </div>
 
-
       </div>
 
 
@@ -1804,13 +1836,11 @@ main{
 
       </div>
 
-
     </form>
 
   </div>
 
 </div>
-
 
 
 <!-- PARTS -->
@@ -1821,7 +1851,6 @@ main{
 >
 
   <div class="panel wide">
-
 
     <div class="section-head">
 
@@ -1840,7 +1869,6 @@ main{
 
 
     <div class="form-grid">
-
 
       <div class="field">
 
@@ -1888,7 +1916,6 @@ main{
 
       </div>
 
-
     </div>
 
 
@@ -1912,11 +1939,9 @@ main{
       class="chapters-list"
     ></div>
 
-
   </div>
 
 </div>
-
 
 
 <!-- EDIT PART -->
@@ -1943,7 +1968,6 @@ main{
 
 
     <div class="form-grid">
-
 
       <div class="field">
 
@@ -1988,7 +2012,6 @@ main{
 
       </div>
 
-
     </div>
 
 
@@ -2019,7 +2042,6 @@ main{
   </div>
 
 </div>
-
 
 
 <!-- PAGE MANAGER -->
@@ -2065,8 +2087,7 @@ main{
 </div>
 
 
-
-<!-- INFO DEL COMIC -->
+<!-- INFO -->
 
 <div
   id="detailModal"
@@ -2093,7 +2114,6 @@ main{
 
 
     <div class="detail">
-
 
       <div
         id="detailCover"
@@ -2161,19 +2181,14 @@ main{
 </div>
 
 
-
-<!-- =========================
-     DIRECT READER
-========================= -->
+<!-- READER -->
 
 <div
   id="reader"
   class="reader"
 >
 
-
   <div class="reader-bar">
-
 
     <div class="reader-left">
 
@@ -2227,7 +2242,6 @@ main{
 
     </div>
 
-
   </div>
 
 
@@ -2242,16 +2256,12 @@ main{
     class="reader-bottom-nav"
   ></div>
 
-
 </div>
-
 
 
 <script>
 
-/* =====================================
-   GLOBAL
-===================================== */
+/* GLOBAL */
 
 const qs = s =>
   document.querySelector(s);
@@ -2303,9 +2313,7 @@ let readerParts = [];
 let currentReaderIndex = -1;
 
 
-/* =====================================
-   HELPERS
-===================================== */
+/* HELPERS */
 
 function esc(value = "") {
 
@@ -2347,9 +2355,10 @@ qsa("[data-close]")
 
   btn.addEventListener(
     "click",
-    () => closeModal(
-      btn.dataset.close
-    )
+    () =>
+      closeModal(
+        btn.dataset.close
+      )
   );
 
 });
@@ -2390,12 +2399,9 @@ async function api(
 
 
   try {
-
     data =
       await response.json();
-
   }
-
   catch {}
 
 
@@ -2414,9 +2420,7 @@ async function api(
 }
 
 
-/* =====================================
-   ROUTES
-===================================== */
+/* ROUTES */
 
 function getRoute() {
 
@@ -2429,14 +2433,12 @@ function getRoute() {
   if (match) {
 
     return {
-
       type:"comic",
 
       slug:
         decodeURIComponent(
           match[1]
         )
-
     };
 
   }
@@ -2490,9 +2492,7 @@ function setComicMetadata(comic) {
 }
 
 
-/* =====================================
-   PUBLIC CATALOG
-===================================== */
+/* CATALOG */
 
 async function loadCatalog(
   page = 1
@@ -2523,22 +2523,18 @@ async function loadCatalog(
 
 
     if (searchQuery) {
-
       params.set(
         "q",
         searchQuery
       );
-
     }
 
 
     if (selectedGenre) {
-
       params.set(
         "genre",
         selectedGenre
       );
-
     }
 
 
@@ -2577,11 +2573,9 @@ async function loadCatalog(
 
     qs("#comicGrid")
     .innerHTML = `
-
       <div class="empty">
         ${esc(error.message)}
       </div>
-
     `;
 
   }
@@ -2607,11 +2601,9 @@ function renderCatalog() {
   if (!catalog.length) {
 
     grid.innerHTML = `
-
       <div class="empty">
         No encontramos cómics.
       </div>
-
     `;
 
     return;
@@ -2621,7 +2613,6 @@ function renderCatalog() {
 
   grid.innerHTML =
     catalog.map(comic => {
-
 
       const parts =
         Number(
@@ -2634,18 +2625,14 @@ function renderCatalog() {
 
 
       if (parts === 1) {
-
         badge =
           "▶ Leer";
-
       }
 
 
       if (parts > 1) {
-
         badge =
           `▶ ${parts} partes`;
-
       }
 
 
@@ -2734,9 +2721,7 @@ function renderCatalog() {
 }
 
 
-/* =====================================
-   PAGINATION
-===================================== */
+/* PAGINATION */
 
 function renderPagination() {
 
@@ -2797,9 +2782,7 @@ function renderPagination() {
       total > 7 &&
       i !== 1 &&
       i !== total &&
-      Math.abs(
-        i - page
-      ) > 2
+      Math.abs(i - page) > 2
     ) {
 
       continue;
@@ -2881,9 +2864,7 @@ function renderPagination() {
 }
 
 
-/* =====================================
-   POPULAR
-===================================== */
+/* POPULAR */
 
 async function loadPopular() {
 
@@ -2934,11 +2915,9 @@ async function loadPopular() {
       ).join("")
       :
       `
-
         <div class="empty">
           Sin datos.
         </div>
-
       `;
 
 
@@ -2965,11 +2944,9 @@ async function loadPopular() {
 
     qs("#popularList")
     .innerHTML = `
-
       <div class="empty">
         ${esc(error.message)}
       </div>
-
     `;
 
   }
@@ -2977,9 +2954,7 @@ async function loadPopular() {
 }
 
 
-/* =====================================
-   UPDATES
-===================================== */
+/* UPDATES */
 
 async function loadUpdates() {
 
@@ -3000,7 +2975,6 @@ async function loadUpdates() {
       updates.length
       ?
       updates.map(update => {
-
 
         const cover =
           update.cover_url
@@ -3027,11 +3001,9 @@ async function loadUpdates() {
             <div>
 
               <div class="update-title">
-
                 ${esc(
                   update.comic_title
                 )}
-
               </div>
 
               <div class="update-meta">
@@ -3067,11 +3039,9 @@ async function loadUpdates() {
       }).join("")
       :
       `
-
         <div class="empty">
           Todavía no hay actualizaciones.
         </div>
-
       `;
 
 
@@ -3101,11 +3071,9 @@ async function loadUpdates() {
 
     qs("#updatesList")
     .innerHTML = `
-
       <div class="empty">
         ${esc(error.message)}
       </div>
-
     `;
 
   }
@@ -3113,9 +3081,7 @@ async function loadUpdates() {
 }
 
 
-/* =====================================
-   DIRECT COMIC OPEN
-===================================== */
+/* DIRECT READER */
 
 async function openComicDirect(
   slug,
@@ -3189,7 +3155,8 @@ async function openComicDirect(
     }
 
 
-    let index = -1;
+    let index =
+      -1;
 
 
     if (
@@ -3253,9 +3220,7 @@ async function openComicDirect(
 }
 
 
-/* =====================================
-   COMIC INFORMATION
-===================================== */
+/* INFO */
 
 function prepareComicInfo(
   comic,
@@ -3304,11 +3269,9 @@ function prepareComicInfo(
   if (!chapters.length) {
 
     parts.innerHTML = `
-
       <div class="empty">
         No hay partes publicadas.
       </div>
-
     `;
 
     return;
@@ -3394,9 +3357,7 @@ function showNoPages() {
 }
 
 
-/* =====================================
-   READER
-===================================== */
+/* READER */
 
 async function openReaderByIndex(
   index
@@ -3406,9 +3367,7 @@ async function openReaderByIndex(
     index < 0 ||
     index >= readerParts.length
   ) {
-
     return;
-
   }
 
 
@@ -3680,9 +3639,7 @@ qs("#readerInfo")
 );
 
 
-/* =====================================
-   READER SHARE
-===================================== */
+/* SHARE */
 
 function comicUrl() {
 
@@ -3699,9 +3656,7 @@ function comicUrl() {
 async function shareCurrentComic() {
 
   if (!currentPublicComic) {
-
     return;
-
   }
 
 
@@ -3716,12 +3671,9 @@ async function shareCurrentComic() {
     ) {
 
       await navigator.share({
-
         title:
           currentPublicComic.title,
-
         url
-
       });
 
 
@@ -3803,9 +3755,7 @@ qs("#copyComicBtn")
 );
 
 
-/* =====================================
-   CLOSE INFO
-===================================== */
+/* EXIT */
 
 qs("#closeDetailBtn")
 .addEventListener(
@@ -3833,10 +3783,6 @@ qs("#closeDetailBtn")
   }
 );
 
-
-/* =====================================
-   EXIT READER
-===================================== */
 
 function exitComic() {
 
@@ -3907,9 +3853,7 @@ qs("#closeReader")
 );
 
 
-/* =====================================
-   HISTORY
-===================================== */
+/* HISTORY */
 
 window.addEventListener(
   "popstate",
@@ -3959,9 +3903,7 @@ window.addEventListener(
 );
 
 
-/* =====================================
-   SEARCH
-===================================== */
+/* SEARCH */
 
 qs("#searchInput")
 .addEventListener(
@@ -3995,9 +3937,7 @@ qs("#searchInput")
 );
 
 
-/* =====================================
-   GENRES
-===================================== */
+/* GENRES */
 
 qsa(".genre-btn")
 .forEach(button => {
@@ -4029,9 +3969,7 @@ qsa(".genre-btn")
 });
 
 
-/* =====================================
-   SORT
-===================================== */
+/* SORT */
 
 qsa(".tab")
 .forEach(button => {
@@ -4063,9 +4001,7 @@ qsa(".tab")
 });
 
 
-/* =====================================
-   ADMIN LOGIN
-===================================== */
+/* ADMIN LOGIN */
 
 qs("#openAdmin")
 .addEventListener(
@@ -4194,9 +4130,7 @@ async function loginAdmin() {
 }
 
 
-/* =====================================
-   ADMIN DASHBOARD
-===================================== */
+/* ADMIN */
 
 async function showAdmin() {
 
@@ -4280,9 +4214,118 @@ async function loadStats() {
 }
 
 
-/* =====================================
-   ADMIN COMICS
-===================================== */
+/* READINESS */
+
+function calculateReadiness(
+  comic,
+  chapters
+) {
+
+  const all =
+    chapters || [];
+
+
+  const published =
+    all.filter(
+      chapter =>
+        Boolean(
+          chapter.is_published
+        )
+    );
+
+
+  const readable =
+    published.filter(
+      chapter =>
+        Number(
+          chapter.page_count || 0
+        ) > 0
+    );
+
+
+  const totalPages =
+    readable.reduce(
+      (sum,chapter) =>
+        sum +
+        Number(
+          chapter.page_count || 0
+        ),
+      0
+    );
+
+
+  if (
+    !comic.is_published
+  ) {
+
+    return {
+      rowClass:"draft",
+      badgeClass:"draft",
+      label:"BORRADOR",
+      detail:
+        "El cómic no aparece para los lectores."
+    };
+
+  }
+
+
+  if (
+    all.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTA CREAR UNA PARTE",
+      detail:
+        "Pulsa Partes y crea la Parte 1."
+    };
+
+  }
+
+
+  if (
+    published.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTA PUBLICAR UNA PARTE",
+      detail:
+        "La obra tiene partes, pero ninguna está publicada."
+    };
+
+  }
+
+
+  if (
+    readable.length === 0
+  ) {
+
+    return {
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"⚠ FALTAN PÁGINAS",
+      detail:
+        "La parte está publicada, pero todavía no tiene imágenes."
+    };
+
+  }
+
+
+  return {
+    rowClass:"ready",
+    badgeClass:"ok",
+    label:"✓ LISTO PARA LEER",
+    detail:
+      `${readable.length} parte(s) disponible(s) · ${totalPages} páginas`
+  };
+
+}
+
+
+/* ADMIN COMICS */
 
 async function loadAdminComics() {
 
@@ -4296,12 +4339,25 @@ async function loadAdminComics() {
     data.comics || [];
 
 
-  qs("#adminList")
-  .innerHTML =
-    comics.length
-    ?
-    comics.map(comic => {
+  const box =
+    qs("#adminList");
 
+
+  if (!comics.length) {
+
+    box.innerHTML = `
+      <div class="empty">
+        No hay cómics.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    comics.map(comic => {
 
       const cover =
         comic.cover_url
@@ -4313,8 +4369,10 @@ async function loadAdminComics() {
 
       return `
 
-        <div class="admin-row">
-
+        <div
+          class="admin-row"
+          id="adminComic-${comic.id}"
+        >
 
           <div
             class="admin-cover"
@@ -4324,11 +4382,23 @@ async function loadAdminComics() {
 
           <div>
 
-            <strong>
-              ${esc(comic.title)}
-            </strong>
+            <div class="admin-title-line">
+
+              <strong>
+                ${esc(comic.title)}
+              </strong>
+
+            </div>
+
 
             <small>
+
+              ${esc(
+                comic.genre ||
+                "Sin género"
+              )}
+
+              ·
 
               ${comic.part_count}
               parte(s)
@@ -4344,6 +4414,20 @@ async function loadAdminComics() {
               }
 
             </small>
+
+
+            <div
+              class="readiness"
+              id="readiness-${comic.id}"
+            >
+
+              <span
+                class="ready-badge loading"
+              >
+                Comprobando contenido...
+              </span>
+
+            </div>
 
           </div>
 
@@ -4370,20 +4454,12 @@ async function loadAdminComics() {
 
           </div>
 
-
         </div>
 
       `;
 
-    }).join("")
-    :
-    `
-
-      <div class="empty">
-        No hay cómics.
-      </div>
-
-    `;
+    })
+    .join("");
 
 
   qsa("[data-edit]")
@@ -4444,6 +4520,99 @@ async function loadAdminComics() {
 
   });
 
+
+  await Promise.all(
+
+    comics.map(
+      async comic => {
+
+        try {
+
+          const result =
+            await api(
+              `/api/admin/comics/${comic.id}/chapters`
+            );
+
+
+          const status =
+            calculateReadiness(
+              comic,
+              result.chapters || []
+            );
+
+
+          const row =
+            qs(
+              `#adminComic-${comic.id}`
+            );
+
+
+          if (row) {
+
+            row.classList.add(
+              status.rowClass
+            );
+
+          }
+
+
+          const indicator =
+            qs(
+              `#readiness-${comic.id}`
+            );
+
+
+          if (indicator) {
+
+            indicator.innerHTML = `
+
+              <span
+                class="ready-badge ${status.badgeClass}"
+              >
+                ${status.label}
+              </span>
+
+              <span
+                class="readiness-detail"
+              >
+                ${esc(status.detail)}
+              </span>
+
+            `;
+
+          }
+
+        }
+
+        catch {
+
+          const indicator =
+            qs(
+              `#readiness-${comic.id}`
+            );
+
+
+          if (indicator) {
+
+            indicator.innerHTML = `
+
+              <span
+                class="ready-badge warn"
+              >
+                Estado no disponible
+              </span>
+
+            `;
+
+          }
+
+        }
+
+      }
+    )
+
+  );
+
 }
 
 
@@ -4464,9 +4633,7 @@ qs("#refreshAdminBtn")
 );
 
 
-/* =====================================
-   NEW COMIC
-===================================== */
+/* NEW COMIC */
 
 qs("#newComicBtn")
 .addEventListener(
@@ -4490,6 +4657,10 @@ qs("#newComicBtn")
       "Nuevo cómic";
 
 
+    qs("#comicMsg")
+    .textContent = "";
+
+
     openModal(
       "comicModal"
     );
@@ -4498,9 +4669,7 @@ qs("#newComicBtn")
 );
 
 
-/* =====================================
-   EDIT COMIC
-===================================== */
+/* EDIT COMIC */
 
 function editComic(
   id,
@@ -4552,6 +4721,10 @@ function editComic(
     "Editar cómic";
 
 
+  qs("#comicMsg")
+  .textContent = "";
+
+
   openModal(
     "comicModal"
   );
@@ -4559,9 +4732,7 @@ function editComic(
 }
 
 
-/* =====================================
-   SAVE COMIC
-===================================== */
+/* SAVE COMIC */
 
 qs("#comicForm")
 .addEventListener(
@@ -4717,9 +4888,7 @@ qs("#comicForm")
 );
 
 
-/* =====================================
-   DELETE COMIC
-===================================== */
+/* DELETE COMIC */
 
 async function deleteComic(id) {
 
@@ -4728,9 +4897,7 @@ async function deleteComic(id) {
       "¿Eliminar este cómic y todas sus páginas?"
     )
   ) {
-
     return;
-
   }
 
 
@@ -4753,9 +4920,7 @@ async function deleteComic(id) {
 }
 
 
-/* =====================================
-   MANAGE PARTS
-===================================== */
+/* MANAGE PARTS */
 
 async function manageParts(
   id,
@@ -4779,6 +4944,22 @@ async function manageParts(
     (
       comic?.title || ""
     );
+
+
+  qs("#chapterNumber")
+  .value = 1;
+
+
+  qs("#chapterTitle")
+  .value = "";
+
+
+  qs("#chapterPublished")
+  .checked = true;
+
+
+  qs("#chapterMsg")
+  .textContent = "";
 
 
   openModal(
@@ -4811,7 +4992,6 @@ async function loadParts() {
       chapter => `
 
         <div class="chapter-row">
-
 
           <div>
 
@@ -4895,18 +5075,15 @@ async function loadParts() {
 
           </div>
 
-
         </div>
 
       `
     ).join("")
     :
     `
-
       <div class="empty">
         Todavía no hay partes.
       </div>
-
     `;
 
 
@@ -4968,9 +5145,7 @@ async function loadParts() {
 }
 
 
-/* =====================================
-   ADD PART
-===================================== */
+/* ADD PART */
 
 qs("#addChapterBtn")
 .addEventListener(
@@ -5035,9 +5210,7 @@ qs("#addChapterBtn")
 );
 
 
-/* =====================================
-   EDIT PART
-===================================== */
+/* EDIT PART */
 
 function openEditChapter(id) {
 
@@ -5065,6 +5238,10 @@ function openEditChapter(id) {
     Boolean(
       chapter.is_published
     );
+
+
+  qs("#editChapterMsg")
+  .textContent = "";
 
 
   openModal(
@@ -5119,6 +5296,7 @@ qs("#saveChapterBtn")
 
       await Promise.all([
         loadParts(),
+        loadAdminComics(),
         loadCatalog(currentPage),
         loadUpdates(),
         loadStats()
@@ -5148,9 +5326,7 @@ qs("#saveChapterBtn")
 );
 
 
-/* =====================================
-   UPLOAD PAGES
-===================================== */
+/* UPLOAD */
 
 async function uploadPages(
   chapterId
@@ -5219,6 +5395,7 @@ async function uploadPages(
 
     await Promise.all([
       loadParts(),
+      loadAdminComics(),
       loadStats(),
       loadCatalog(currentPage),
       loadUpdates()
@@ -5226,7 +5403,7 @@ async function uploadPages(
 
 
     alert(
-      "Páginas subidas."
+      "Páginas subidas. El cómic ya puede aparecer como LISTO PARA LEER."
     );
 
   }
@@ -5242,9 +5419,7 @@ async function uploadPages(
 }
 
 
-/* =====================================
-   DELETE PART
-===================================== */
+/* DELETE PART */
 
 async function deleteChapter(id) {
 
@@ -5253,9 +5428,7 @@ async function deleteChapter(id) {
       "¿Eliminar esta parte?"
     )
   ) {
-
     return;
-
   }
 
 
@@ -5269,8 +5442,8 @@ async function deleteChapter(id) {
 
   await Promise.all([
     loadParts(),
-    loadStats(),
     loadAdminComics(),
+    loadStats(),
     loadCatalog(currentPage),
     loadUpdates()
   ]);
@@ -5278,9 +5451,7 @@ async function deleteChapter(id) {
 }
 
 
-/* =====================================
-   PAGE MANAGER
-===================================== */
+/* PAGE MANAGER */
 
 async function openPagesManager(id) {
 
@@ -5325,7 +5496,6 @@ function renderManagedPages() {
       (page,index) => `
 
         <div class="page-card">
-
 
           <div class="page-thumb">
 
@@ -5384,18 +5554,15 @@ function renderManagedPages() {
 
           </div>
 
-
         </div>
 
       `
     ).join("")
     :
     `
-
       <div class="empty">
         No hay páginas.
       </div>
-
     `;
 
 
@@ -5468,9 +5635,7 @@ async function movePage(
     newIndex >=
     managedPages.length
   ) {
-
     return;
-
   }
 
 
@@ -5546,9 +5711,7 @@ async function deletePage(id) {
       "¿Eliminar esta página?"
     )
   ) {
-
     return;
-
   }
 
 
@@ -5563,6 +5726,7 @@ async function deletePage(id) {
   await Promise.all([
     loadManagedPages(),
     loadParts(),
+    loadAdminComics(),
     loadStats(),
     loadCatalog(currentPage),
     loadUpdates()
@@ -5571,9 +5735,7 @@ async function deletePage(id) {
 }
 
 
-/* =====================================
-   START
-===================================== */
+/* START */
 
 async function startNightInk() {
 

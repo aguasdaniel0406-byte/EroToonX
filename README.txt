@@ -18,4 +18,4 @@ Expected response:
 {"ok":true,"app":"nightink-app","worker":true}
 
 Do not add D1, R2 or ADMIN_TOKEN yet. First confirm this clean deployment works.
-vf
+vt

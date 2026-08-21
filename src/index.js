@@ -1,5797 +1,2200 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>NightInk Comics</title>
-
-<meta
-  id="metaDescription"
-  name="description"
-  content="NightInk Comics"
->
-
-<style>
-:root{
-  --bg:#0f1014;
-  --panel:#181a21;
-  --panel2:#20232c;
-  --line:#303441;
-  --text:#f4f5f7;
-  --muted:#a9afbb;
-  --accent:#7c4dff;
-  --accent2:#ef476f;
-  --danger:#d94b62;
-  --green:#2cb67d;
-  --warning:#f1ad45;
-}
-
-*{box-sizing:border-box}
-
-html{scroll-behavior:smooth}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-body.locked{overflow:hidden}
-
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
-button,
-input,
-select,
-textarea{
-  font:inherit;
-}
-
-button{cursor:pointer}
-
-.wrap{
-  width:min(1280px,calc(100% - 24px));
-  margin:auto;
-}
-
-
-/* TOP */
-
-.topline{
-  background:#090a0d;
-  border-bottom:1px solid #20232b;
-  color:#c8ccd4;
-  font-size:12px;
-}
-
-.topline .wrap{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  padding:7px 0;
-  flex-wrap:wrap;
-}
-
-
-/* HEADER */
-
-header{
-  position:sticky;
-  top:0;
-  z-index:40;
-  background:rgba(17,18,23,.97);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(12px);
-}
-
-.header-inner{
-  min-height:72px;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:18px;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:24px;
-  font-weight:800;
-}
-
-.logo-mark{
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  font-size:14px;
-}
-
-.nav{
-  display:flex;
-  gap:5px;
-  flex-wrap:wrap;
-}
-
-.nav a{
-  padding:10px 12px;
-  border-radius:8px;
-  color:#d5d8de;
-  font-size:14px;
-}
-
-.nav a:hover,
-.nav a.active{
-  background:#242731;
-  color:white;
-}
-
-.head-actions{
-  display:flex;
-  gap:8px;
-}
-
-.search{
-  width:230px;
-  height:40px;
-  border:1px solid var(--line);
-  background:#1b1e26;
-  color:white;
-  border-radius:9px;
-  padding:0 12px;
-  outline:none;
-}
-
-.admin-btn{
-  height:40px;
-  border:0;
-  border-radius:9px;
-  padding:0 14px;
-  background:linear-gradient(135deg,var(--accent),#5d35c8);
-  color:white;
-  font-weight:700;
-}
-
-
-/* MAIN */
-
-main{
-  padding:18px 0 45px;
-}
-
-
-/* HERO */
-
-.hero{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:16px;
-  margin-bottom:18px;
-}
-
-.hero-main,
-.hero-side,
-.section,
-.sidebar,
-.admin-shell{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:12px;
-}
-
-.hero-main{
-  padding:28px;
-  min-height:300px;
-  background:
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(124,77,255,.24),
-      transparent 29%
-    ),
-    radial-gradient(
-      circle at 15% 85%,
-      rgba(239,71,111,.16),
-      transparent 30%
-    ),
-    #171920;
-}
-
-.hero-main h1{
-  max-width:760px;
-  margin:10px 0 15px;
-  font-size:42px;
-  line-height:1.03;
-}
-
-.hero-main p{
-  max-width:700px;
-  color:var(--muted);
-  line-height:1.7;
-}
-
-.eyebrow{
-  color:#c8b6ff;
-  font-size:11px;
-  letter-spacing:.14em;
-  font-weight:800;
-}
-
-.hero-tags{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:20px;
-}
-
-.pill{
-  display:inline-flex;
-  padding:6px 9px;
-  border-radius:999px;
-  background:#242735;
-  border:1px solid #343847;
-  color:#dfe2e8;
-  font-size:11px;
-}
-
-.hero-side{
-  padding:14px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-.mini-cover{
-  min-height:270px;
-  border-radius:10px;
-  border:1px solid #343845;
-  padding:12px;
-  display:flex;
-  align-items:flex-end;
-  position:relative;
-  overflow:hidden;
-}
-
-.mini-cover:nth-child(1){
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
-}
-
-.mini-cover:nth-child(2){
-  background:linear-gradient(150deg,#9d355e,#401527 60%,#160c12);
-}
-
-.mini-cover:nth-child(3){
-  background:linear-gradient(150deg,#3e6175,#172b37 60%,#0c151b);
-}
-
-.mini-cover:after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.88));
-}
-
-.mini-cover span{
-  position:relative;
-  z-index:1;
-  font-weight:800;
-}
-
-
-/* LAYOUT */
-
-.layout{
-  display:grid;
-  grid-template-columns:245px 1fr;
-  gap:16px;
-}
-
-.sidebar{
-  padding:14px;
-  height:max-content;
-  position:sticky;
-  top:88px;
-}
-
-.side-title{
-  font-weight:800;
-  font-size:15px;
-  margin-bottom:10px;
-}
-
-.genre-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-}
-
-.genre-btn,
-.tab{
-  border:1px solid #353947;
-  background:#22252e;
-  color:#e8e9ed;
-  border-radius:8px;
-}
-
-.genre-btn{
-  padding:9px 10px;
-  font-size:12px;
-  text-align:left;
-}
-
-.genre-btn:hover,
-.genre-btn.active,
-.tab.active{
-  background:var(--accent);
-  border-color:var(--accent);
-}
-
-.side-block{
-  margin-top:18px;
-  padding-top:15px;
-  border-top:1px solid var(--line);
-}
-
-
-/* POPULAR */
-
-.popular-list{
-  display:grid;
-  gap:8px;
-}
-
-.popular-item{
-  display:grid;
-  grid-template-columns:30px 1fr;
-  gap:8px;
-  align-items:center;
-  padding:9px;
-  border-radius:8px;
-  background:#20232b;
-  border:1px solid transparent;
-  cursor:pointer;
-}
-
-.popular-item:hover{
-  border-color:#3c4250;
-}
-
-.popular-rank{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border-radius:7px;
-  background:#2b2f3a;
-  font-weight:800;
-  font-size:11px;
-}
-
-.popular-item strong{
-  display:block;
-  font-size:12px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.popular-item small{
-  display:block;
-  margin-top:3px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-
-/* SECTION */
-
-.section{
-  padding:14px;
-  margin-bottom:16px;
-}
-
-.section-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.section-head h2{
-  margin:0;
-  font-size:21px;
-}
-
-.tabs{
-  display:flex;
-  gap:7px;
-}
-
-.tab{
-  padding:8px 11px;
-  font-size:12px;
-}
-
-
-/* COMICS */
-
-.comic-grid{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-}
-
-.comic-card{
-  background:#20232b;
-  border:1px solid #313644;
-  border-radius:10px;
-  overflow:hidden;
-  transition:.17s;
-  cursor:pointer;
-}
-
-.comic-card:hover{
-  transform:translateY(-3px);
-  border-color:#565d72;
-}
-
-.cover{
-  aspect-ratio:3/4;
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:flex-end;
-  padding:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
-  background-size:cover;
-  background-position:center;
-}
-
-.cover:after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.9));
-}
-
-.cover-title{
-  position:relative;
-  z-index:1;
-  font-size:15px;
-  font-weight:800;
-}
-
-.chapter-badge{
-  position:absolute;
-  top:8px;
-  right:8px;
-  z-index:2;
-  background:rgba(0,0,0,.8);
-  padding:5px 7px;
-  border-radius:7px;
-  font-size:10px;
-}
-
-.card-info{
-  padding:10px;
-}
-
-.card-title{
-  margin:0 0 5px;
-  font-size:14px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.card-meta{
-  display:flex;
-  justify-content:space-between;
-  gap:5px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.empty{
-  grid-column:1/-1;
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-  border:1px dashed #373b47;
-  border-radius:10px;
-}
-
-
-/* PAGINATION */
-
-.pagination{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
-.page-btn{
-  min-width:36px;
-  height:36px;
-  border-radius:8px;
-  border:1px solid #373b47;
-  background:#22252d;
-  color:white;
-  padding:0 10px;
-}
-
-.page-btn.active{
-  background:var(--accent);
-  border-color:var(--accent);
-}
-
-.page-btn:disabled{
-  opacity:.35;
-  cursor:not-allowed;
-}
-
-
-/* UPDATES */
-
-.updates-list{
-  display:grid;
-  gap:8px;
-}
-
-.update-item{
-  display:grid;
-  grid-template-columns:54px 1fr auto;
-  gap:12px;
-  align-items:center;
-  padding:9px;
-  background:#20232b;
-  border:1px solid #303541;
-  border-radius:9px;
-  cursor:pointer;
-}
-
-.update-item:hover{
-  border-color:#505667;
-}
-
-.update-cover{
-  width:54px;
-  height:70px;
-  border-radius:7px;
-  background:#111318;
-  background-size:cover;
-  background-position:center;
-  border:1px solid #353946;
-}
-
-.update-title{
-  font-weight:800;
-  font-size:13px;
-}
-
-.update-meta{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:4px;
-}
-
-.update-part{
-  padding:6px 8px;
-  border-radius:7px;
-  background:#292d38;
-  border:1px solid #383d49;
-  font-size:10px;
-}
-
-
-/* BUTTONS */
-
-.btn{
-  border:0;
-  border-radius:9px;
-  padding:10px 14px;
-  font-weight:700;
-}
-
-.btn.primary{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:white;
-}
-
-.btn.secondary{
-  background:#292d36;
-  color:white;
-  border:1px solid #3b414d;
-}
-
-.btn.danger{
-  background:#3c1d26;
-  color:#ff9cac;
-  border:1px solid #69303e;
-}
-
-.btn.small{
-  padding:7px 9px;
-  font-size:11px;
-}
-
-
-/* ADMIN */
-
-.admin-shell{
-  display:none;
-  padding:16px;
-  margin-bottom:16px;
-}
-
-.admin-shell.visible{
-  display:block;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-
-.stat{
-  padding:12px;
-  background:#22252e;
-  border:1px solid #353a47;
-  border-radius:9px;
-}
-
-.stat strong{
-  display:block;
-  font-size:22px;
-}
-
-.stat small{
-  color:var(--muted);
-}
-
-.admin-toolbar{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  margin:14px 0;
-  flex-wrap:wrap;
-}
-
-.admin-toolbar-left,
-.admin-toolbar-right{
-  display:flex;
-  gap:8px;
-}
-
-.admin-list{
-  display:grid;
-  gap:10px;
-}
-
-.admin-row{
-  display:grid;
-  grid-template-columns:65px 1fr auto;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  background:#20232b;
-  border:1px solid #323744;
-  border-radius:10px;
-}
-
-.admin-row.ready{
-  border-color:rgba(44,182,125,.5);
-}
-
-.admin-row.warning{
-  border-color:rgba(241,173,69,.45);
-}
-
-.admin-row.draft{
-  opacity:.78;
-}
-
-.admin-cover{
-  width:65px;
-  height:86px;
-  border-radius:7px;
-  background:#15171c;
-  background-size:cover;
-  background-position:center;
-  border:1px solid #353a47;
-}
-
-.admin-row small{
-  display:block;
-  margin-top:5px;
-  color:var(--muted);
-}
-
-.admin-title-line{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.readiness{
-  margin-top:8px;
-  display:flex;
-  gap:6px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-.ready-badge{
-  display:inline-flex;
-  align-items:center;
-  padding:6px 9px;
-  border-radius:7px;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.02em;
-}
-
-.ready-badge.ok{
-  background:rgba(44,182,125,.14);
-  border:1px solid rgba(44,182,125,.45);
-  color:#78e5b4;
-}
-
-.ready-badge.warn{
-  background:rgba(241,173,69,.13);
-  border:1px solid rgba(241,173,69,.42);
-  color:#ffc86d;
-}
-
-.ready-badge.draft{
-  background:#282c35;
-  border:1px solid #404552;
-  color:#b5bac5;
-}
-
-.ready-badge.loading{
-  background:#242735;
-  border:1px solid #383d49;
-  color:#a9afbb;
-}
-
-.readiness-detail{
-  color:#8f96a4;
-  font-size:10px;
-}
-
-.row-actions{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-.row-actions button{
-  border:1px solid #3a3f4c;
-  background:#292d36;
-  color:white;
-  border-radius:7px;
-  padding:7px 9px;
-  font-size:11px;
-}
-
-
-/* MODALS */
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:210;
-  background:rgba(0,0,0,.84);
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  overflow:auto;
-}
-
-.modal.open{
-  display:flex;
-}
-
-.panel{
-  width:min(680px,100%);
-  max-height:92vh;
-  overflow:auto;
-  background:#1b1f27;
-  border:1px solid #343947;
-  border-radius:14px;
-  padding:22px;
-}
-
-.panel.wide{
-  width:min(1050px,100%);
-}
-
-.panel h2{
-  margin-top:0;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.field{
-  display:grid;
-  gap:6px;
-}
-
-.field.full{
-  grid-column:1/-1;
-}
-
-.field label{
-  font-size:12px;
-  color:#c8ccd4;
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  });
 }
 
-.field input,
-.field select,
-.field textarea{
-  width:100%;
-  background:#11141a;
-  border:1px solid #3a404d;
-  color:white;
-  border-radius:8px;
-  padding:10px;
-  outline:none;
+function getAdminToken(request) {
+  return request.headers.get("X-Admin-Token") || "";
 }
 
-.field textarea{
-  min-height:100px;
+function isAdmin(request, env) {
+  return Boolean(env.ADMIN_TOKEN) &&
+         getAdminToken(request) === env.ADMIN_TOKEN;
 }
-
-.check{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.check input{
-  width:auto;
-}
-
-.modal-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  margin-top:14px;
-}
-
-.msg{
-  min-height:18px;
-  margin-top:8px;
-  font-size:12px;
-}
-
-.error{color:#ff7488}
-.success{color:#67d99c}
-
-
-/* CHAPTERS */
-
-.chapters-list{
-  display:grid;
-  gap:8px;
-  margin-top:14px;
-}
-
-.chapter-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  padding:12px;
-  background:#20232b;
-  border:1px solid #323744;
-  border-radius:9px;
-}
-
-.chapter-row small{
-  display:block;
-  margin-top:5px;
-  color:var(--muted);
-}
-
-.upload-zone{
-  margin-top:10px;
-  padding:10px;
-  border:1px dashed #4a5060;
-  border-radius:8px;
-}
-
-
-/* PAGE MANAGER */
-
-.page-manager-info{
-  padding:10px 12px;
-  margin-bottom:12px;
-  border:1px solid #333846;
-  background:#20232b;
-  border-radius:9px;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.pages-grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-}
-
-.page-card{
-  border:1px solid #353a47;
-  background:#20232b;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.page-thumb{
-  aspect-ratio:3/4;
-  background:#101116;
-  overflow:hidden;
-}
-
-.page-thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.page-bottom{
-  padding:8px;
-}
-
-.page-number{
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:7px;
-}
-
-.page-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:5px;
-}
-
-.page-actions button{
-  padding:6px;
-  font-size:11px;
-  border-radius:6px;
-  border:1px solid #3c414e;
-  background:#292d36;
-  color:white;
-}
-
-.page-actions .delete-page{
-  grid-column:1/-1;
-  color:#ff9aaa;
-  background:#391b23;
-}
-
-.page-actions button:disabled{
-  opacity:.3;
-}
-
-
-/* INFO */
-
-.detail{
-  display:grid;
-  grid-template-columns:220px 1fr;
-  gap:18px;
-}
-
-.detail-cover{
-  aspect-ratio:3/4;
-  border-radius:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d,#11101a);
-  background-size:cover;
-  background-position:center;
-}
-
-.parts{
-  display:grid;
-  gap:8px;
-  margin-top:15px;
-}
-
-.part-btn{
-  width:100%;
-  text-align:left;
-  background:#22252e;
-  border:1px solid #353a47;
-  color:white;
-  border-radius:8px;
-  padding:11px;
-}
-
-
-/* READER */
-
-.reader{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:150;
-  background:#090a0d;
-  overflow-y:auto;
-}
-
-.reader.open{
-  display:block;
-}
-
-.reader-bar{
-  position:sticky;
-  top:0;
-  z-index:5;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:10px;
-  padding:9px 14px;
-  background:rgba(19,21,27,.97);
-  border-bottom:1px solid #303441;
-  backdrop-filter:blur(10px);
-}
-
-.reader-left,
-.reader-right{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.reader-title{
-  text-align:center;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:13px;
-}
-
-.reader-pages{
-  width:min(1050px,100%);
-  margin:auto;
-  padding-bottom:50px;
-}
-
-.reader-pages img{
-  width:100%;
-  height:auto;
-  display:block;
-  margin:0 auto;
-}
-
-.reader-empty{
-  min-height:70vh;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  color:var(--muted);
-  padding:40px;
-}
-
-.reader-bottom-nav{
-  width:min(1050px,100%);
-  margin:25px auto 60px;
-  padding:20px;
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-
-/* MOBILE */
-
-@media(max-width:1100px){
-
-  .comic-grid{
-    grid-template-columns:repeat(4,1fr);
-  }
-
-  .pages-grid{
-    grid-template-columns:repeat(4,1fr);
-  }
-
-  .hero{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:900px){
-
-  .header-inner{
-    grid-template-columns:1fr;
-    padding:12px 0;
-  }
-
-  .head-actions{
-    width:100%;
-  }
-
-  .search{
-    flex:1;
-    width:auto;
-  }
-
-  .layout{
-    grid-template-columns:1fr;
-  }
-
-  .sidebar{
-    position:static;
-  }
-
-  .comic-grid{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .pages-grid{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-}
-
-@media(max-width:640px){
-
-  .nav{
-    display:none;
-  }
-
-  .comic-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .pages-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .hero-side{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .mini-cover{
-    min-height:180px;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .field.full{
-    grid-column:auto;
-  }
-
-  .admin-row{
-    grid-template-columns:52px 1fr;
-  }
-
-  .admin-cover{
-    width:52px;
-    height:70px;
-  }
-
-  .admin-row .row-actions{
-    grid-column:1/-1;
-  }
-
-  .chapter-row{
-    grid-template-columns:1fr;
-  }
-
-  .update-item{
-    grid-template-columns:48px 1fr;
-  }
-
-  .update-part{
-    grid-column:1/-1;
-  }
-
-  .detail{
-    grid-template-columns:1fr;
-  }
-
-  .detail-cover{
-    max-width:220px;
-  }
-
-  .reader-bar{
-    grid-template-columns:1fr;
-  }
-
-  .reader-left,
-  .reader-right{
-    justify-content:center;
-  }
-
-  .reader-title{
-    order:-1;
-  }
-
-}
-</style>
-</head>
-
-<body>
-
-
-<div class="topline">
-  <div class="wrap">
-
-    <div>
-      NightInk Comics · +18
-    </div>
-
-    <div>
-      Cómics · Series · Actualizaciones
-    </div>
-
-  </div>
-</div>
-
-
-<header>
-
-<div class="wrap header-inner">
-
-  <a
-    class="logo"
-    href="/"
-    id="homeLogo"
-  >
-    <span class="logo-mark">NI</span>
-    <span>NightInk</span>
-  </a>
-
-
-  <nav class="nav">
-
-    <a href="/" class="active">
-      Inicio
-    </a>
-
-    <a href="/#catalogo">
-      Últimos
-    </a>
-
-    <a href="/#actualizaciones">
-      Actualizaciones
-    </a>
-
-    <a href="/#categorias">
-      Categorías
-    </a>
-
-  </nav>
-
-
-  <div class="head-actions">
-
-    <input
-      id="searchInput"
-      class="search"
-      placeholder="Buscar cómic..."
-    >
-
-    <button
-      id="openAdmin"
-      class="admin-btn"
-    >
-      ⚙ Admin
-    </button>
-
-  </div>
-
-</div>
-
-</header>
-
-
-<main class="wrap">
-
-
-<section class="hero">
-
-  <div class="hero-main">
-
-    <span class="eyebrow">
-      NIGHTINK COMICS
-    </span>
-
-    <h1>
-      Lee directamente. Sin pasos innecesarios.
-    </h1>
-
-    <p>
-      Abre cualquier obra y comienza a leer inmediatamente.
-      Si tiene varias partes podrás moverte entre ellas desde
-      el propio lector.
-    </p>
-
-    <div class="hero-tags">
-
-      <span class="pill">+18</span>
-      <span class="pill">One-shots</span>
-      <span class="pill">Series</span>
-      <span class="pill">Actualizaciones</span>
-
-    </div>
-
-  </div>
-
-
-  <div class="hero-side">
-
-    <div class="mini-cover">
-      <span>NightInk</span>
-    </div>
-
-    <div class="mini-cover">
-      <span>Leer ahora</span>
-    </div>
-
-    <div class="mini-cover">
-      <span>Nuevas partes</span>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ADMIN -->
-
-<section
-  id="adminShell"
-  class="admin-shell"
->
-
-  <div class="section-head">
-
-    <h2>
-      Panel de administración
-    </h2>
-
-    <span class="pill">
-      D1 + R2
-    </span>
-
-  </div>
-
-
-  <div
-    id="stats"
-    class="stats"
-  ></div>
-
-
-  <div class="admin-toolbar">
-
-    <div class="admin-toolbar-left">
-
-      <button
-        id="newComicBtn"
-        class="btn primary"
-      >
-        + Nuevo cómic
-      </button>
-
-      <button
-        id="refreshAdminBtn"
-        class="btn secondary"
-      >
-        Actualizar
-      </button>
-
-    </div>
-
-
-    <div class="admin-toolbar-right">
-
-      <button
-        id="logoutAdminBtn"
-        class="btn secondary"
-      >
-        Cerrar Admin
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="adminList"
-    class="admin-list"
-  ></div>
-
-</section>
-
-
-<div class="layout">
-
-
-<aside
-  id="categorias"
-  class="sidebar"
->
-
-  <div class="side-title">
-    Categorías
-  </div>
-
-
-  <div class="genre-grid">
-
-    <button class="genre-btn active" data-genre="">
-      Todos
-    </button>
-
-    <button class="genre-btn" data-genre="Romance">
-      Romance
-    </button>
-
-    <button class="genre-btn" data-genre="Fantasía">
-      Fantasía
-    </button>
-
-    <button class="genre-btn" data-genre="Drama">
-      Drama
-    </button>
-
-    <button class="genre-btn" data-genre="Misterio">
-      Misterio
-    </button>
-
-    <button class="genre-btn" data-genre="Thriller">
-      Thriller
-    </button>
-
-    <button class="genre-btn" data-genre="Acción">
-      Acción
-    </button>
-
-    <button class="genre-btn" data-genre="Otros">
-      Otros
-    </button>
-
-  </div>
-
-
-  <div class="side-block">
-
-    <div class="side-title">
-      Más vistos
-    </div>
-
-    <div
-      id="popularList"
-      class="popular-list"
-    >
-      <div class="empty">
-        Cargando...
-      </div>
-    </div>
-
-  </div>
-
-</aside>
-
-
-<div class="content">
-
-
-<section
-  id="catalogo"
-  class="section"
->
-
-  <div class="section-head">
-
-    <h2 id="catalogTitle">
-      Últimos cómics
-    </h2>
-
-    <div class="tabs">
-
-      <button
-        class="tab active"
-        data-sort="latest"
-      >
-        Últimos
-      </button>
-
-      <button
-        class="tab"
-        data-sort="popular"
-      >
-        Populares
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="comicGrid"
-    class="comic-grid"
-  >
-    <div class="empty">
-      Cargando catálogo...
-    </div>
-  </div>
-
-
-  <div
-    id="pagination"
-    class="pagination"
-  ></div>
-
-</section>
-
-
-<section
-  id="actualizaciones"
-  class="section"
->
-
-  <div class="section-head">
-
-    <h2>
-      Últimas actualizaciones
-    </h2>
-
-    <span class="pill">
-      Leer directamente
-    </span>
-
-  </div>
-
-
-  <div
-    id="updatesList"
-    class="updates-list"
-  >
-    <div class="empty">
-      Cargando...
-    </div>
-  </div>
-
-</section>
-
-
-</div>
-
-</div>
-
-</main>
-
-
-<footer>
-
-<div class="wrap">
-  NightInk Comics · Privacidad · Términos · DMCA · Reportar contenido
-</div>
-
-</footer>
-
-
-<!-- LOGIN -->
-
-<div
-  id="loginModal"
-  class="modal"
->
-
-  <div
-    class="panel"
-    style="width:min(410px,100%)"
-  >
-
-    <h2>
-      Administrador
-    </h2>
-
-    <div class="field">
-
-      <input
-        id="adminPassword"
-        type="password"
-        placeholder="Contraseña"
-      >
-
-    </div>
-
-
-    <div
-      id="loginMsg"
-      class="msg"
-    ></div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn secondary"
-        data-close="loginModal"
-      >
-        Cancelar
-      </button>
-
-      <button
-        id="loginBtn"
-        class="btn primary"
-      >
-        Entrar
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- COMIC FORM -->
-
-<div
-  id="comicModal"
-  class="modal"
->
-
-  <div class="panel">
-
-    <h2 id="comicFormTitle">
-      Nuevo cómic
-    </h2>
-
-
-    <form id="comicForm">
-
-      <input
-        id="comicId"
-        type="hidden"
-      >
-
-
-      <div class="form-grid">
-
-
-        <div class="field">
-
-          <label>
-            Título
-          </label>
-
-          <input
-            id="comicTitle"
-            required
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Slug
-          </label>
-
-          <input
-            id="comicSlug"
-            placeholder="Opcional"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Autor
-          </label>
-
-          <input
-            id="comicAuthor"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Género
-          </label>
-
-          <input
-            id="comicGenre"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Estado
-          </label>
-
-          <select id="comicStatus">
-
-            <option>
-              En emisión
-            </option>
-
-            <option>
-              Completo
-            </option>
-
-            <option>
-              Pausado
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Portada
-          </label>
-
-          <input
-            id="comicCover"
-            type="file"
-            accept="image/*"
-          >
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            Descripción
-          </label>
-
-          <textarea
-            id="comicDescription"
-          ></textarea>
-
-        </div>
-
-
-        <div class="field full">
-
-          <label class="check">
-
-            <input
-              id="comicPublished"
-              type="checkbox"
-            >
-
-            Publicado
-
-          </label>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="comicMsg"
-        class="msg"
-      ></div>
-
-
-      <div class="modal-actions">
-
-        <button
-          type="button"
-          class="btn secondary"
-          data-close="comicModal"
-        >
-          Cancelar
-        </button>
-
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Guardar
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- PARTS -->
-
-<div
-  id="chaptersModal"
-  class="modal"
->
-
-  <div class="panel wide">
-
-    <div class="section-head">
-
-      <h2 id="chaptersTitle">
-        Partes
-      </h2>
-
-      <button
-        class="btn secondary"
-        data-close="chaptersModal"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div class="form-grid">
-
-      <div class="field">
-
-        <label>
-          Número
-        </label>
-
-        <input
-          id="chapterNumber"
-          type="number"
-          step="0.1"
-          value="1"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Título
-        </label>
-
-        <input
-          id="chapterTitle"
-          placeholder="Opcional"
-        >
-
-      </div>
-
-
-      <div class="field full">
-
-        <label class="check">
-
-          <input
-            id="chapterPublished"
-            type="checkbox"
-            checked
-          >
-
-          Publicada
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <button
-      id="addChapterBtn"
-      class="btn primary"
-      style="margin-top:10px"
-    >
-      + Añadir parte
-    </button>
-
-
-    <div
-      id="chapterMsg"
-      class="msg"
-    ></div>
-
-
-    <div
-      id="chaptersList"
-      class="chapters-list"
-    ></div>
-
-  </div>
-
-</div>
-
-
-<!-- EDIT PART -->
-
-<div
-  id="editChapterModal"
-  class="modal"
->
-
-  <div
-    class="panel"
-    style="width:min(500px,100%)"
-  >
-
-    <h2>
-      Editar parte
-    </h2>
-
-
-    <input
-      id="editChapterId"
-      type="hidden"
-    >
-
-
-    <div class="form-grid">
-
-      <div class="field">
-
-        <label>
-          Número
-        </label>
-
-        <input
-          id="editChapterNumber"
-          type="number"
-          step="0.1"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Título
-        </label>
-
-        <input
-          id="editChapterTitle"
-        >
-
-      </div>
-
-
-      <div class="field full">
-
-        <label class="check">
-
-          <input
-            id="editChapterPublished"
-            type="checkbox"
-          >
-
-          Publicada
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="editChapterMsg"
-      class="msg"
-    ></div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn secondary"
-        data-close="editChapterModal"
-      >
-        Cancelar
-      </button>
-
-      <button
-        id="saveChapterBtn"
-        class="btn primary"
-      >
-        Guardar
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- PAGE MANAGER -->
-
-<div
-  id="pagesModal"
-  class="modal"
->
-
-  <div class="panel wide">
-
-    <div class="section-head">
-
-      <h2 id="pagesTitle">
-        Gestionar páginas
-      </h2>
-
-      <button
-        class="btn secondary"
-        data-close="pagesModal"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div class="page-manager-info">
-
-      Usa ← y → para mover las páginas
-      o elimina solamente la página que quieras.
-
-    </div>
-
-
-    <div
-      id="pagesGrid"
-      class="pages-grid"
-    ></div>
-
-  </div>
-
-</div>
-
-
-<!-- INFO -->
-
-<div
-  id="detailModal"
-  class="modal"
->
-
-  <div
-    class="panel"
-    style="width:min(900px,100%)"
-  >
-
-    <div class="section-head">
-
-      <h2 id="detailTitle"></h2>
-
-      <button
-        id="closeDetailBtn"
-        class="btn secondary"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div class="detail">
-
-      <div
-        id="detailCover"
-        class="detail-cover"
-      ></div>
-
-
-      <div>
-
-        <p
-          id="detailMeta"
-          style="color:var(--muted)"
-        ></p>
-
-
-        <p
-          id="detailDescription"
-          style="line-height:1.7"
-        ></p>
-
-
-        <div
-          style="
-            display:flex;
-            gap:8px;
-            flex-wrap:wrap;
-            margin:12px 0;
-          "
-        >
-
-          <button
-            id="shareComicBtn"
-            class="btn primary"
-          >
-            Compartir
-          </button>
-
-          <button
-            id="copyComicBtn"
-            class="btn secondary"
-          >
-            Copiar enlace
-          </button>
-
-        </div>
-
-
-        <div
-          id="shareMessage"
-          class="msg success"
-        ></div>
-
-
-        <div
-          id="detailParts"
-          class="parts"
-        ></div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- READER -->
-
-<div
-  id="reader"
-  class="reader"
->
-
-  <div class="reader-bar">
-
-    <div class="reader-left">
-
-      <button
-        id="closeReader"
-        class="btn secondary small"
-      >
-        ← Salir
-      </button>
-
-      <button
-        id="readerPrev"
-        class="btn secondary small"
-      >
-        ← Parte anterior
-      </button>
-
-    </div>
-
-
-    <strong
-      id="readerTitle"
-      class="reader-title"
-    >
-      NightInk
-    </strong>
-
-
-    <div class="reader-right">
-
-      <button
-        id="readerInfo"
-        class="btn secondary small"
-      >
-        Información
-      </button>
-
-      <button
-        id="readerShare"
-        class="btn secondary small"
-      >
-        Compartir
-      </button>
-
-      <button
-        id="readerNext"
-        class="btn primary small"
-      >
-        Parte siguiente →
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="readerPages"
-    class="reader-pages"
-  ></div>
-
-
-  <div
-    id="readerBottomNav"
-    class="reader-bottom-nav"
-  ></div>
-
-</div>
-
-
-<script>
-
-/* GLOBAL */
-
-const qs = s =>
-  document.querySelector(s);
-
-const qsa = s =>
-  [...document.querySelectorAll(s)];
-
-
-let catalog = [];
-
-let pagination = {
-  page:1,
-  total_pages:1,
-  total:0
-};
-
-let currentPage = 1;
-
-let selectedGenre = "";
-
-let sortMode = "latest";
-
-let searchQuery = "";
-
-let searchTimer;
-
-
-let adminToken =
-  sessionStorage.getItem(
-    "nightink_admin_token"
-  ) || "";
-
-
-let currentComicForChapters = null;
-
-let currentAdminChapters = [];
-
-let currentManagedChapter = null;
-
-let managedPages = [];
-
-
-let currentPublicComic = null;
-
-let currentPublicSlug = null;
-
-let readerParts = [];
-
-let currentReaderIndex = -1;
-
-
-/* HELPERS */
-
-function esc(value = "") {
 
+function slugify(value = "") {
   return String(value)
-    .replace(
-      /[&<>"']/g,
-      c => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[c])
-    );
-
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 90);
 }
 
+async function deleteComicMedia(env, comicId) {
+  const pages = await env.DB.prepare(`
+    SELECT p.object_key
+    FROM pages p
+    JOIN chapters ch
+      ON ch.id = p.chapter_id
+    WHERE ch.comic_id = ?
+  `)
+  .bind(comicId)
+  .all();
 
-function openModal(id) {
+  const comic = await env.DB.prepare(`
+    SELECT cover_key
+    FROM comics
+    WHERE id = ?
+  `)
+  .bind(comicId)
+  .first();
 
-  qs("#" + id)
-    .classList
-    .add("open");
+  const keys = [];
 
-}
-
-
-function closeModal(id) {
-
-  qs("#" + id)
-    .classList
-    .remove("open");
-
-}
-
-
-qsa("[data-close]")
-.forEach(btn => {
-
-  btn.addEventListener(
-    "click",
-    () =>
-      closeModal(
-        btn.dataset.close
-      )
-  );
-
-});
-
-
-async function api(
-  url,
-  options = {}
-) {
-
-  const headers =
-    new Headers(
-      options.headers || {}
-    );
-
-
-  if (adminToken) {
-
-    headers.set(
-      "X-Admin-Token",
-      adminToken
-    );
-
+  if (comic?.cover_key) {
+    keys.push(comic.cover_key);
   }
 
-
-  const response =
-    await fetch(
-      url,
-      {
-        ...options,
-        headers
-      }
-    );
-
-
-  let data = {};
-
-
-  try {
-    data =
-      await response.json();
-  }
-  catch {}
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      data.error ||
-      "Error del servidor"
-    );
-
-  }
-
-
-  return data;
-
-}
-
-
-/* ROUTES */
-
-function getRoute() {
-
-  const match =
-    location.pathname.match(
-      /^\/comic\/([^/]+)\/?$/
-    );
-
-
-  if (match) {
-
-    return {
-      type:"comic",
-
-      slug:
-        decodeURIComponent(
-          match[1]
-        )
-    };
-
-  }
-
-
-  return {
-    type:"home"
-  };
-
-}
-
-
-function comicPath(slug) {
-
-  return (
-    "/comic/" +
-    encodeURIComponent(slug)
-  );
-
-}
-
-
-function setHomeMetadata() {
-
-  document.title =
-    "NightInk Comics";
-
-
-  qs("#metaDescription")
-  .content =
-    "NightInk Comics";
-
-}
-
-
-function setComicMetadata(comic) {
-
-  document.title =
-    comic.title +
-    " | NightInk Comics";
-
-
-  qs("#metaDescription")
-  .content =
-    comic.description
-    ?
-    comic.description.slice(0,150)
-    :
-    `Lee ${comic.title} en NightInk Comics`;
-
-}
-
-
-/* CATALOG */
-
-async function loadCatalog(
-  page = 1
-) {
-
-  try {
-
-    const params =
-      new URLSearchParams();
-
-
-    params.set(
-      "page",
-      page
-    );
-
-
-    params.set(
-      "limit",
-      10
-    );
-
-
-    params.set(
-      "sort",
-      sortMode
-    );
-
-
-    if (searchQuery) {
-      params.set(
-        "q",
-        searchQuery
-      );
+  for (const page of pages.results || []) {
+    if (page.object_key) {
+      keys.push(page.object_key);
     }
-
-
-    if (selectedGenre) {
-      params.set(
-        "genre",
-        selectedGenre
-      );
-    }
-
-
-    const data =
-      await api(
-        "/api/comics?" +
-        params.toString()
-      );
-
-
-    catalog =
-      data.comics || [];
-
-
-    pagination =
-      data.pagination || {
-        page:1,
-        total_pages:1,
-        total:catalog.length
-      };
-
-
-    currentPage =
-      Number(
-        pagination.page || 1
-      );
-
-
-    renderCatalog();
-
-    renderPagination();
-
   }
 
-  catch(error) {
-
-    qs("#comicGrid")
-    .innerHTML = `
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
-    `;
-
+  if (keys.length) {
+    await env.MEDIA.delete(keys);
   }
-
 }
 
-
-function renderCatalog() {
-
-  const grid =
-    qs("#comicGrid");
-
-
-  qs("#catalogTitle")
-  .textContent =
-    sortMode === "popular"
-    ?
-    "Cómics más populares"
-    :
-    "Últimos cómics";
-
-
-  if (!catalog.length) {
-
-    grid.innerHTML = `
-      <div class="empty">
-        No encontramos cómics.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  grid.innerHTML =
-    catalog.map(comic => {
-
-      const parts =
-        Number(
-          comic.part_count || 0
-        );
-
-
-      let badge =
-        "Sin páginas";
-
-
-      if (parts === 1) {
-        badge =
-          "▶ Leer";
-      }
-
-
-      if (parts > 1) {
-        badge =
-          `▶ ${parts} partes`;
-      }
-
-
-      const cover =
-        comic.cover_url
-        ?
-        `background-image:url('${comic.cover_url}')`
-        :
-        "";
-
-
-      return `
-
-        <article
-          class="comic-card"
-          data-comic="${esc(comic.slug)}"
-        >
-
-          <div
-            class="cover"
-            style="${cover}"
-          >
-
-            <span class="chapter-badge">
-              ${badge}
-            </span>
-
-            <span class="cover-title">
-              ${esc(comic.title)}
-            </span>
-
-          </div>
-
-
-          <div class="card-info">
-
-            <h3 class="card-title">
-              ${esc(comic.title)}
-            </h3>
-
-            <div class="card-meta">
-
-              <span>
-                ${esc(
-                  comic.genre ||
-                  "Sin categoría"
-                )}
-              </span>
-
-              <span>
-                ${Number(
-                  comic.views || 0
-                )}
-                vistas
-              </span>
-
-            </div>
-
-          </div>
-
-        </article>
-
-      `;
-
-    })
-    .join("");
-
-
-  qsa("[data-comic]")
-  .forEach(card => {
-
-    card.addEventListener(
-      "click",
-      () => {
-
-        openComicDirect(
-          card.dataset.comic,
-          true
-        );
-
-      }
-    );
-
-  });
-
+async function touchComic(env, comicId) {
+  await env.DB.prepare(`
+    UPDATE comics
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `)
+  .bind(comicId)
+  .run();
 }
 
-
-/* PAGINATION */
-
-function renderPagination() {
-
-  const box =
-    qs("#pagination");
-
-
-  const total =
-    Number(
-      pagination.total_pages || 1
-    );
-
-
-  const page =
-    Number(
-      pagination.page || 1
-    );
-
-
-  if (total <= 1) {
-
-    box.innerHTML = "";
-
-    return;
-
-  }
-
-
-  let html = "";
-
-
-  html += `
-
-    <button
-      class="page-btn"
-      data-page="${page - 1}"
-      ${
-        page === 1
-        ?
-        "disabled"
-        :
-        ""
-      }
-    >
-      ←
-    </button>
-
-  `;
-
-
-  for (
-    let i = 1;
-    i <= total;
-    i++
-  ) {
-
-    if (
-      total > 7 &&
-      i !== 1 &&
-      i !== total &&
-      Math.abs(i - page) > 2
-    ) {
-
-      continue;
-
-    }
-
-
-    html += `
-
-      <button
-        class="page-btn
-        ${
-          i === page
-          ?
-          "active"
-          :
-          ""
-        }"
-        data-page="${i}"
-      >
-        ${i}
-      </button>
-
-    `;
-
-  }
-
-
-  html += `
-
-    <button
-      class="page-btn"
-      data-page="${page + 1}"
-      ${
-        page === total
-        ?
-        "disabled"
-        :
-        ""
-      }
-    >
-      →
-    </button>
-
-  `;
-
-
-  box.innerHTML =
-    html;
-
-
-  qsa("[data-page]")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const n =
-          Number(
-            button.dataset.page
-          );
-
-
-        if (
-          n >= 1 &&
-          n <= total
-        ) {
-
-          loadCatalog(n);
-
-        }
-
-      }
-    );
-
-  });
-
+async function touchChapter(env, chapterId) {
+  await env.DB.prepare(`
+    UPDATE chapters
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `)
+  .bind(chapterId)
+  .run();
 }
 
-
-/* POPULAR */
-
-async function loadPopular() {
-
-  try {
-
-    const data =
-      await api(
-        "/api/comics?page=1&limit=5&sort=popular"
-      );
-
-
-    const items =
-      data.comics || [];
-
-
-    qs("#popularList")
-    .innerHTML =
-      items.length
-      ?
-      items.map(
-        (comic,index) => `
-
-          <div
-            class="popular-item"
-            data-popular="${esc(comic.slug)}"
-          >
-
-            <div class="popular-rank">
-              ${index + 1}
-            </div>
-
-            <div>
-
-              <strong>
-                ${esc(comic.title)}
-              </strong>
-
-              <small>
-                ${comic.views}
-                vistas
-              </small>
-
-            </div>
-
-          </div>
-
-        `
-      ).join("")
-      :
-      `
-        <div class="empty">
-          Sin datos.
-        </div>
-      `;
-
-
-    qsa("[data-popular]")
-    .forEach(item => {
-
-      item.addEventListener(
-        "click",
-        () => {
-
-          openComicDirect(
-            item.dataset.popular,
-            true
-          );
-
-        }
-      );
-
-    });
-
-  }
-
-  catch(error) {
-
-    qs("#popularList")
-    .innerHTML = `
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
-    `;
-
-  }
-
-}
-
-
-/* UPDATES */
-
-async function loadUpdates() {
-
-  try {
-
-    const data =
-      await api(
-        "/api/updates?limit=8"
-      );
-
-
-    const updates =
-      data.updates || [];
-
-
-    qs("#updatesList")
-    .innerHTML =
-      updates.length
-      ?
-      updates.map(update => {
-
-        const cover =
-          update.cover_url
-          ?
-          `background-image:url('${update.cover_url}')`
-          :
-          "";
-
-
-        return `
-
-          <div
-            class="update-item"
-            data-update-slug="${esc(update.slug)}"
-            data-update-chapter="${update.chapter_id}"
-          >
-
-            <div
-              class="update-cover"
-              style="${cover}"
-            ></div>
-
-
-            <div>
-
-              <div class="update-title">
-                ${esc(
-                  update.comic_title
-                )}
-              </div>
-
-              <div class="update-meta">
-
-                ${Number(
-                  update.page_count || 0
-                )}
-                páginas
-
-                ·
-
-                ${esc(
-                  update.genre ||
-                  "Sin categoría"
-                )}
-
-              </div>
-
-            </div>
-
-
-            <div class="update-part">
-
-              ▶ Parte
-              ${update.chapter_number}
-
-            </div>
-
-          </div>
-
-        `;
-
-      }).join("")
-      :
-      `
-        <div class="empty">
-          Todavía no hay actualizaciones.
-        </div>
-      `;
-
-
-    qsa("[data-update-slug]")
-    .forEach(item => {
-
-      item.addEventListener(
-        "click",
-        () => {
-
-          openComicDirect(
-            item.dataset.updateSlug,
-            true,
-            Number(
-              item.dataset.updateChapter
-            )
-          );
-
-        }
-      );
-
-    });
-
-  }
-
-  catch(error) {
-
-    qs("#updatesList")
-    .innerHTML = `
-      <div class="empty">
-        ${esc(error.message)}
-      </div>
-    `;
-
-  }
-
-}
-
-
-/* DIRECT READER */
-
-async function openComicDirect(
-  slug,
-  pushRoute = true,
-  preferredChapterId = null
-) {
-
-  try {
-
-    const data =
-      await api(
-        "/api/comics/" +
-        encodeURIComponent(slug)
-      );
-
-
-    const comic =
-      data.comic;
-
-
-    const chapters =
-      data.chapters || [];
-
-
-    currentPublicComic =
-      comic;
-
-
-    currentPublicSlug =
-      comic.slug;
-
-
-    readerParts =
-      chapters;
-
-
-    setComicMetadata(
-      comic
-    );
-
-
-    if (pushRoute) {
-
-      history.pushState(
-        {
-          type:"comic",
-          slug:comic.slug,
-          fromSite:true
-        },
-        "",
-        comicPath(
-          comic.slug
-        )
-      );
-
-    }
-
-
-    prepareComicInfo(
-      comic,
-      chapters
-    );
-
-
-    if (!chapters.length) {
-
-      showNoPages();
-
-      return;
-
-    }
-
-
-    let index =
-      -1;
-
-
-    if (
-      preferredChapterId
-    ) {
-
-      index =
-        chapters.findIndex(
-          chapter =>
-            Number(chapter.id) ===
-            Number(preferredChapterId)
-        );
-
-    }
-
-
-    if (
-      index === -1 ||
-      Number(
-        chapters[index]?.page_count || 0
-      ) === 0
-    ) {
-
-      index =
-        chapters.findIndex(
-          chapter =>
-            Number(
-              chapter.page_count || 0
-            ) > 0
-        );
-
-    }
-
-
-    if (index === -1) {
-
-      showNoPages();
-
-      return;
-
-    }
-
-
-    await openReaderByIndex(
-      index
-    );
-
-
-    loadPopular();
-
-  }
-
-  catch(error) {
-
-    alert(
-      error.message
-    );
-
-  }
-
-}
-
-
-/* INFO */
-
-function prepareComicInfo(
-  comic,
-  chapters
-) {
-
-  qs("#detailTitle")
-  .textContent =
-    comic.title;
-
-
-  qs("#detailMeta")
-  .textContent =
-    [
-      comic.author,
-      comic.genre,
-      comic.status,
-      `${comic.views} vistas`
-    ]
-    .filter(Boolean)
-    .join(" · ");
-
-
-  qs("#detailDescription")
-  .textContent =
-    comic.description || "";
-
-
-  qs("#detailCover")
-  .style.backgroundImage =
-    comic.cover_url
-    ?
-    `url("${comic.cover_url}")`
-    :
-    "";
-
-
-  qs("#shareMessage")
-  .textContent = "";
-
-
-  const parts =
-    qs("#detailParts");
-
-
-  if (!chapters.length) {
-
-    parts.innerHTML = `
-      <div class="empty">
-        No hay partes publicadas.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  parts.innerHTML =
-    chapters.map(
-      (chapter,index) => `
-
-        <button
-          class="part-btn"
-          data-info-part="${index}"
-        >
-
-          ▶ Parte
-          ${chapter.chapter_number}
-
-          ${
-            chapter.title
-            ?
-            " · " +
-            esc(chapter.title)
-            :
-            ""
-          }
-
-          ·
-
-          ${chapter.page_count}
-          páginas
-
-        </button>
-
-      `
-    )
-    .join("");
-
-
-  qsa("[data-info-part]")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      async () => {
-
-        closeModal(
-          "detailModal"
-        );
-
-
-        await openReaderByIndex(
-          Number(
-            button.dataset.infoPart
-          )
-        );
-
-      }
-    );
-
-  });
-
-}
-
-
-function showNoPages() {
-
-  qs("#reader")
-  .classList
-  .remove("open");
-
-
-  document.body
-  .classList
-  .remove("locked");
-
-
-  openModal(
-    "detailModal"
-  );
-
-}
-
-
-/* READER */
-
-async function openReaderByIndex(
-  index
-) {
-
-  if (
-    index < 0 ||
-    index >= readerParts.length
-  ) {
+async function renumberPages(env, chapterId) {
+  const result = await env.DB.prepare(`
+    SELECT id
+    FROM pages
+    WHERE chapter_id = ?
+    ORDER BY page_number ASC, id ASC
+  `)
+  .bind(chapterId)
+  .all();
+
+  const pages = result.results || [];
+
+  if (!pages.length) {
     return;
   }
 
+  const tempStatements = pages.map((page, index) =>
+    env.DB.prepare(`
+      UPDATE pages
+      SET page_number = ?
+      WHERE id = ?
+    `)
+    .bind(-(index + 1), page.id)
+  );
 
-  currentReaderIndex =
-    index;
+  await env.DB.batch(tempStatements);
 
+  const finalStatements = pages.map((page, index) =>
+    env.DB.prepare(`
+      UPDATE pages
+      SET page_number = ?
+      WHERE id = ?
+    `)
+    .bind(index + 1, page.id)
+  );
 
-  const selected =
-    readerParts[index];
-
-
-  try {
-
-    const data =
-      await api(
-        `/api/chapters/${selected.id}/pages`
-      );
-
-
-    const pages =
-      data.pages || [];
-
-
-    const chapter =
-      data.chapter;
-
-
-    qs("#readerTitle")
-    .textContent =
-      readerParts.length === 1
-      ?
-      chapter.comic_title
-      :
-      `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
-
-
-    if (!pages.length) {
-
-      qs("#readerPages")
-      .innerHTML = `
-
-        <div class="reader-empty">
-
-          <div>
-
-            <h2>
-              Esta parte todavía no tiene páginas.
-            </h2>
-
-            <p>
-              Selecciona otra parte o vuelve al catálogo.
-            </p>
-
-          </div>
-
-        </div>
-
-      `;
-
-    }
-
-    else {
-
-      qs("#readerPages")
-      .innerHTML =
-        pages.map(page => `
-
-          <img
-            src="${page.url}"
-            alt="Página ${page.page_number}"
-            loading="lazy"
-          >
-
-        `)
-        .join("");
-
-    }
-
-
-    updateReaderNavigation();
-
-
-    closeModal(
-      "detailModal"
-    );
-
-
-    qs("#reader")
-    .classList
-    .add("open");
-
-
-    document.body
-    .classList
-    .add("locked");
-
-
-    qs("#reader")
-    .scrollTop = 0;
-
-  }
-
-  catch(error) {
-
-    alert(
-      error.message
-    );
-
-  }
-
+  await env.DB.batch(finalStatements);
 }
 
-
-function updateReaderNavigation() {
-
-  const previous =
-    currentReaderIndex - 1;
-
-
-  const next =
-    currentReaderIndex + 1;
-
-
-  qs("#readerPrev")
-  .disabled =
-    previous < 0;
-
-
-  qs("#readerNext")
-  .disabled =
-    next >=
-    readerParts.length;
-
-
-  const bottom =
-    qs("#readerBottomNav");
-
-
-  let html = `
-
-    <button
-      class="btn secondary"
-      id="bottomInfo"
-    >
-      Información
-    </button>
-
-  `;
-
-
-  if (
-    previous >= 0
-  ) {
-
-    html += `
-
-      <button
-        class="btn secondary"
-        id="bottomPrev"
-      >
-        ← Parte anterior
-      </button>
-
-    `;
-
-  }
-
-
-  if (
-    next <
-    readerParts.length
-  ) {
-
-    html += `
-
-      <button
-        class="btn primary"
-        id="bottomNext"
-      >
-        Parte siguiente →
-      </button>
-
-    `;
-
-  }
-
-
-  bottom.innerHTML =
-    html;
-
-
-  qs("#bottomInfo")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      openModal(
-        "detailModal"
-      );
-
-    }
+async function publicComics(env, url) {
+  const requestedPage = Math.max(
+    1,
+    Number(url.searchParams.get("page") || 1)
   );
 
-
-  qs("#bottomPrev")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        previous
-      );
-
-    }
-  );
-
-
-  qs("#bottomNext")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        next
-      );
-
-    }
-  );
-
-}
-
-
-qs("#readerPrev")
-.addEventListener(
-  "click",
-  () => {
-
-    openReaderByIndex(
-      currentReaderIndex - 1
-    );
-
-  }
-);
-
-
-qs("#readerNext")
-.addEventListener(
-  "click",
-  () => {
-
-    openReaderByIndex(
-      currentReaderIndex + 1
-    );
-
-  }
-);
-
-
-qs("#readerInfo")
-.addEventListener(
-  "click",
-  () => {
-
-    openModal(
-      "detailModal"
-    );
-
-  }
-);
-
-
-/* SHARE */
-
-function comicUrl() {
-
-  return (
-    location.origin +
-    comicPath(
-      currentPublicSlug
+  const limit = Math.min(
+    50,
+    Math.max(
+      1,
+      Number(url.searchParams.get("limit") || 20)
     )
   );
 
-}
-
-
-async function shareCurrentComic() {
-
-  if (!currentPublicComic) {
-    return;
-  }
-
-
-  const url =
-    comicUrl();
-
-
-  try {
-
-    if (
-      navigator.share
-    ) {
-
-      await navigator.share({
-        title:
-          currentPublicComic.title,
-        url
-      });
-
-
-      return;
-
-    }
-
-
-    await navigator.clipboard
-    .writeText(url);
-
-
-    alert(
-      "Enlace copiado."
-    );
-
-  }
-
-  catch(error) {
-
-    if (
-      error?.name !==
-      "AbortError"
-    ) {
-
-      alert(
-        "No se pudo compartir."
-      );
-
-    }
-
-  }
-
-}
-
-
-qs("#readerShare")
-.addEventListener(
-  "click",
-  shareCurrentComic
-);
-
-
-qs("#shareComicBtn")
-.addEventListener(
-  "click",
-  shareCurrentComic
-);
-
-
-qs("#copyComicBtn")
-.addEventListener(
-  "click",
-  async () => {
-
-    try {
-
-      await navigator.clipboard
-      .writeText(
-        comicUrl()
-      );
-
-
-      qs("#shareMessage")
-      .textContent =
-        "Enlace copiado.";
-
-    }
-
-    catch {
-
-      qs("#shareMessage")
-      .textContent =
-        comicUrl();
-
-    }
-
-  }
-);
-
-
-/* EXIT */
-
-qs("#closeDetailBtn")
-.addEventListener(
-  "click",
-  () => {
-
-    closeModal(
-      "detailModal"
-    );
-
-
-    if (
-      qs("#reader")
-      .classList
-      .contains("open")
-    ) {
-
-      return;
-
-    }
-
-
-    exitComic();
-
-  }
-);
-
-
-function exitComic() {
-
-  qs("#reader")
-  .classList
-  .remove("open");
-
-
-  closeModal(
-    "detailModal"
-  );
-
-
-  document.body
-  .classList
-  .remove("locked");
-
-
-  currentReaderIndex =
-    -1;
-
-
-  const state =
-    history.state;
-
-
-  if (
-    state?.type === "comic" &&
-    state?.fromSite
-  ) {
-
-    history.back();
-
-    return;
-
-  }
-
-
-  history.replaceState(
-    {
-      type:"home"
-    },
-    "",
-    "/"
-  );
-
-
-  currentPublicComic = null;
-
-  currentPublicSlug = null;
-
-
-  setHomeMetadata();
-
-
-  window.scrollTo(
-    0,
-    0
-  );
-
-}
-
-
-qs("#closeReader")
-.addEventListener(
-  "click",
-  exitComic
-);
-
-
-/* HISTORY */
-
-window.addEventListener(
-  "popstate",
-  async () => {
-
-    const route =
-      getRoute();
-
-
-    qs("#reader")
-    .classList
-    .remove("open");
-
-
-    closeModal(
-      "detailModal"
-    );
-
-
-    document.body
-    .classList
-    .remove("locked");
-
-
-    if (
-      route.type === "comic"
-    ) {
-
-      await openComicDirect(
-        route.slug,
-        false
-      );
-
-    }
-
-    else {
-
-      currentPublicComic = null;
-
-      currentPublicSlug = null;
-
-      setHomeMetadata();
-
-    }
-
-  }
-);
-
-
-/* SEARCH */
-
-qs("#searchInput")
-.addEventListener(
-  "input",
-  event => {
-
-    clearTimeout(
-      searchTimer
-    );
-
-
-    searchTimer =
-      setTimeout(
-        () => {
-
-          searchQuery =
-            event.target.value
-            .trim();
-
-
-          currentPage = 1;
-
-
-          loadCatalog(1);
-
-        },
-        300
-      );
-
-  }
-);
-
-
-/* GENRES */
-
-qsa(".genre-btn")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      selectedGenre =
-        button.dataset.genre;
-
-
-      qsa(".genre-btn")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
-
-
-      loadCatalog(1);
-
-    }
-  );
-
-});
-
-
-/* SORT */
-
-qsa(".tab")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      sortMode =
-        button.dataset.sort;
-
-
-      qsa(".tab")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
-
-
-      loadCatalog(1);
-
-    }
-  );
-
-});
-
-
-/* ADMIN LOGIN */
-
-qs("#openAdmin")
-.addEventListener(
-  "click",
-  async () => {
-
-    if (adminToken) {
-
-      try {
-
-        await showAdmin();
-
-        return;
-
-      }
-
-      catch {
-
-        adminToken = "";
-
-
-        sessionStorage.removeItem(
-          "nightink_admin_token"
-        );
-
-      }
-
-    }
-
-
-    openModal(
-      "loginModal"
-    );
-
-
-    qs("#adminPassword")
-    .focus();
-
-  }
-);
-
-
-qs("#loginBtn")
-.addEventListener(
-  "click",
-  loginAdmin
-);
-
-
-qs("#adminPassword")
-.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.key === "Enter"
-    ) {
-
-      loginAdmin();
-
-    }
-
-  }
-);
-
-
-async function loginAdmin() {
-
-  const password =
-    qs("#adminPassword")
-    .value;
-
-
-  try {
-
-    await api(
-      "/api/admin/login",
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            password
-          })
-      }
-    );
-
-
-    adminToken =
-      password;
-
-
-    sessionStorage.setItem(
-      "nightink_admin_token",
-      password
-    );
-
-
-    closeModal(
-      "loginModal"
-    );
-
-
-    await showAdmin();
-
-  }
-
-  catch(error) {
-
-    qs("#loginMsg")
-    .className =
-      "msg error";
-
-
-    qs("#loginMsg")
-    .textContent =
-      error.message;
-
-  }
-
-}
-
-
-/* ADMIN */
-
-async function showAdmin() {
-
-  qs("#adminShell")
-  .classList
-  .add("visible");
-
-
-  await Promise.all([
-    loadStats(),
-    loadAdminComics()
-  ]);
-
-
-  qs("#adminShell")
-  .scrollIntoView({
-    behavior:"smooth"
-  });
-
-}
-
-
-qs("#logoutAdminBtn")
-.addEventListener(
-  "click",
-  () => {
-
-    adminToken = "";
-
-
-    sessionStorage.removeItem(
-      "nightink_admin_token"
-    );
-
-
-    qs("#adminShell")
-    .classList
-    .remove("visible");
-
-  }
-);
-
-
-async function loadStats() {
-
-  const data =
-    await api(
-      "/api/admin/stats"
-    );
-
-
-  const s =
-    data.stats;
-
-
-  qs("#stats")
-  .innerHTML = `
-
-    <div class="stat">
-      <strong>${s.comics}</strong>
-      <small>Cómics</small>
-    </div>
-
-    <div class="stat">
-      <strong>${s.chapters}</strong>
-      <small>Partes</small>
-    </div>
-
-    <div class="stat">
-      <strong>${s.pages}</strong>
-      <small>Páginas</small>
-    </div>
-
-    <div class="stat">
-      <strong>${s.views}</strong>
-      <small>Vistas</small>
-    </div>
-
-  `;
-
-}
-
-
-/* READINESS */
-
-function calculateReadiness(
-  comic,
-  chapters
-) {
-
-  const all =
-    chapters || [];
-
-
-  const published =
-    all.filter(
-      chapter =>
-        Boolean(
-          chapter.is_published
-        )
-    );
-
-
-  const readable =
-    published.filter(
-      chapter =>
-        Number(
-          chapter.page_count || 0
-        ) > 0
-    );
-
-
-  const totalPages =
-    readable.reduce(
-      (sum,chapter) =>
-        sum +
-        Number(
-          chapter.page_count || 0
-        ),
-      0
-    );
-
-
-  if (
-    !comic.is_published
-  ) {
-
-    return {
-      rowClass:"draft",
-      badgeClass:"draft",
-      label:"BORRADOR",
-      detail:
-        "El cómic no aparece para los lectores."
-    };
-
-  }
-
-
-  if (
-    all.length === 0
-  ) {
-
-    return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTA CREAR UNA PARTE",
-      detail:
-        "Pulsa Partes y crea la Parte 1."
-    };
-
-  }
-
-
-  if (
-    published.length === 0
-  ) {
-
-    return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTA PUBLICAR UNA PARTE",
-      detail:
-        "La obra tiene partes, pero ninguna está publicada."
-    };
-
-  }
-
-
-  if (
-    readable.length === 0
-  ) {
-
-    return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTAN PÁGINAS",
-      detail:
-        "La parte está publicada, pero todavía no tiene imágenes."
-    };
-
-  }
-
-
-  return {
-    rowClass:"ready",
-    badgeClass:"ok",
-    label:"✓ LISTO PARA LEER",
-    detail:
-      `${readable.length} parte(s) disponible(s) · ${totalPages} páginas`
-  };
-
-}
-
-
-/* ADMIN COMICS */
-
-async function loadAdminComics() {
-
-  const data =
-    await api(
-      "/api/admin/comics"
-    );
-
-
-  const comics =
-    data.comics || [];
-
-
-  const box =
-    qs("#adminList");
-
-
-  if (!comics.length) {
-
-    box.innerHTML = `
-      <div class="empty">
-        No hay cómics.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  box.innerHTML =
-    comics.map(comic => {
-
-      const cover =
-        comic.cover_url
-        ?
-        `background-image:url('${comic.cover_url}')`
-        :
-        "";
-
-
-      return `
-
-        <div
-          class="admin-row"
-          id="adminComic-${comic.id}"
-        >
-
-          <div
-            class="admin-cover"
-            style="${cover}"
-          ></div>
-
-
-          <div>
-
-            <div class="admin-title-line">
-
-              <strong>
-                ${esc(comic.title)}
-              </strong>
-
-            </div>
-
-
-            <small>
-
-              ${esc(
-                comic.genre ||
-                "Sin género"
-              )}
-
-              ·
-
-              ${comic.part_count}
-              parte(s)
-
-              ·
-
-              ${
-                comic.is_published
-                ?
-                "Publicado"
-                :
-                "Borrador"
-              }
-
-            </small>
-
-
-            <div
-              class="readiness"
-              id="readiness-${comic.id}"
-            >
-
-              <span
-                class="ready-badge loading"
-              >
-                Comprobando contenido...
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <div class="row-actions">
-
-            <button
-              data-edit="${comic.id}"
-            >
-              Editar
-            </button>
-
-            <button
-              data-parts="${comic.id}"
-            >
-              Partes
-            </button>
-
-            <button
-              data-delete="${comic.id}"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-    })
-    .join("");
-
-
-  qsa("[data-edit]")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        editComic(
-          Number(
-            button.dataset.edit
-          ),
-          comics
-        );
-
-      }
-    );
-
-  });
-
-
-  qsa("[data-parts]")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        manageParts(
-          Number(
-            button.dataset.parts
-          ),
-          comics
-        );
-
-      }
-    );
-
-  });
-
-
-  qsa("[data-delete]")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        deleteComic(
-          Number(
-            button.dataset.delete
-          )
-        );
-
-      }
-    );
-
-  });
-
-
-  await Promise.all(
-
-    comics.map(
-      async comic => {
-
-        try {
-
-          const result =
-            await api(
-              `/api/admin/comics/${comic.id}/chapters`
-            );
-
-
-          const status =
-            calculateReadiness(
-              comic,
-              result.chapters || []
-            );
-
-
-          const row =
-            qs(
-              `#adminComic-${comic.id}`
-            );
-
-
-          if (row) {
-
-            row.classList.add(
-              status.rowClass
-            );
-
-          }
-
-
-          const indicator =
-            qs(
-              `#readiness-${comic.id}`
-            );
-
-
-          if (indicator) {
-
-            indicator.innerHTML = `
-
-              <span
-                class="ready-badge ${status.badgeClass}"
-              >
-                ${status.label}
-              </span>
-
-              <span
-                class="readiness-detail"
-              >
-                ${esc(status.detail)}
-              </span>
-
-            `;
-
-          }
-
-        }
-
-        catch {
-
-          const indicator =
-            qs(
-              `#readiness-${comic.id}`
-            );
-
-
-          if (indicator) {
-
-            indicator.innerHTML = `
-
-              <span
-                class="ready-badge warn"
-              >
-                Estado no disponible
-              </span>
-
-            `;
-
-          }
-
-        }
-
-      }
-    )
-
-  );
-
-}
-
-
-qs("#refreshAdminBtn")
-.addEventListener(
-  "click",
-  async () => {
-
-    await Promise.all([
-      loadStats(),
-      loadAdminComics(),
-      loadCatalog(currentPage),
-      loadPopular(),
-      loadUpdates()
-    ]);
-
-  }
-);
-
-
-/* NEW COMIC */
-
-qs("#newComicBtn")
-.addEventListener(
-  "click",
-  () => {
-
-    qs("#comicForm")
-    .reset();
-
-
-    qs("#comicId")
-    .value = "";
-
-
-    qs("#comicPublished")
-    .checked = true;
-
-
-    qs("#comicFormTitle")
-    .textContent =
-      "Nuevo cómic";
-
-
-    qs("#comicMsg")
-    .textContent = "";
-
-
-    openModal(
-      "comicModal"
-    );
-
-  }
-);
-
-
-/* EDIT COMIC */
-
-function editComic(
-  id,
-  comics
-) {
-
-  const comic =
-    comics.find(
-      c =>
-        Number(c.id) === id
-    );
-
-
-  if (!comic) return;
-
-
-  qs("#comicId").value =
-    comic.id;
-
-  qs("#comicTitle").value =
-    comic.title || "";
-
-  qs("#comicSlug").value =
-    comic.slug || "";
-
-  qs("#comicAuthor").value =
-    comic.author || "";
-
-  qs("#comicGenre").value =
-    comic.genre || "";
-
-  qs("#comicStatus").value =
-    comic.status ||
-    "En emisión";
-
-  qs("#comicDescription").value =
-    comic.description || "";
-
-  qs("#comicPublished").checked =
-    Boolean(
-      comic.is_published
-    );
-
-  qs("#comicCover").value =
-    "";
-
-  qs("#comicFormTitle")
-  .textContent =
-    "Editar cómic";
-
-
-  qs("#comicMsg")
-  .textContent = "";
-
-
-  openModal(
-    "comicModal"
-  );
-
-}
-
-
-/* SAVE COMIC */
-
-qs("#comicForm")
-.addEventListener(
-  "submit",
-  async event => {
-
-    event.preventDefault();
-
-
-    const id =
-      Number(
-        qs("#comicId").value ||
-        0
-      );
-
-
-    const payload = {
-
-      title:
-        qs("#comicTitle").value,
-
-      slug:
-        qs("#comicSlug").value,
-
-      author:
-        qs("#comicAuthor").value,
-
-      genre:
-        qs("#comicGenre").value,
-
-      status:
-        qs("#comicStatus").value,
-
-      description:
-        qs("#comicDescription").value,
-
-      is_published:
-        qs("#comicPublished").checked
-
-    };
-
-
-    try {
-
-      let comicId =
-        id;
-
-
-      if (id) {
-
-        await api(
-          `/api/admin/comics/${id}`,
-          {
-            method:"PUT",
-
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-          }
-        );
-
-      }
-
-      else {
-
-        const result =
-          await api(
-            "/api/admin/comics",
-            {
-              method:"POST",
-
-              headers:{
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify(
-                  payload
-                )
-            }
-          );
-
-
-        comicId =
-          result.id;
-
-      }
-
-
-      const cover =
-        qs("#comicCover")
-        .files[0];
-
-
-      if (cover) {
-
-        const form =
-          new FormData();
-
-
-        form.append(
-          "cover",
-          cover
-        );
-
-
-        await api(
-          `/api/admin/comics/${comicId}/cover`,
-          {
-            method:"POST",
-            body:form
-          }
-        );
-
-      }
-
-
-      await Promise.all([
-        loadAdminComics(),
-        loadStats(),
-        loadCatalog(currentPage),
-        loadPopular(),
-        loadUpdates()
-      ]);
-
-
-      closeModal(
-        "comicModal"
-      );
-
-  }
-
-  catch(error) {
-
-    qs("#comicMsg")
-    .className =
-      "msg error";
-
-
-    qs("#comicMsg")
-    .textContent =
-      error.message;
-
-  }
-
-);
-
-
-/* DELETE COMIC */
-
-async function deleteComic(id) {
-
-  if (
-    !confirm(
-      "¿Eliminar este cómic y todas sus páginas?"
-    )
-  ) {
-    return;
-  }
-
-
-  await api(
-    `/api/admin/comics/${id}`,
-    {
-      method:"DELETE"
-    }
-  );
-
-
-  await Promise.all([
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(1),
-    loadPopular(),
-    loadUpdates()
-  ]);
-
-}
-
-
-/* MANAGE PARTS */
-
-async function manageParts(
-  id,
-  comics
-) {
-
-  currentComicForChapters =
-    id;
-
-
-  const comic =
-    comics.find(
-      c =>
-        Number(c.id) === id
-    );
-
-
-  qs("#chaptersTitle")
-  .textContent =
-    "Partes · " +
-    (
-      comic?.title || ""
-    );
-
-
-  qs("#chapterNumber")
-  .value = 1;
-
-
-  qs("#chapterTitle")
-  .value = "";
-
-
-  qs("#chapterPublished")
-  .checked = true;
-
-
-  qs("#chapterMsg")
-  .textContent = "";
-
-
-  openModal(
-    "chaptersModal"
-  );
-
-
-  await loadParts();
-
-}
-
-
-async function loadParts() {
-
-  const data =
-    await api(
-      `/api/admin/comics/${currentComicForChapters}/chapters`
-    );
-
-
-  currentAdminChapters =
-    data.chapters || [];
-
-
-  qs("#chaptersList")
-  .innerHTML =
-    currentAdminChapters.length
-    ?
-    currentAdminChapters.map(
-      chapter => `
-
-        <div class="chapter-row">
-
-          <div>
-
-            <strong>
-
-              Parte
-              ${chapter.chapter_number}
-
-              ${
-                chapter.title
-                ?
-                " · " +
-                esc(chapter.title)
-                :
-                ""
-              }
-
-            </strong>
-
-
-            <small>
-
-              ${chapter.page_count}
-              páginas
-
-              ·
-
-              ${
-                chapter.is_published
-                ?
-                "Publicada"
-                :
-                "Borrador"
-              }
-
-            </small>
-
-
-            <div class="upload-zone">
-
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                data-files="${chapter.id}"
-              >
-
-              <br><br>
-
-              <button
-                class="btn secondary small"
-                data-upload="${chapter.id}"
-              >
-                Subir páginas
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div class="row-actions">
-
-            <button
-              data-edit-chapter="${chapter.id}"
-            >
-              Editar
-            </button>
-
-            <button
-              data-manage-pages="${chapter.id}"
-            >
-              Páginas
-            </button>
-
-            <button
-              data-delchapter="${chapter.id}"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
-        </div>
-
-      `
-    ).join("")
-    :
-    `
-      <div class="empty">
-        Todavía no hay partes.
-      </div>
-    `;
-
-
-  qsa("[data-upload]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        uploadPages(
-          Number(
-            button.dataset.upload
-          )
-        );
-
-  });
-
-
-  qsa("[data-edit-chapter]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        openEditChapter(
-          Number(
-            button.dataset.editChapter
-          )
-        );
-
-  });
-
-
-  qsa("[data-manage-pages]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        openPagesManager(
-          Number(
-            button.dataset.managePages
-          )
-        );
-
-  });
-
-
-  qsa("[data-delchapter]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        deleteChapter(
-          Number(
-            button.dataset.delchapter
-          )
-        );
-
-  });
-
-}
-
-
-/* ADD PART */
-
-qs("#addChapterBtn")
-.addEventListener(
-  "click",
-  async () => {
-
-    try {
-
-      await api(
-        `/api/admin/comics/${currentComicForChapters}/chapters`,
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-
-              chapter_number:
-                Number(
-                  qs("#chapterNumber").value
-                ),
-
-              title:
-                qs("#chapterTitle").value,
-
-              is_published:
-                qs("#chapterPublished").checked
-
-            })
-        }
-      );
-
-
-      await Promise.all([
-        loadParts(),
-        loadAdminComics(),
-        loadStats(),
-        loadCatalog(currentPage),
-        loadUpdates()
-      ]);
-
-    }
-
-    catch(error) {
-
-      qs("#chapterMsg")
-      .className =
-        "msg error";
-
-
-      qs("#chapterMsg")
-      .textContent =
-        error.message;
-
-    }
-
-  }
-);
-
-
-/* EDIT PART */
-
-function openEditChapter(id) {
-
-  const chapter =
-    currentAdminChapters
-    .find(
-      ch =>
-        Number(ch.id) === id
-    );
-
-
-  if (!chapter) return;
-
-
-  qs("#editChapterId").value =
-    chapter.id;
-
-  qs("#editChapterNumber").value =
-    chapter.chapter_number;
-
-  qs("#editChapterTitle").value =
-    chapter.title || "";
-
-  qs("#editChapterPublished").checked =
-    Boolean(
-      chapter.is_published
-    );
-
-
-  qs("#editChapterMsg")
-  .textContent = "";
-
-
-  openModal(
-    "editChapterModal"
-  );
-
-}
-
-
-qs("#saveChapterBtn")
-.addEventListener(
-  "click",
-  async () => {
-
-    const id =
-      Number(
-        qs("#editChapterId").value
-      );
-
-
-    try {
-
-      await api(
-        `/api/admin/chapters/${id}`,
-        {
-          method:"PUT",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-
-              chapter_number:
-                Number(
-                  qs("#editChapterNumber").value
-                ),
-
-              title:
-                qs("#editChapterTitle").value,
-
-              is_published:
-                qs("#editChapterPublished").checked
-
-            })
-
-        }
-      );
-
-
-      await Promise.all([
-        loadParts(),
-        loadAdminComics(),
-        loadCatalog(currentPage),
-        loadUpdates(),
-        loadStats()
-      ]);
-
-
-      closeModal(
-        "editChapterModal"
-      );
-
-    }
-
-    catch(error) {
-
-      qs("#editChapterMsg")
-      .className =
-        "msg error";
-
-
-      qs("#editChapterMsg")
-      .textContent =
-        error.message;
-
-    }
-
-  }
-);
-
-
-/* UPLOAD */
-
-async function uploadPages(
-  chapterId
-) {
-
-  const input =
-    qs(
-      `[data-files="${chapterId}"]`
-    );
-
-
-  if (
-    !input ||
-    !input.files.length
-  ) {
-
-    alert(
-      "Selecciona imágenes."
-    );
-
-    return;
-
-  }
-
-
-  const files =
-    [...input.files]
-    .sort(
-      (a,b) =>
-        a.name.localeCompare(
-          b.name,
-          undefined,
-          {
-            numeric:true
-          }
-        )
-    );
-
-
-  const form =
-    new FormData();
-
-
-  files.forEach(
-    file =>
-      form.append(
-        "pages",
-        file
-      )
-  );
-
-
-  try {
-
-    await api(
-      `/api/admin/chapters/${chapterId}/pages`,
-      {
-        method:"POST",
-        body:form
-      }
-    );
-
-
-    input.value = "";
-
-
-    await Promise.all([
-      loadParts(),
-      loadAdminComics(),
-      loadStats(),
-      loadCatalog(currentPage),
-      loadUpdates()
-    ]);
-
-
-    alert(
-      "Páginas subidas. El cómic ya puede aparecer como LISTO PARA LEER."
-    );
-
-  }
-
-  catch(error) {
-
-    alert(
-      error.message
-    );
-
-  }
-
-}
-
-
-/* DELETE PART */
-
-async function deleteChapter(id) {
-
-  if (
-    !confirm(
-      "¿Eliminar esta parte?"
-    )
-  ) {
-    return;
-  }
-
-
-  await api(
-    `/api/admin/chapters/${id}`,
-    {
-      method:"DELETE"
-    }
-  );
-
-
-  await Promise.all([
-    loadParts(),
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(currentPage),
-    loadUpdates()
-  ]);
-
-}
-
-
-/* PAGE MANAGER */
-
-async function openPagesManager(id) {
-
-  currentManagedChapter =
-    id;
-
-
-  openModal(
-    "pagesModal"
-  );
-
-
-  await loadManagedPages();
-
-}
-
-
-async function loadManagedPages() {
-
-  const data =
-    await api(
-      `/api/admin/chapters/${currentManagedChapter}/pages`
-    );
-
-
-  managedPages =
-    data.pages || [];
-
-
-  renderManagedPages();
-
-}
-
-
-function renderManagedPages() {
-
-  qs("#pagesGrid")
-  .innerHTML =
-    managedPages.length
-    ?
-    managedPages.map(
-      (page,index) => `
-
-        <div class="page-card">
-
-          <div class="page-thumb">
-
-            <img
-              src="${page.url}"
-              alt="Página"
-            >
-
-          </div>
-
-
-          <div class="page-bottom">
-
-            <div class="page-number">
-              Página ${index + 1}
-            </div>
-
-
-            <div class="page-actions">
-
-              <button
-                data-left="${page.id}"
-                ${
-                  index === 0
-                  ?
-                  "disabled"
-                  :
-                  ""
-                }
-              >
-                ←
-              </button>
-
-              <button
-                data-right="${page.id}"
-                ${
-                  index ===
-                  managedPages.length - 1
-                  ?
-                  "disabled"
-                  :
-                  ""
-                }
-              >
-                →
-              </button>
-
-              <button
-                class="delete-page"
-                data-delpage="${page.id}"
-              >
-                Eliminar
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      `
-    ).join("")
-    :
-    `
-      <div class="empty">
-        No hay páginas.
-      </div>
-    `;
-
-
-  qsa("[data-left]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        movePage(
-          Number(
-            button.dataset.left
-          ),
-          -1
-        );
-
-  });
-
-
-  qsa("[data-right]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        movePage(
-          Number(
-            button.dataset.right
-          ),
-          1
-        );
-
-  });
-
-
-  qsa("[data-delpage]")
-  .forEach(button => {
-
-    button.onclick =
-      () =>
-        deletePage(
-          Number(
-            button.dataset.delpage
-          )
-        );
-
-  });
-
-}
-
-
-async function movePage(
-  id,
-  direction
-) {
-
-  const index =
-    managedPages.findIndex(
-      p =>
-        Number(p.id) === id
-    );
-
-
-  const newIndex =
-    index +
-    direction;
-
-
-  if (
-    index < 0 ||
-    newIndex < 0 ||
-    newIndex >=
-    managedPages.length
-  ) {
-    return;
-  }
-
-
-  const copy =
-    [...managedPages];
-
-
-  [
-    copy[index],
-    copy[newIndex]
-  ] = [
-    copy[newIndex],
-    copy[index]
+  const sort =
+    url.searchParams.get("sort") === "popular"
+      ? "popular"
+      : "latest";
+
+  const search = String(
+    url.searchParams.get("q") || ""
+  ).trim();
+
+  const genre = String(
+    url.searchParams.get("genre") || ""
+  ).trim();
+
+  const where = [
+    "c.is_published = 1"
   ];
 
+  const bindings = [];
 
-  managedPages =
-    copy;
+  if (search) {
+    where.push(`
+      (
+        c.title LIKE ?
+        OR c.author LIKE ?
+        OR c.description LIKE ?
+      )
+    `);
+
+    const value = `%${search}%`;
+
+    bindings.push(
+      value,
+      value,
+      value
+    );
+  }
+
+  if (genre) {
+    where.push(`
+      LOWER(c.genre) = LOWER(?)
+    `);
+
+    bindings.push(genre);
+  }
+
+  const whereSql = where.join(" AND ");
+
+  const countResult = await env.DB.prepare(`
+    SELECT COUNT(*) AS total
+    FROM comics c
+    WHERE ${whereSql}
+  `)
+  .bind(...bindings)
+  .first();
+
+  const total = Number(
+    countResult?.total || 0
+  );
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / limit)
+  );
+
+  const page = Math.min(
+    requestedPage,
+    totalPages
+  );
+
+  const offset =
+    (page - 1) * limit;
+
+  const orderSql =
+    sort === "popular"
+      ? `
+        c.views DESC,
+        c.updated_at DESC,
+        c.id DESC
+      `
+      : `
+        c.updated_at DESC,
+        c.id DESC
+      `;
+
+  const result = await env.DB.prepare(`
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.author,
+      c.status,
+      c.cover_key,
+      c.views,
+      c.is_published,
+      c.created_at,
+      c.updated_at,
+
+      COUNT(ch.id) AS part_count,
+
+      MAX(ch.chapter_number) AS latest_part
+
+    FROM comics c
+
+    LEFT JOIN chapters ch
+      ON ch.comic_id = c.id
+      AND ch.is_published = 1
+
+    WHERE ${whereSql}
+
+    GROUP BY c.id
+
+    ORDER BY ${orderSql}
+
+    LIMIT ?
+    OFFSET ?
+  `)
+  .bind(
+    ...bindings,
+    limit,
+    offset
+  )
+  .all();
+
+  const comics = (result.results || []).map(comic => ({
+    ...comic,
+
+    cover_url:
+      comic.cover_key
+        ? `/media/${encodeURIComponent(comic.cover_key)}`
+        : null,
+
+    views:
+      Number(comic.views || 0),
+
+    part_count:
+      Number(comic.part_count || 0),
+
+    latest_part:
+      comic.latest_part == null
+        ? null
+        : Number(comic.latest_part)
+  }));
+
+  return {
+    comics,
+
+    pagination: {
+      page,
+      limit,
+      total,
+      total_pages: totalPages
+    }
+  };
+}
+
+async function adminComics(env) {
+  const result = await env.DB.prepare(`
+    SELECT
+      c.*,
+      COUNT(ch.id) AS part_count
+    FROM comics c
+    LEFT JOIN chapters ch
+      ON ch.comic_id = c.id
+    GROUP BY c.id
+    ORDER BY
+      c.updated_at DESC,
+      c.id DESC
+  `)
+  .all();
+
+  return (result.results || []).map(comic => ({
+    ...comic,
+
+    cover_url:
+      comic.cover_key
+        ? `/media/${encodeURIComponent(comic.cover_key)}`
+        : null,
+
+    views:
+      Number(comic.views || 0),
+
+    part_count:
+      Number(comic.part_count || 0)
+  }));
+}
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
 
 
-  renderManagedPages();
+    /* =====================================
+       HEALTH
+    ===================================== */
+
+    if (
+      path === "/api/health" &&
+      request.method === "GET"
+    ) {
+      let databaseConnected = false;
+      let mediaConnected = false;
+
+      try {
+        const result = await env.DB
+          .prepare("SELECT 1 AS ok")
+          .first();
+
+        databaseConnected =
+          result?.ok === 1;
+      } catch {}
+
+      try {
+        const result = await env.MEDIA.list({
+          limit: 1
+        });
+
+        mediaConnected =
+          Array.isArray(result.objects);
+      } catch {}
+
+      return json({
+        ok:
+          databaseConnected &&
+          mediaConnected,
+
+        app: "nightink-app",
+
+        worker: true,
+
+        databaseConnected,
+
+        mediaConnected,
+
+        adminConfigured:
+          Boolean(env.ADMIN_TOKEN)
+      });
+    }
 
 
-  try {
+    /* =====================================
+       ADMIN LOGIN
+    ===================================== */
 
-    await api(
-      `/api/admin/chapters/${currentManagedChapter}/pages/reorder`,
-      {
-        method:"POST",
+    if (
+      path === "/api/admin/login" &&
+      request.method === "POST"
+    ) {
+      let body = {};
 
-        headers:{
-          "Content-Type":
-            "application/json"
+      try {
+        body = await request.json();
+      } catch {}
+
+      if (!env.ADMIN_TOKEN) {
+        return json(
+          {
+            ok: false,
+            error:
+              "ADMIN_TOKEN no configurado"
+          },
+          500
+        );
+      }
+
+      if (
+        (body.password || "") !==
+        env.ADMIN_TOKEN
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Clave incorrecta"
+          },
+          401
+        );
+      }
+
+      return json({
+        ok: true
+      });
+    }
+
+
+    /* =====================================
+       PUBLIC COMICS + PAGINATION
+    ===================================== */
+
+    if (
+      path === "/api/comics" &&
+      request.method === "GET"
+    ) {
+      const result =
+        await publicComics(
+          env,
+          url
+        );
+
+      return json({
+        ok: true,
+
+        comics:
+          result.comics,
+
+        pagination:
+          result.pagination
+      });
+    }
+
+
+    /* =====================================
+       LATEST UPDATES
+    ===================================== */
+
+    if (
+      path === "/api/updates" &&
+      request.method === "GET"
+    ) {
+      const limit = Math.min(
+        30,
+        Math.max(
+          1,
+          Number(
+            url.searchParams.get("limit") || 10
+          )
+        )
+      );
+
+      const result = await env.DB.prepare(`
+        SELECT
+
+          ch.id AS chapter_id,
+
+          ch.chapter_number,
+
+          ch.title AS chapter_title,
+
+          ch.updated_at,
+
+          c.id AS comic_id,
+
+          c.slug,
+
+          c.title AS comic_title,
+
+          c.genre,
+
+          c.author,
+
+          c.cover_key,
+
+          c.views,
+
+          (
+            SELECT COUNT(*)
+            FROM pages p
+            WHERE p.chapter_id = ch.id
+          ) AS page_count
+
+        FROM chapters ch
+
+        JOIN comics c
+          ON c.id = ch.comic_id
+
+        WHERE
+          ch.is_published = 1
+          AND c.is_published = 1
+
+        ORDER BY
+          ch.updated_at DESC,
+          ch.id DESC
+
+        LIMIT ?
+      `)
+      .bind(limit)
+      .all();
+
+      return json({
+        ok: true,
+
+        updates:
+          (result.results || [])
+          .map(item => ({
+            ...item,
+
+            chapter_number:
+              Number(
+                item.chapter_number
+              ),
+
+            views:
+              Number(
+                item.views || 0
+              ),
+
+            page_count:
+              Number(
+                item.page_count || 0
+              ),
+
+            cover_url:
+              item.cover_key
+                ? `/media/${encodeURIComponent(item.cover_key)}`
+                : null
+          }))
+      });
+    }
+
+
+    /* =====================================
+       PUBLIC COMIC DETAIL
+    ===================================== */
+
+    const publicComicMatch =
+      path.match(
+        /^\/api\/comics\/([^/]+)$/
+      );
+
+    if (
+      publicComicMatch &&
+      request.method === "GET"
+    ) {
+      const slug =
+        decodeURIComponent(
+          publicComicMatch[1]
+        );
+
+      const comic =
+        await env.DB.prepare(`
+          SELECT *
+          FROM comics
+          WHERE slug = ?
+            AND is_published = 1
+        `)
+        .bind(slug)
+        .first();
+
+      if (!comic) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Cómic no encontrado"
+          },
+          404
+        );
+      }
+
+      await env.DB.prepare(`
+        UPDATE comics
+        SET views = views + 1
+        WHERE id = ?
+      `)
+      .bind(comic.id)
+      .run();
+
+      const chapters =
+        await env.DB.prepare(`
+          SELECT
+
+            ch.id,
+
+            ch.chapter_number,
+
+            ch.title,
+
+            ch.is_published,
+
+            ch.created_at,
+
+            ch.updated_at,
+
+            COUNT(p.id)
+              AS page_count
+
+          FROM chapters ch
+
+          LEFT JOIN pages p
+            ON p.chapter_id = ch.id
+
+          WHERE
+            ch.comic_id = ?
+            AND ch.is_published = 1
+
+          GROUP BY ch.id
+
+          ORDER BY
+            ch.chapter_number ASC
+        `)
+        .bind(comic.id)
+        .all();
+
+      return json({
+        ok: true,
+
+        comic: {
+          ...comic,
+
+          views:
+            Number(
+              comic.views || 0
+            ) + 1,
+
+          cover_url:
+            comic.cover_key
+              ? `/media/${encodeURIComponent(comic.cover_key)}`
+              : null
         },
 
-        body:
-          JSON.stringify({
+        chapters:
+          (chapters.results || [])
+          .map(chapter => ({
+            ...chapter,
 
-            page_ids:
-              managedPages.map(
-                p =>
-                  Number(p.id)
+            chapter_number:
+              Number(
+                chapter.chapter_number
+              ),
+
+            page_count:
+              Number(
+                chapter.page_count || 0
               )
+          }))
+      });
+    }
 
-          })
 
+    /* =====================================
+       PUBLIC CHAPTER PAGES
+    ===================================== */
+
+    const publicChapterMatch =
+      path.match(
+        /^\/api\/chapters\/(\d+)\/pages$/
+      );
+
+    if (
+      publicChapterMatch &&
+      request.method === "GET"
+    ) {
+      const chapterId =
+        Number(
+          publicChapterMatch[1]
+        );
+
+      const chapter =
+        await env.DB.prepare(`
+          SELECT
+
+            ch.*,
+
+            c.title
+              AS comic_title,
+
+            c.slug
+              AS comic_slug
+
+          FROM chapters ch
+
+          JOIN comics c
+            ON c.id =
+               ch.comic_id
+
+          WHERE
+            ch.id = ?
+            AND ch.is_published = 1
+            AND c.is_published = 1
+        `)
+        .bind(chapterId)
+        .first();
+
+      if (!chapter) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Parte no encontrada"
+          },
+          404
+        );
       }
-    );
 
+      const pages =
+        await env.DB.prepare(`
+          SELECT
+            id,
+            page_number,
+            object_key
+          FROM pages
+          WHERE chapter_id = ?
+          ORDER BY
+            page_number ASC,
+            id ASC
+        `)
+        .bind(chapterId)
+        .all();
 
-    await loadManagedPages();
+      return json({
+        ok: true,
 
-  }
+        chapter: {
+          ...chapter,
 
-  catch(error) {
+          chapter_number:
+            Number(
+              chapter.chapter_number
+            )
+        },
 
-    alert(
-      error.message
-    );
+        pages:
+          (pages.results || [])
+          .map(page => ({
+            id:
+              Number(page.id),
 
+            page_number:
+              Number(
+                page.page_number
+              ),
 
-    await loadManagedPages();
-
-  }
-
-}
-
-
-async function deletePage(id) {
-
-  if (
-    !confirm(
-      "¿Eliminar esta página?"
-    )
-  ) {
-    return;
-  }
-
-
-  await api(
-    `/api/admin/pages/${id}`,
-    {
-      method:"DELETE"
+            url:
+              `/media/${encodeURIComponent(page.object_key)}`
+          }))
+      });
     }
-  );
 
 
-  await Promise.all([
-    loadManagedPages(),
-    loadParts(),
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(currentPage),
-    loadUpdates()
-  ]);
+    /* =====================================
+       MEDIA
+    ===================================== */
 
-}
+    if (
+      path.startsWith("/media/") &&
+      request.method === "GET"
+    ) {
+      const key =
+        decodeURIComponent(
+          path.slice(
+            "/media/".length
+          )
+        );
 
+      const object =
+        await env.MEDIA.get(key);
 
-/* START */
+      if (!object) {
+        return new Response(
+          "Not found",
+          {
+            status: 404
+          }
+        );
+      }
 
-async function startNightInk() {
+      const headers =
+        new Headers();
 
-  const route =
-    getRoute();
+      object.writeHttpMetadata(
+        headers
+      );
 
+      headers.set(
+        "etag",
+        object.httpEtag
+      );
 
-  history.replaceState(
-    route.type === "comic"
-    ?
-    {
-      type:"comic",
-      slug:route.slug,
-      fromSite:false
+      headers.set(
+        "Cache-Control",
+        "public, max-age=86400"
+      );
+
+      return new Response(
+        object.body,
+        {
+          headers
+        }
+      );
     }
-    :
-    {
-      type:"home"
-    },
-    "",
-    location.pathname +
-    location.search +
-    location.hash
-  );
 
 
-  await Promise.all([
-    loadCatalog(1),
-    loadPopular(),
-    loadUpdates()
-  ]);
+    /* =====================================
+       ADMIN SECURITY
+    ===================================== */
+
+    if (
+      path.startsWith("/api/admin/") &&
+      !isAdmin(request, env)
+    ) {
+      return json(
+        {
+          ok: false,
+          error:
+            "No autorizado"
+        },
+        401
+      );
+    }
 
 
-  if (
-    route.type === "comic"
-  ) {
+    /* =====================================
+       ADMIN STATS
+    ===================================== */
 
-    await openComicDirect(
-      route.slug,
-      false
+    if (
+      path === "/api/admin/stats" &&
+      request.method === "GET"
+    ) {
+      const comics =
+        await env.DB.prepare(`
+          SELECT COUNT(*) AS n
+          FROM comics
+        `)
+        .first();
+
+      const chapters =
+        await env.DB.prepare(`
+          SELECT COUNT(*) AS n
+          FROM chapters
+        `)
+        .first();
+
+      const pages =
+        await env.DB.prepare(`
+          SELECT COUNT(*) AS n
+          FROM pages
+        `)
+        .first();
+
+      const views =
+        await env.DB.prepare(`
+          SELECT
+            COALESCE(
+              SUM(views),
+              0
+            ) AS n
+          FROM comics
+        `)
+        .first();
+
+      return json({
+        ok: true,
+
+        stats: {
+          comics:
+            Number(
+              comics?.n || 0
+            ),
+
+          chapters:
+            Number(
+              chapters?.n || 0
+            ),
+
+          pages:
+            Number(
+              pages?.n || 0
+            ),
+
+          views:
+            Number(
+              views?.n || 0
+            )
+        }
+      });
+    }
+
+
+    /* =====================================
+       ADMIN COMICS LIST
+    ===================================== */
+
+    if (
+      path === "/api/admin/comics" &&
+      request.method === "GET"
+    ) {
+      return json({
+        ok: true,
+
+        comics:
+          await adminComics(env)
+      });
+    }
+
+
+    /* =====================================
+       CREATE COMIC
+    ===================================== */
+
+    if (
+      path === "/api/admin/comics" &&
+      request.method === "POST"
+    ) {
+      let body = {};
+
+      try {
+        body = await request.json();
+      } catch {}
+
+      const title =
+        String(
+          body.title || ""
+        ).trim();
+
+      if (!title) {
+        return json(
+          {
+            ok: false,
+            error:
+              "El título es obligatorio"
+          },
+          400
+        );
+      }
+
+      const slug =
+        slugify(
+          body.slug || title
+        );
+
+      if (!slug) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Slug inválido"
+          },
+          400
+        );
+      }
+
+      try {
+        const result =
+          await env.DB.prepare(`
+            INSERT INTO comics
+            (
+              slug,
+              title,
+              description,
+              genre,
+              author,
+              status,
+              views,
+              is_published,
+              created_at,
+              updated_at
+            )
+            VALUES
+            (
+              ?, ?, ?, ?, ?, ?,
+              0,
+              ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+          `)
+          .bind(
+            slug,
+            title,
+            String(
+              body.description || ""
+            ),
+            String(
+              body.genre || ""
+            ),
+            String(
+              body.author || ""
+            ),
+            String(
+              body.status ||
+              "En emisión"
+            ),
+            body.is_published
+              ? 1
+              : 0
+          )
+          .run();
+
+        return json({
+          ok: true,
+
+          id:
+            result.meta
+            .last_row_id,
+
+          slug
+        });
+      }
+
+      catch(error) {
+        if (
+          String(error)
+          .toLowerCase()
+          .includes("unique")
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Ya existe una obra con ese título o slug"
+            },
+            409
+          );
+        }
+
+        return json(
+          {
+            ok: false,
+            error:
+              "No se pudo crear el cómic"
+          },
+          500
+        );
+      }
+    }
+
+
+    /* =====================================
+       UPDATE / DELETE COMIC
+    ===================================== */
+
+    const adminComicMatch =
+      path.match(
+        /^\/api\/admin\/comics\/(\d+)$/
+      );
+
+    if (adminComicMatch) {
+      const id =
+        Number(
+          adminComicMatch[1]
+        );
+
+      if (
+        request.method === "PUT"
+      ) {
+        let body = {};
+
+        try {
+          body =
+            await request.json();
+        } catch {}
+
+        const existing =
+          await env.DB.prepare(`
+            SELECT *
+            FROM comics
+            WHERE id = ?
+          `)
+          .bind(id)
+          .first();
+
+        if (!existing) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Cómic no encontrado"
+            },
+            404
+          );
+        }
+
+        const title =
+          String(
+            body.title ??
+            existing.title
+          ).trim();
+
+        const slug =
+          slugify(
+            body.slug ??
+            existing.slug ??
+            title
+          );
+
+        try {
+          await env.DB.prepare(`
+            UPDATE comics
+            SET
+              slug = ?,
+              title = ?,
+              description = ?,
+              genre = ?,
+              author = ?,
+              status = ?,
+              is_published = ?,
+              updated_at =
+                CURRENT_TIMESTAMP
+            WHERE id = ?
+          `)
+          .bind(
+            slug,
+
+            title,
+
+            String(
+              body.description ??
+              existing.description ??
+              ""
+            ),
+
+            String(
+              body.genre ??
+              existing.genre ??
+              ""
+            ),
+
+            String(
+              body.author ??
+              existing.author ??
+              ""
+            ),
+
+            String(
+              body.status ??
+              existing.status ??
+              "En emisión"
+            ),
+
+            body.is_published
+              ? 1
+              : 0,
+
+            id
+          )
+          .run();
+
+          return json({
+            ok: true
+          });
+        }
+
+        catch(error) {
+          if (
+            String(error)
+            .toLowerCase()
+            .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese slug ya existe"
+              },
+              409
+            );
+          }
+
+          return json(
+            {
+              ok: false,
+              error:
+                "No se pudo actualizar"
+            },
+            500
+          );
+        }
+      }
+
+      if (
+        request.method === "DELETE"
+      ) {
+        await deleteComicMedia(
+          env,
+          id
+        );
+
+        await env.DB.prepare(`
+          DELETE FROM comics
+          WHERE id = ?
+        `)
+        .bind(id)
+        .run();
+
+        return json({
+          ok: true
+        });
+      }
+    }
+
+
+    /* =====================================
+       COVER
+    ===================================== */
+
+    const coverMatch =
+      path.match(
+        /^\/api\/admin\/comics\/(\d+)\/cover$/
+      );
+
+    if (
+      coverMatch &&
+      request.method === "POST"
+    ) {
+      const comicId =
+        Number(
+          coverMatch[1]
+        );
+
+      const comic =
+        await env.DB.prepare(`
+          SELECT *
+          FROM comics
+          WHERE id = ?
+        `)
+        .bind(comicId)
+        .first();
+
+      if (!comic) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Cómic no encontrado"
+          },
+          404
+        );
+      }
+
+      const form =
+        await request.formData();
+
+      const file =
+        form.get("cover");
+
+      if (!(file instanceof File)) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Falta la portada"
+          },
+          400
+        );
+      }
+
+      const extension =
+        (
+          file.name
+          .split(".")
+          .pop() ||
+          "jpg"
+        )
+        .toLowerCase()
+        .replace(
+          /[^a-z0-9]/g,
+          ""
+        );
+
+      const key =
+        `covers/${comicId}/${crypto.randomUUID()}.${extension || "jpg"}`;
+
+      if (comic.cover_key) {
+        await env.MEDIA.delete(
+          comic.cover_key
+        );
+      }
+
+      await env.MEDIA.put(
+        key,
+        file.stream(),
+        {
+          httpMetadata: {
+            contentType:
+              file.type ||
+              "image/jpeg"
+          }
+        }
+      );
+
+      await env.DB.prepare(`
+        UPDATE comics
+        SET
+          cover_key = ?,
+          updated_at =
+            CURRENT_TIMESTAMP
+        WHERE id = ?
+      `)
+      .bind(
+        key,
+        comicId
+      )
+      .run();
+
+      return json({
+        ok: true,
+
+        cover_url:
+          `/media/${encodeURIComponent(key)}`
+      });
+    }
+
+
+    /* =====================================
+       LIST / CREATE CHAPTERS
+    ===================================== */
+
+    const chapterListMatch =
+      path.match(
+        /^\/api\/admin\/comics\/(\d+)\/chapters$/
+      );
+
+    if (
+      chapterListMatch &&
+      request.method === "GET"
+    ) {
+      const comicId =
+        Number(
+          chapterListMatch[1]
+        );
+
+      const result =
+        await env.DB.prepare(`
+          SELECT
+
+            ch.*,
+
+            COUNT(p.id)
+              AS page_count
+
+          FROM chapters ch
+
+          LEFT JOIN pages p
+            ON p.chapter_id =
+               ch.id
+
+          WHERE
+            ch.comic_id = ?
+
+          GROUP BY ch.id
+
+          ORDER BY
+            ch.chapter_number ASC
+        `)
+        .bind(comicId)
+        .all();
+
+      return json({
+        ok: true,
+
+        chapters:
+          (result.results || [])
+          .map(chapter => ({
+            ...chapter,
+
+            chapter_number:
+              Number(
+                chapter.chapter_number
+              ),
+
+            page_count:
+              Number(
+                chapter.page_count || 0
+              )
+          }))
+      });
+    }
+
+    if (
+      chapterListMatch &&
+      request.method === "POST"
+    ) {
+      const comicId =
+        Number(
+          chapterListMatch[1]
+        );
+
+      let body = {};
+
+      try {
+        body =
+          await request.json();
+      } catch {}
+
+      const number =
+        Number(
+          body.chapter_number
+        );
+
+      if (
+        !Number.isFinite(number)
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Número de parte inválido"
+          },
+          400
+        );
+      }
+
+      try {
+        const result =
+          await env.DB.prepare(`
+            INSERT INTO chapters
+            (
+              comic_id,
+              chapter_number,
+              title,
+              is_published,
+              created_at,
+              updated_at
+            )
+            VALUES
+            (
+              ?, ?, ?, ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+          `)
+          .bind(
+            comicId,
+
+            number,
+
+            String(
+              body.title || ""
+            ),
+
+            body.is_published
+              ? 1
+              : 0
+          )
+          .run();
+
+        await touchComic(
+          env,
+          comicId
+        );
+
+        return json({
+          ok: true,
+
+          id:
+            result.meta
+            .last_row_id
+        });
+      }
+
+      catch(error) {
+        if (
+          String(error)
+          .toLowerCase()
+          .includes("unique")
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Ya existe esa parte"
+            },
+            409
+          );
+        }
+
+        return json(
+          {
+            ok: false,
+            error:
+              "No se pudo crear la parte"
+          },
+          500
+        );
+      }
+    }
+
+
+    /* =====================================
+       UPDATE / DELETE CHAPTER
+    ===================================== */
+
+    const chapterMatch =
+      path.match(
+        /^\/api\/admin\/chapters\/(\d+)$/
+      );
+
+    if (chapterMatch) {
+      const chapterId =
+        Number(
+          chapterMatch[1]
+        );
+
+      if (
+        request.method === "PUT"
+      ) {
+        const existing =
+          await env.DB.prepare(`
+            SELECT *
+            FROM chapters
+            WHERE id = ?
+          `)
+          .bind(chapterId)
+          .first();
+
+        if (!existing) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        let body = {};
+
+        try {
+          body =
+            await request.json();
+        } catch {}
+
+        const number =
+          Number(
+            body.chapter_number ??
+            existing.chapter_number
+          );
+
+        if (
+          !Number.isFinite(number)
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de parte inválido"
+            },
+            400
+          );
+        }
+
+        try {
+          await env.DB.prepare(`
+            UPDATE chapters
+            SET
+              chapter_number = ?,
+              title = ?,
+              is_published = ?,
+              updated_at =
+                CURRENT_TIMESTAMP
+            WHERE id = ?
+          `)
+          .bind(
+            number,
+
+            String(
+              body.title ??
+              existing.title ??
+              ""
+            ),
+
+            body.is_published
+              ? 1
+              : 0,
+
+            chapterId
+          )
+          .run();
+
+          await touchComic(
+            env,
+            existing.comic_id
+          );
+
+          return json({
+            ok: true
+          });
+        }
+
+        catch(error) {
+          if (
+            String(error)
+            .toLowerCase()
+            .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ya existe una parte con ese número"
+              },
+              409
+            );
+          }
+
+          return json(
+            {
+              ok: false,
+              error:
+                "No se pudo editar la parte"
+            },
+            500
+          );
+        }
+      }
+
+      if (
+        request.method === "DELETE"
+      ) {
+        const chapter =
+          await env.DB.prepare(`
+            SELECT *
+            FROM chapters
+            WHERE id = ?
+          `)
+          .bind(chapterId)
+          .first();
+
+        if (!chapter) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        const pages =
+          await env.DB.prepare(`
+            SELECT object_key
+            FROM pages
+            WHERE chapter_id = ?
+          `)
+          .bind(chapterId)
+          .all();
+
+        const keys =
+          (pages.results || [])
+          .map(
+            page =>
+              page.object_key
+          )
+          .filter(Boolean);
+
+        if (keys.length) {
+          await env.MEDIA.delete(
+            keys
+          );
+        }
+
+        await env.DB.prepare(`
+          DELETE FROM chapters
+          WHERE id = ?
+        `)
+        .bind(chapterId)
+        .run();
+
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+
+        return json({
+          ok: true
+        });
+      }
+    }
+
+
+    /* =====================================
+       ADMIN PAGES
+    ===================================== */
+
+    const adminPagesMatch =
+      path.match(
+        /^\/api\/admin\/chapters\/(\d+)\/pages$/
+      );
+
+    if (
+      adminPagesMatch &&
+      request.method === "GET"
+    ) {
+      const chapterId =
+        Number(
+          adminPagesMatch[1]
+        );
+
+      const chapter =
+        await env.DB.prepare(`
+          SELECT *
+          FROM chapters
+          WHERE id = ?
+        `)
+        .bind(chapterId)
+        .first();
+
+      if (!chapter) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Parte no encontrada"
+          },
+          404
+        );
+      }
+
+      const result =
+        await env.DB.prepare(`
+          SELECT
+            id,
+            chapter_id,
+            page_number,
+            object_key,
+            created_at
+          FROM pages
+          WHERE chapter_id = ?
+          ORDER BY
+            page_number ASC,
+            id ASC
+        `)
+        .bind(chapterId)
+        .all();
+
+      return json({
+        ok: true,
+
+        chapter,
+
+        pages:
+          (result.results || [])
+          .map(page => ({
+            ...page,
+
+            id:
+              Number(page.id),
+
+            page_number:
+              Number(
+                page.page_number
+              ),
+
+            url:
+              `/media/${encodeURIComponent(page.object_key)}`
+          }))
+      });
+    }
+
+
+    /* =====================================
+       UPLOAD PAGES
+    ===================================== */
+
+    if (
+      adminPagesMatch &&
+      request.method === "POST"
+    ) {
+      const chapterId =
+        Number(
+          adminPagesMatch[1]
+        );
+
+      const chapter =
+        await env.DB.prepare(`
+          SELECT
+            ch.*,
+            c.id AS comic_id
+          FROM chapters ch
+          JOIN comics c
+            ON c.id =
+               ch.comic_id
+          WHERE ch.id = ?
+        `)
+        .bind(chapterId)
+        .first();
+
+      if (!chapter) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Parte no encontrada"
+          },
+          404
+        );
+      }
+
+      const current =
+        await env.DB.prepare(`
+          SELECT
+            COALESCE(
+              MAX(page_number),
+              0
+            ) AS max_page
+          FROM pages
+          WHERE chapter_id = ?
+        `)
+        .bind(chapterId)
+        .first();
+
+      let pageNumber =
+        Number(
+          current?.max_page || 0
+        );
+
+      const form =
+        await request.formData();
+
+      const files =
+        form.getAll("pages")
+        .filter(
+          value =>
+            value instanceof File
+        );
+
+      if (!files.length) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Selecciona al menos una imagen"
+          },
+          400
+        );
+      }
+
+      const added = [];
+
+      for (const file of files) {
+        pageNumber += 1;
+
+        const extension =
+          (
+            file.name
+            .split(".")
+            .pop() ||
+            "jpg"
+          )
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9]/g,
+            ""
+          );
+
+        const key =
+          `chapters/${chapterId}/${String(pageNumber).padStart(4, "0")}-${crypto.randomUUID()}.${extension || "jpg"}`;
+
+        await env.MEDIA.put(
+          key,
+          file.stream(),
+          {
+            httpMetadata: {
+              contentType:
+                file.type ||
+                "image/jpeg"
+            }
+          }
+        );
+
+        const result =
+          await env.DB.prepare(`
+            INSERT INTO pages
+            (
+              chapter_id,
+              page_number,
+              object_key,
+              created_at
+            )
+            VALUES
+            (
+              ?, ?, ?,
+              CURRENT_TIMESTAMP
+            )
+          `)
+          .bind(
+            chapterId,
+            pageNumber,
+            key
+          )
+          .run();
+
+        added.push({
+          id:
+            result.meta
+            .last_row_id,
+
+          page_number:
+            pageNumber,
+
+          url:
+            `/media/${encodeURIComponent(key)}`
+        });
+      }
+
+      await touchChapter(
+        env,
+        chapterId
+      );
+
+      await touchComic(
+        env,
+        chapter.comic_id
+      );
+
+      return json({
+        ok: true,
+        added
+      });
+    }
+
+
+    /* =====================================
+       REORDER PAGES
+    ===================================== */
+
+    const reorderMatch =
+      path.match(
+        /^\/api\/admin\/chapters\/(\d+)\/pages\/reorder$/
+      );
+
+    if (
+      reorderMatch &&
+      request.method === "POST"
+    ) {
+      const chapterId =
+        Number(
+          reorderMatch[1]
+        );
+
+      let body = {};
+
+      try {
+        body =
+          await request.json();
+      } catch {}
+
+      const pageIds =
+        Array.isArray(
+          body.page_ids
+        )
+        ? body.page_ids.map(Number)
+        : [];
+
+      const current =
+        await env.DB.prepare(`
+          SELECT id
+          FROM pages
+          WHERE chapter_id = ?
+          ORDER BY page_number ASC
+        `)
+        .bind(chapterId)
+        .all();
+
+      const currentIds =
+        (current.results || [])
+        .map(
+          page =>
+            Number(page.id)
+        );
+
+      if (
+        pageIds.length !==
+        currentIds.length
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "La lista de páginas no coincide"
+          },
+          400
+        );
+      }
+
+      const expected =
+        [...currentIds]
+        .sort((a,b) => a-b);
+
+      const received =
+        [...pageIds]
+        .sort((a,b) => a-b);
+
+      if (
+        expected.join(",") !==
+        received.join(",")
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Hay páginas inválidas"
+          },
+          400
+        );
+      }
+
+      const temporaryStatements =
+        pageIds.map(
+          (pageId, index) =>
+            env.DB.prepare(`
+              UPDATE pages
+              SET page_number = ?
+              WHERE id = ?
+                AND chapter_id = ?
+            `)
+            .bind(
+              -(index + 1),
+              pageId,
+              chapterId
+            )
+        );
+
+      if (
+        temporaryStatements.length
+      ) {
+        await env.DB.batch(
+          temporaryStatements
+        );
+      }
+
+      const finalStatements =
+        pageIds.map(
+          (pageId, index) =>
+            env.DB.prepare(`
+              UPDATE pages
+              SET page_number = ?
+              WHERE id = ?
+                AND chapter_id = ?
+            `)
+            .bind(
+              index + 1,
+              pageId,
+              chapterId
+            )
+        );
+
+      if (
+        finalStatements.length
+      ) {
+        await env.DB.batch(
+          finalStatements
+        );
+      }
+
+      const chapter =
+        await env.DB.prepare(`
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+        `)
+        .bind(chapterId)
+        .first();
+
+      await touchChapter(
+        env,
+        chapterId
+      );
+
+      if (chapter?.comic_id) {
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+      }
+
+      return json({
+        ok: true
+      });
+    }
+
+
+    /* =====================================
+       DELETE ONE PAGE
+    ===================================== */
+
+    const deletePageMatch =
+      path.match(
+        /^\/api\/admin\/pages\/(\d+)$/
+      );
+
+    if (
+      deletePageMatch &&
+      request.method === "DELETE"
+    ) {
+      const pageId =
+        Number(
+          deletePageMatch[1]
+        );
+
+      const page =
+        await env.DB.prepare(`
+          SELECT *
+          FROM pages
+          WHERE id = ?
+        `)
+        .bind(pageId)
+        .first();
+
+      if (!page) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Página no encontrada"
+          },
+          404
+        );
+      }
+
+      if (page.object_key) {
+        await env.MEDIA.delete(
+          page.object_key
+        );
+      }
+
+      await env.DB.prepare(`
+        DELETE FROM pages
+        WHERE id = ?
+      `)
+      .bind(pageId)
+      .run();
+
+      await renumberPages(
+        env,
+        page.chapter_id
+      );
+
+      const chapter =
+        await env.DB.prepare(`
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+        `)
+        .bind(
+          page.chapter_id
+        )
+        .first();
+
+      await touchChapter(
+        env,
+        page.chapter_id
+      );
+
+      if (
+        chapter?.comic_id
+      ) {
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+      }
+
+      return json({
+        ok: true
+      });
+    }
+
+
+    /* =====================================
+       STATIC WEBSITE
+    ===================================== */
+
+    return env.ASSETS.fetch(
+      request
     );
-
   }
-
-  else {
-
-    setHomeMetadata();
-
-  }
-
-}
-
-
-startNightInk();
-
-</script>
-
-</body>
-</html>
+};

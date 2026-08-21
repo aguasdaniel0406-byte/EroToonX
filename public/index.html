@@ -4,39 +4,3414 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NightInk Comics</title>
+
 <style>
-:root{--bg:#0f1014;--panel:#181a21;--panel2:#20232c;--line:#303441;--text:#f4f5f7;--muted:#a9afbb;--accent:#7c4dff;--accent2:#ef476f;--gold:#f3c75f}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}a{color:inherit;text-decoration:none}button,input{font:inherit}.wrap{width:min(1280px,calc(100% - 24px));margin:auto}
-.topline{background:#090a0d;border-bottom:1px solid #20232b;color:#c8ccd4;font-size:12px}.topline .wrap{display:flex;justify-content:space-between;gap:12px;padding:7px 0;flex-wrap:wrap}
-header{position:sticky;top:0;z-index:40;background:rgba(17,18,23,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.header-inner{min-height:72px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px}.logo{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800}.logo-mark{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:15px}.nav{display:flex;gap:6px;flex-wrap:wrap}.nav a{padding:10px 12px;border-radius:9px;color:#d5d8de;font-size:14px}.nav a:hover,.nav a.active{background:#242731;color:#fff}.head-actions{display:flex;gap:8px}.search-mini{width:230px;height:40px;background:#1b1e26;border:1px solid var(--line);color:#fff;border-radius:9px;padding:0 12px;outline:none}.admin-btn{height:40px;border:0;border-radius:9px;padding:0 14px;background:linear-gradient(135deg,var(--accent),#5d35c8);color:#fff;font-weight:700;cursor:pointer}
-main{padding:18px 0 42px}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:18px}.hero-main,.hero-side{background:var(--panel);border:1px solid var(--line);border-radius:14px}.hero-main{padding:26px;min-height:300px;background:radial-gradient(circle at 80% 20%,rgba(124,77,255,.24),transparent 28%),radial-gradient(circle at 15% 85%,rgba(239,71,111,.16),transparent 30%),#171920}.hero-main h1{font-size:42px;line-height:1.02;margin:10px 0 14px;max-width:720px}.hero-main p{color:var(--muted);line-height:1.65;max-width:680px;font-size:15px}.eyebrow{color:#c8b6ff;font-size:11px;letter-spacing:.14em;font-weight:800}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.pill{display:inline-flex;padding:6px 9px;border-radius:999px;background:#242735;border:1px solid #343847;color:#dfe2e8;font-size:11px}.hero-cta{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer}.btn.primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}.btn.secondary{color:#fff;background:#262a34;border:1px solid #373c49}
-.hero-side{padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mini-cover{min-height:270px;border-radius:10px;border:1px solid #343845;padding:12px;display:flex;align-items:flex-end;position:relative;overflow:hidden}.mini-cover:after,.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 38%,rgba(0,0,0,.86))}.mini-cover span,.cover-title{position:relative;z-index:1;font-weight:800}.g1{background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a)}.g2{background:linear-gradient(150deg,#9d355e,#401527 60%,#160c12)}.g3{background:linear-gradient(150deg,#3e6175,#172b37 60%,#0c151b)}.g4{background:linear-gradient(150deg,#98632e,#3a2211 60%,#120c08)}.g5{background:linear-gradient(150deg,#526b39,#203019 60%,#0e130b)}.g6{background:linear-gradient(150deg,#6e3e7f,#2e1738 60%,#110b16)}
-.layout{display:grid;grid-template-columns:245px 1fr;gap:16px}.sidebar{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;height:max-content;position:sticky;top:88px}.side-title{font-size:15px;font-weight:800;margin-bottom:10px}.genre-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.genre-btn,.tab{border:1px solid #353947;background:#22252e;color:#e8e9ed;border-radius:8px;padding:9px 10px;cursor:pointer;font-size:12px}.genre-btn.active,.genre-btn:hover,.tab.active{background:var(--accent);border-color:var(--accent)}.side-block{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.rank-list{display:grid;gap:8px}.rank{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:8px;background:#20232b;border-radius:8px}.rank-num{width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:#2a2e39;font-size:11px;font-weight:800}.rank strong{font-size:12px}.rank small{display:block;color:var(--muted);margin-top:2px}
-.section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.section-head h2{margin:0;font-size:21px}.tabs{display:flex;gap:7px;flex-wrap:wrap}.comic-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.comic-card{background:#20232b;border:1px solid #313644;border-radius:10px;overflow:hidden;transition:.17s}.comic-card:hover{transform:translateY(-3px);border-color:#565d72}.cover{aspect-ratio:3/4;position:relative;padding:10px;display:flex;align-items:flex-end;overflow:hidden}.chapter-badge{position:absolute;z-index:2;top:8px;right:8px;padding:5px 7px;border-radius:7px;background:rgba(0,0,0,.76);border:1px solid rgba(255,255,255,.15);font-size:10px}.card-info{padding:10px}.card-title{margin:0 0 5px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card-meta{display:flex;justify-content:space-between;gap:6px;color:var(--muted);font-size:10px}.status-green{color:#6ee7a8}.status-gold{color:var(--gold)}
-.updates-table{width:100%;border-collapse:collapse}.updates-table th,.updates-table td{text-align:left;padding:11px 10px;border-bottom:1px solid #2c303a;font-size:12px}.updates-table th{color:#b9bec8;background:#1b1e25}.tag{display:inline-block;padding:4px 7px;border-radius:999px;background:#293341;color:#d7e2ee;font-size:10px}.pagination{display:flex;justify-content:center;gap:6px;margin-top:16px}.page-btn{width:34px;height:34px;border-radius:8px;border:1px solid #373b47;background:#22252d;color:#fff;cursor:pointer}.page-btn.active{background:var(--accent);border-color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:28px;padding:24px 0 34px;color:var(--muted);font-size:12px}.footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.login-box{width:min(410px,100%);background:#1b1f27;border:1px solid #343947;border-radius:14px;padding:24px}.login-box p{color:var(--muted);font-size:13px}.login-box input{width:100%;margin:12px 0;padding:12px;border-radius:9px;background:#11141a;border:1px solid #3a404d;color:#fff}.login-actions{display:flex;gap:8px}.login-actions button{flex:1;padding:11px;border-radius:9px;font-weight:700;cursor:pointer}.cancel{background:#292d36;color:#fff;border:1px solid #3b414d}.login{background:var(--accent);color:#fff;border:0}#loginMessage{min-height:20px;margin-top:12px;font-size:12px}.success{color:#67d99c}.error{color:#ff7488}.admin-panel{display:none;margin-bottom:16px;background:#181a21;border:1px solid #3b4050;border-radius:12px;padding:16px}.admin-panel.visible{display:block}.admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.admin-stat{background:#22252e;border:1px solid #353a47;border-radius:9px;padding:12px}.admin-stat strong{display:block;font-size:22px}.admin-stat small{color:var(--muted)}
-@media(max-width:1100px){.comic-grid{grid-template-columns:repeat(4,1fr)}.hero{grid-template-columns:1fr}}@media(max-width:900px){.header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.head-actions{width:100%}.search-mini{flex:1;width:auto}.layout{grid-template-columns:1fr}.sidebar{position:static}.comic-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:640px){.comic-grid{grid-template-columns:repeat(2,1fr)}.hero-main h1{font-size:31px}.hero-side{grid-template-columns:repeat(3,1fr)}.mini-cover{min-height:190px}.admin-grid{grid-template-columns:1fr 1fr}}
+:root{
+  --bg:#0f1014;
+  --panel:#181a21;
+  --panel2:#20232c;
+  --line:#303441;
+  --text:#f4f5f7;
+  --muted:#a9afbb;
+  --accent:#7c4dff;
+  --accent2:#ef476f;
+  --green:#2cb67d;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.wrap{
+  width:min(1280px,calc(100% - 24px));
+  margin:auto;
+}
+
+/* TOP */
+
+.topline{
+  background:#090a0d;
+  border-bottom:1px solid #20232b;
+  color:#c8ccd4;
+  font-size:12px;
+}
+
+.topline .wrap{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:7px 0;
+}
+
+/* HEADER */
+
+header{
+  position:sticky;
+  top:0;
+  z-index:40;
+  background:rgba(17,18,23,.97);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
+}
+
+.header-inner{
+  min-height:72px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:18px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:24px;
+  font-weight:800;
+}
+
+.logo-mark{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-size:14px;
+}
+
+.nav{
+  display:flex;
+  gap:5px;
+}
+
+.nav a{
+  padding:10px 12px;
+  border-radius:8px;
+  color:#d5d8de;
+  font-size:14px;
+}
+
+.nav a:hover,
+.nav a.active{
+  background:#242731;
+  color:white;
+}
+
+.head-actions{
+  display:flex;
+  gap:8px;
+}
+
+.search{
+  width:230px;
+  height:40px;
+  border:1px solid var(--line);
+  background:#1b1e26;
+  color:white;
+  border-radius:9px;
+  padding:0 12px;
+  outline:none;
+}
+
+.admin-btn{
+  height:40px;
+  border:0;
+  border-radius:9px;
+  padding:0 14px;
+  background:linear-gradient(135deg,var(--accent),#5d35c8);
+  color:white;
+  font-weight:700;
+}
+
+/* HERO */
+
+main{
+  padding:18px 0 45px;
+}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:16px;
+  margin-bottom:18px;
+}
+
+.hero-main,
+.hero-side,
+.section,
+.sidebar,
+.admin-shell{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+
+.hero-main{
+  padding:28px;
+  min-height:300px;
+  background:
+    radial-gradient(circle at 80% 20%,rgba(124,77,255,.24),transparent 29%),
+    radial-gradient(circle at 15% 85%,rgba(239,71,111,.16),transparent 30%),
+    #171920;
+}
+
+.hero-main h1{
+  max-width:760px;
+  margin:10px 0 15px;
+  font-size:42px;
+  line-height:1.03;
+}
+
+.hero-main p{
+  max-width:700px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.eyebrow{
+  color:#c8b6ff;
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+}
+
+.hero-tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.pill{
+  display:inline-flex;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#242735;
+  border:1px solid #343847;
+  color:#dfe2e8;
+  font-size:11px;
+}
+
+.hero-side{
+  padding:14px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.mini-cover{
+  min-height:270px;
+  border-radius:10px;
+  border:1px solid #343845;
+  padding:12px;
+  display:flex;
+  align-items:flex-end;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+}
+
+.mini-cover:nth-child(2){
+  background:linear-gradient(150deg,#9d355e,#401527 60%,#160c12);
+}
+
+.mini-cover:nth-child(3){
+  background:linear-gradient(150deg,#3e6175,#172b37 60%,#0c151b);
+}
+
+.mini-cover:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(transparent 35%,rgba(0,0,0,.88));
+}
+
+.mini-cover span{
+  position:relative;
+  z-index:1;
+  font-weight:800;
+}
+
+/* MAIN PORTAL */
+
+.layout{
+  display:grid;
+  grid-template-columns:245px 1fr;
+  gap:16px;
+}
+
+.sidebar{
+  padding:14px;
+  height:max-content;
+  position:sticky;
+  top:88px;
+}
+
+.side-title{
+  font-weight:800;
+  font-size:15px;
+  margin-bottom:10px;
+}
+
+.genre-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.genre-btn,
+.tab{
+  border:1px solid #353947;
+  background:#22252e;
+  color:#e8e9ed;
+  border-radius:8px;
+}
+
+.genre-btn{
+  padding:9px 10px;
+  font-size:12px;
+  text-align:left;
+}
+
+.genre-btn:hover,
+.genre-btn.active,
+.tab.active{
+  background:var(--accent);
+  border-color:var(--accent);
+}
+
+.section{
+  padding:14px;
+  margin-bottom:16px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.section-head h2{
+  margin:0;
+  font-size:21px;
+}
+
+.tabs{
+  display:flex;
+  gap:7px;
+}
+
+.tab{
+  padding:8px 11px;
+  font-size:12px;
+}
+
+/* COMICS */
+
+.comic-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
+}
+
+.comic-card{
+  background:#20232b;
+  border:1px solid #313644;
+  border-radius:10px;
+  overflow:hidden;
+  transition:.17s;
+}
+
+.comic-card:hover{
+  transform:translateY(-3px);
+  border-color:#565d72;
+}
+
+.cover{
+  aspect-ratio:3/4;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-end;
+  padding:10px;
+  background:
+    linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background-size:cover;
+  background-position:center;
+}
+
+.cover:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(transparent 35%,rgba(0,0,0,.9));
+}
+
+.cover-title{
+  position:relative;
+  z-index:1;
+  font-size:15px;
+  font-weight:800;
+}
+
+.chapter-badge{
+  position:absolute;
+  top:8px;
+  right:8px;
+  z-index:2;
+  background:rgba(0,0,0,.78);
+  padding:5px 7px;
+  border-radius:7px;
+  font-size:10px;
+}
+
+.card-info{
+  padding:10px;
+}
+
+.card-title{
+  margin:0 0 5px;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.card-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:5px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.empty{
+  grid-column:1/-1;
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+  border:1px dashed #373b47;
+  border-radius:10px;
+}
+
+/* BUTTONS */
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:10px 14px;
+  font-weight:700;
+}
+
+.btn.primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+}
+
+.btn.secondary{
+  background:#292d36;
+  color:white;
+  border:1px solid #3b414d;
+}
+
+/* ADMIN */
+
+.admin-shell{
+  display:none;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.admin-shell.visible{
+  display:block;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.stat{
+  padding:12px;
+  background:#22252e;
+  border:1px solid #353a47;
+  border-radius:9px;
+}
+
+.stat strong{
+  display:block;
+  font-size:22px;
+}
+
+.stat small{
+  color:var(--muted);
+}
+
+.admin-toolbar{
+  display:flex;
+  gap:8px;
+  margin:14px 0;
+}
+
+.admin-list{
+  display:grid;
+  gap:8px;
+}
+
+.admin-row,
+.chapter-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  background:#20232b;
+  border:1px solid #323744;
+  border-radius:9px;
+}
+
+.admin-row small,
+.chapter-row small{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+}
+
+.row-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.row-actions button{
+  border:1px solid #3a3f4c;
+  background:#292d36;
+  color:white;
+  border-radius:7px;
+  padding:7px 9px;
+  font-size:11px;
+}
+
+/* MODALS */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.84);
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow:auto;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.panel{
+  width:min(680px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:#1b1f27;
+  border:1px solid #343947;
+  border-radius:14px;
+  padding:22px;
+}
+
+.panel h2{
+  margin-top:0;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.field{
+  display:grid;
+  gap:6px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  font-size:12px;
+  color:#c8ccd4;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  background:#11141a;
+  border:1px solid #3a404d;
+  color:white;
+  border-radius:8px;
+  padding:10px;
+  outline:none;
+}
+
+.field textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.check{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.check input{
+  width:auto;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:14px;
+}
+
+.msg{
+  min-height:18px;
+  margin-top:8px;
+  font-size:12px;
+}
+
+.error{
+  color:#ff7488;
+}
+
+.success{
+  color:#67d99c;
+}
+
+/* CHAPTERS */
+
+.chapters-list{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.upload-zone{
+  margin-top:9px;
+  padding:10px;
+  border:1px dashed #4a5060;
+  border-radius:8px;
+}
+
+/* COMIC DETAIL */
+
+.detail{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:18px;
+}
+
+.detail-cover{
+  aspect-ratio:3/4;
+  border-radius:10px;
+  background:
+    linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background-size:cover;
+  background-position:center;
+}
+
+.parts{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.part-btn{
+  width:100%;
+  text-align:left;
+  background:#22252e;
+  border:1px solid #353a47;
+  color:white;
+  border-radius:8px;
+  padding:11px;
+}
+
+/* READER */
+
+.reader{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:150;
+  background:#090a0d;
+  overflow:auto;
+}
+
+.reader.open{
+  display:block;
+}
+
+.reader-bar{
+  position:sticky;
+  top:0;
+  z-index:3;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 14px;
+  background:#15171d;
+  border-bottom:1px solid #303441;
+}
+
+.reader-pages{
+  width:min(900px,100%);
+  margin:auto;
+}
+
+.reader-pages img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.reader-empty{
+  padding:60px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+/* FOOTER */
+
+footer{
+  margin-top:28px;
+  padding:24px 0 34px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px){
+
+  .comic-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .hero{
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:900px){
+
+  .header-inner{
+    grid-template-columns:1fr;
+    padding:12px 0;
+  }
+
+  .head-actions{
+    width:100%;
+  }
+
+  .search{
+    flex:1;
+    width:auto;
+  }
+
+  .layout{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    position:static;
+  }
+
+  .comic-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .detail{
+    grid-template-columns:1fr;
+  }
+
+  .detail-cover{
+    max-width:260px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+}
+
+@media(max-width:640px){
+
+  .nav{
+    display:none;
+  }
+
+  .comic-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hero-side{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .mini-cover{
+    min-height:180px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+
+  .admin-row,
+  .chapter-row{
+    grid-template-columns:1fr;
+  }
+
+}
 </style>
 </head>
+
 <body>
-<div class="topline"><div class="wrap"><div>NightInk Comics · Portal para mayores de 18 años</div><div>Últimas actualizaciones · Nuevas series cada semana</div></div></div>
-<header><div class="wrap header-inner"><a class="logo" href="#"><span class="logo-mark">NI</span><span>NightInk</span></a><div class="nav"><a href="#" class="active">Inicio</a><a href="#ultimos">Últimos</a><a href="#populares">Populares</a><a href="#categorias">Categorías</a><a href="#actualizaciones">Actualizaciones</a></div><div class="head-actions"><input id="searchInput" class="search-mini" type="search" placeholder="Buscar cómic..."><button class="admin-btn" id="openAdmin">⚙ Admin</button></div></div></header>
+
+<div class="topline">
+  <div class="wrap">
+    <div>NightInk Comics · +18</div>
+    <div>Obras únicas · Series · Nuevas partes</div>
+  </div>
+</div>
+
+<header>
+
+  <div class="wrap header-inner">
+
+    <a class="logo" href="#">
+      <span class="logo-mark">NI</span>
+      <span>NightInk</span>
+    </a>
+
+    <nav class="nav">
+      <a class="active" href="#">Inicio</a>
+      <a href="#catalogo">Últimos</a>
+      <a href="#categorias">Categorías</a>
+    </nav>
+
+    <div class="head-actions">
+
+      <input
+        id="searchInput"
+        class="search"
+        placeholder="Buscar cómic..."
+      >
+
+      <button
+        id="openAdmin"
+        class="admin-btn"
+      >
+        ⚙ Admin
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
 <main class="wrap">
-<section class="hero"><div class="hero-main"><span class="eyebrow">PORTAL DE CÓMICS PARA ADULTOS</span><h1>Historias nuevas, capítulos recientes y un catálogo que crece contigo.</h1><p>NightInk combina una estructura de portal clásico con una navegación moderna: muchas series visibles, capítulos recientes, populares, categorías y lectura rápida.</p><div class="hero-tags"><span class="pill">+18</span><span class="pill">Últimos capítulos</span><span class="pill">Más vistos</span><span class="pill">Series completas</span></div><div class="hero-cta"><button class="btn primary" onclick="document.getElementById('ultimos').scrollIntoView({behavior:'smooth'})">Explorar catálogo</button><button class="btn secondary">Nuevas series</button></div></div><div class="hero-side"><div class="mini-cover g1"><span>Nocturne</span></div><div class="mini-cover g2"><span>Velvet Room</span></div><div class="mini-cover g3"><span>Afterdark</span></div></div></section>
-<section class="admin-panel" id="adminPanel"><div class="section-head"><h2>Panel de administración</h2><span class="pill">Acceso autorizado</span></div><div class="admin-grid"><div class="admin-stat"><strong>0</strong><small>Cómics</small></div><div class="admin-stat"><strong>0</strong><small>Capítulos</small></div><div class="admin-stat"><strong>0</strong><small>Imágenes</small></div><div class="admin-stat"><strong>0</strong><small>Visitas hoy</small></div></div></section>
-<div class="layout"><aside class="sidebar" id="categorias"><div class="side-title">Categorías</div><div class="genre-grid"><button class="genre-btn active" data-genre="all">Todos</button><button class="genre-btn" data-genre="romance">Romance</button><button class="genre-btn" data-genre="fantasy">Fantasía</button><button class="genre-btn" data-genre="drama">Drama</button><button class="genre-btn" data-genre="mystery">Misterio</button><button class="genre-btn" data-genre="thriller">Thriller</button><button class="genre-btn" data-genre="action">Acción</button><button class="genre-btn" data-genre="other">Otros</button></div><div class="side-block" id="populares"><div class="side-title">Más vistos</div><div class="rank-list"><div class="rank"><div class="rank-num">1</div><div><strong>Crimson Hotel</strong><small>14.3k vistas</small></div></div><div class="rank"><div class="rank-num">2</div><div><strong>Afterdark</strong><small>12.1k vistas</small></div></div><div class="rank"><div class="rank-num">3</div><div><strong>Neon Hearts</strong><small>10.9k vistas</small></div></div><div class="rank"><div class="rank-num">4</div><div><strong>Nocturne</strong><small>9.8k vistas</small></div></div></div></div></aside>
-<div class="content"><section class="section" id="ultimos"><div class="section-head"><h2>Últimos cómics</h2><div class="tabs"><button class="tab active" data-tab="latest">Últimos</button><button class="tab" data-tab="popular">Populares</button><button class="tab" data-tab="complete">Completos</button></div></div><div class="comic-grid" id="comicGrid"></div><div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn">4</button><button class="page-btn">5</button></div></section>
-<section class="section" id="actualizaciones"><div class="section-head"><h2>Últimas actualizaciones</h2><span class="pill">Hoy</span></div><div style="overflow:auto"><table class="updates-table"><thead><tr><th>Título</th><th>Capítulo</th><th>Categoría</th><th>Estado</th></tr></thead><tbody id="updatesBody"></tbody></table></div></section></div></div></main>
-<footer><div class="wrap footer-inner"><div>NightInk Comics · Sitio para mayores de 18 años</div><div>Privacidad · Términos · DMCA · Reportar contenido</div></div></footer>
-<div class="modal" id="adminModal"><div class="login-box"><h2>Administrador</h2><p>Introduce tu contraseña para acceder al panel.</p><input type="password" id="adminPassword" placeholder="Contraseña" autocomplete="current-password"><div class="login-actions"><button class="cancel" id="cancelLogin">Cancelar</button><button class="login" id="loginButton">Entrar</button></div><div id="loginMessage"></div></div></div>
+
+<section class="hero">
+
+  <div class="hero-main">
+
+    <span class="eyebrow">
+      PORTAL DE CÓMICS PARA ADULTOS
+    </span>
+
+    <h1>
+      Una obra puede empezar sola y convertirse
+      en serie cuando quieras.
+    </h1>
+
+    <p>
+      Si tiene una sola parte, NightInk mostrará
+      “Leer ahora”. Si luego aparecen continuaciones,
+      automáticamente mostrará la lista completa
+      de partes.
+    </p>
+
+    <div class="hero-tags">
+      <span class="pill">+18</span>
+      <span class="pill">One-shots</span>
+      <span class="pill">Series</span>
+      <span class="pill">Últimas partes</span>
+    </div>
+
+  </div>
+
+
+  <div class="hero-side">
+
+    <div class="mini-cover">
+      <span>NightInk</span>
+    </div>
+
+    <div class="mini-cover">
+      <span>Nuevas obras</span>
+    </div>
+
+    <div class="mini-cover">
+      <span>Actualizaciones</span>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section
+  id="adminShell"
+  class="admin-shell"
+>
+
+  <div class="section-head">
+
+    <h2>
+      Panel de administración
+    </h2>
+
+    <span class="pill">
+      Cloudflare D1 + R2
+    </span>
+
+  </div>
+
+
+  <div
+    id="stats"
+    class="stats"
+  ></div>
+
+
+  <div class="admin-toolbar">
+
+    <button
+      id="newComicBtn"
+      class="btn primary"
+    >
+      + Nuevo cómic
+    </button>
+
+    <button
+      id="refreshAdminBtn"
+      class="btn secondary"
+    >
+      Actualizar
+    </button>
+
+  </div>
+
+
+  <div
+    id="adminList"
+    class="admin-list"
+  ></div>
+
+</section>
+
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+
+<aside
+  id="categorias"
+  class="sidebar"
+>
+
+  <div class="side-title">
+    Categorías
+  </div>
+
+  <div
+    id="genreGrid"
+    class="genre-grid"
+  >
+
+    <button class="genre-btn active" data-genre="all">
+      Todos
+    </button>
+
+    <button class="genre-btn" data-genre="romance">
+      Romance
+    </button>
+
+    <button class="genre-btn" data-genre="fantasía">
+      Fantasía
+    </button>
+
+    <button class="genre-btn" data-genre="drama">
+      Drama
+    </button>
+
+    <button class="genre-btn" data-genre="misterio">
+      Misterio
+    </button>
+
+    <button class="genre-btn" data-genre="thriller">
+      Thriller
+    </button>
+
+    <button class="genre-btn" data-genre="acción">
+      Acción
+    </button>
+
+    <button class="genre-btn" data-genre="otros">
+      Otros
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- CATALOG -->
+
+<div class="content">
+
+<section
+  id="catalogo"
+  class="section"
+>
+
+  <div class="section-head">
+
+    <h2>
+      Últimos cómics
+    </h2>
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        data-sort="latest"
+      >
+        Últimos
+      </button>
+
+      <button
+        class="tab"
+        data-sort="popular"
+      >
+        Populares
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="comicGrid"
+    class="comic-grid"
+  >
+    <div class="empty">
+      Cargando catálogo...
+    </div>
+  </div>
+
+</section>
+
+</div>
+
+</div>
+
+</main>
+
+
+<footer>
+
+  <div class="wrap">
+    NightInk Comics · Privacidad · Términos ·
+    DMCA · Reportar contenido
+  </div>
+
+</footer>
+
+
+<!-- LOGIN ADMIN -->
+
+<div
+  id="loginModal"
+  class="modal"
+>
+
+  <div
+    class="panel"
+    style="width:min(410px,100%)"
+  >
+
+    <h2>
+      Administrador
+    </h2>
+
+    <p style="color:var(--muted)">
+      Introduce tu contraseña de administrador.
+    </p>
+
+    <div class="field">
+
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="Contraseña"
+      >
+
+    </div>
+
+    <div
+      id="loginMsg"
+      class="msg"
+    ></div>
+
+    <div class="modal-actions">
+
+      <button
+        class="btn secondary"
+        data-close="loginModal"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="loginBtn"
+        class="btn primary"
+      >
+        Entrar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- CREATE / EDIT COMIC -->
+
+<div
+  id="comicModal"
+  class="modal"
+>
+
+  <div class="panel">
+
+    <h2 id="comicFormTitle">
+      Nuevo cómic
+    </h2>
+
+
+    <form id="comicForm">
+
+      <input
+        id="comicId"
+        type="hidden"
+      >
+
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label>
+            Título
+          </label>
+
+          <input
+            id="comicTitle"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Slug
+          </label>
+
+          <input
+            id="comicSlug"
+            placeholder="Opcional"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Autor
+          </label>
+
+          <input
+            id="comicAuthor"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Género
+          </label>
+
+          <input
+            id="comicGenre"
+            placeholder="Romance, Fantasía..."
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Estado
+          </label>
+
+          <select id="comicStatus">
+
+            <option>
+              En emisión
+            </option>
+
+            <option>
+              Completo
+            </option>
+
+            <option>
+              Pausado
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Portada
+          </label>
+
+          <input
+            id="comicCover"
+            type="file"
+            accept="image/*"
+          >
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            Descripción
+          </label>
+
+          <textarea
+            id="comicDescription"
+          ></textarea>
+
+        </div>
+
+
+        <div class="field full">
+
+          <label class="check">
+
+            <input
+              id="comicPublished"
+              type="checkbox"
+            >
+
+            Publicado
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="comicMsg"
+        class="msg"
+      ></div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          data-close="comicModal"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="btn primary"
+        >
+          Guardar
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- PARTS -->
+
+<div
+  id="chaptersModal"
+  class="modal"
+>
+
+  <div class="panel">
+
+    <div class="section-head">
+
+      <h2 id="chaptersTitle">
+        Partes
+      </h2>
+
+      <button
+        class="btn secondary"
+        data-close="chaptersModal"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label>
+          Número de parte
+        </label>
+
+        <input
+          id="chapterNumber"
+          type="number"
+          step="0.1"
+          value="1"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Título de la parte
+        </label>
+
+        <input
+          id="chapterTitle"
+          placeholder="Opcional"
+        >
+
+      </div>
+
+
+      <div class="field full">
+
+        <label class="check">
+
+          <input
+            id="chapterPublished"
+            type="checkbox"
+            checked
+          >
+
+          Publicada
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <button
+      id="addChapterBtn"
+      class="btn primary"
+      style="margin-top:10px"
+    >
+      + Añadir parte
+    </button>
+
+
+    <div
+      id="chapterMsg"
+      class="msg"
+    ></div>
+
+
+    <div
+      id="chaptersList"
+      class="chapters-list"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- PUBLIC COMIC -->
+
+<div
+  id="detailModal"
+  class="modal"
+>
+
+  <div
+    class="panel"
+    style="width:min(900px,100%)"
+  >
+
+    <div class="section-head">
+
+      <h2 id="detailTitle"></h2>
+
+      <button
+        class="btn secondary"
+        data-close="detailModal"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+
+    <div class="detail">
+
+      <div
+        id="detailCover"
+        class="detail-cover"
+      ></div>
+
+
+      <div>
+
+        <p
+          id="detailMeta"
+          style="color:var(--muted)"
+        ></p>
+
+        <p
+          id="detailDescription"
+          style="line-height:1.7"
+        ></p>
+
+        <div
+          id="detailParts"
+          class="parts"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- READER -->
+
+<div
+  id="reader"
+  class="reader"
+>
+
+  <div class="reader-bar">
+
+    <strong id="readerTitle">
+      Lectura
+    </strong>
+
+    <button
+      id="closeReader"
+      class="btn secondary"
+    >
+      Cerrar lector
+    </button>
+
+  </div>
+
+
+  <div
+    id="readerPages"
+    class="reader-pages"
+  ></div>
+
+</div>
+
+
 <script>
-const comics=[{id:1,title:'Nocturne',genre:'thriller',genreLabel:'Thriller',chapter:'Cap. 12',views:9800,status:'En emisión',cover:'g1'},{id:2,title:'Velvet Room',genre:'romance',genreLabel:'Romance',chapter:'Cap. 8',views:8500,status:'En emisión',cover:'g2'},{id:3,title:'Afterdark',genre:'fantasy',genreLabel:'Fantasía',chapter:'Cap. 16',views:12100,status:'En emisión',cover:'g3'},{id:4,title:'Black Orchid',genre:'drama',genreLabel:'Drama',chapter:'Cap. 4',views:6300,status:'Nuevo',cover:'g4'},{id:5,title:'Crimson Hotel',genre:'mystery',genreLabel:'Misterio',chapter:'Cap. 21',views:14300,status:'Popular',cover:'g2'},{id:6,title:'Lunar Kiss',genre:'romance',genreLabel:'Romance',chapter:'Cap. 10',views:7700,status:'En emisión',cover:'g6'},{id:7,title:'Crown of Ash',genre:'fantasy',genreLabel:'Fantasía',chapter:'Cap. 6',views:9100,status:'Nuevo',cover:'g4'},{id:8,title:'Neon Hearts',genre:'drama',genreLabel:'Drama',chapter:'Cap. 18',views:10900,status:'Popular',cover:'g6'},{id:9,title:'Blue Hour',genre:'mystery',genreLabel:'Misterio',chapter:'Cap. 7',views:5900,status:'En emisión',cover:'g3'},{id:10,title:'Wild Bloom',genre:'other',genreLabel:'Otros',chapter:'Cap. 5',views:4800,status:'Nuevo',cover:'g5'}];
-const comicGrid=document.getElementById('comicGrid'),updatesBody=document.getElementById('updatesBody'),searchInput=document.getElementById('searchInput'),genreButtons=[...document.querySelectorAll('.genre-btn')],tabButtons=[...document.querySelectorAll('.tab')];let selectedGenre='all',selectedTab='latest';
-function cardTemplate(c){return `<article class="comic-card"><div class="cover ${c.cover}"><span class="chapter-badge">${c.chapter}</span><span class="cover-title">${c.title}</span></div><div class="card-info"><h3 class="card-title">${c.title}</h3><div class="card-meta"><span>${c.genreLabel}</span><span class="${c.status==='Nuevo'?'status-green':'status-gold'}">${c.status}</span></div></div></article>`}
-function renderComics(){const q=searchInput.value.trim().toLowerCase();let data=comics.filter(c=>(selectedGenre==='all'||c.genre===selectedGenre)&&(!q||c.title.toLowerCase().includes(q)));if(selectedTab==='popular')data=[...data].sort((a,b)=>b.views-a.views);if(selectedTab==='complete')data=data.filter((_,i)=>i%3===0);comicGrid.innerHTML=data.length?data.map(cardTemplate).join(''):'<div style="grid-column:1/-1;padding:20px;color:#a9afbb;border:1px dashed #373b47;border-radius:10px;text-align:center">No hay resultados.</div>'}
-function renderUpdates(){updatesBody.innerHTML=[...comics].sort((a,b)=>b.id-a.id).slice(0,7).map(c=>`<tr><td><strong>${c.title}</strong></td><td>${c.chapter}</td><td><span class="tag">${c.genreLabel}</span></td><td>${c.status}</td></tr>`).join('')}
-genreButtons.forEach(btn=>btn.addEventListener('click',()=>{selectedGenre=btn.dataset.genre;genreButtons.forEach(b=>b.classList.toggle('active',b===btn));renderComics()}));tabButtons.forEach(btn=>btn.addEventListener('click',()=>{selectedTab=btn.dataset.tab;tabButtons.forEach(b=>b.classList.toggle('active',b===btn));renderComics()}));searchInput.addEventListener('input',renderComics);renderComics();renderUpdates();
-const modal=document.getElementById('adminModal'),openAdmin=document.getElementById('openAdmin'),cancelLogin=document.getElementById('cancelLogin'),loginButton=document.getElementById('loginButton'),passwordInput=document.getElementById('adminPassword'),loginMessage=document.getElementById('loginMessage'),adminPanel=document.getElementById('adminPanel');openAdmin.addEventListener('click',()=>{modal.classList.add('open');passwordInput.value='';loginMessage.textContent='';setTimeout(()=>passwordInput.focus(),100)});cancelLogin.addEventListener('click',()=>modal.classList.remove('open'));
-async function loginAdmin(){const password=passwordInput.value;if(!password){loginMessage.className='error';loginMessage.textContent='Escribe tu contraseña.';return}loginButton.disabled=true;loginButton.textContent='Comprobando...';loginMessage.textContent='';try{const response=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});const data=await response.json();if(!response.ok||!data.ok){loginMessage.className='error';loginMessage.textContent=data.error||'Clave incorrecta.';return}loginMessage.className='success';loginMessage.textContent='Acceso correcto.';setTimeout(()=>{modal.classList.remove('open');adminPanel.classList.add('visible');adminPanel.scrollIntoView({behavior:'smooth'})},400)}catch{loginMessage.className='error';loginMessage.textContent='No se pudo conectar con el servidor.'}finally{loginButton.disabled=false;loginButton.textContent='Entrar'}}loginButton.addEventListener('click',loginAdmin);passwordInput.addEventListener('keydown',e=>{if(e.key==='Enter')loginAdmin()});modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+
+const qs = selector =>
+  document.querySelector(selector);
+
+const qsa = selector =>
+  [...document.querySelectorAll(selector)];
+
+
+let catalog = [];
+
+let selectedGenre = "all";
+
+let sortMode = "latest";
+
+let adminToken =
+  sessionStorage.getItem(
+    "nightink_admin_token"
+  ) || "";
+
+let currentComicForChapters = null;
+
+
+function esc(value = "") {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    character => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[character])
+  );
+
+}
+
+
+function openModal(id) {
+
+  qs("#" + id)
+    .classList
+    .add("open");
+
+}
+
+
+function closeModal(id) {
+
+  qs("#" + id)
+    .classList
+    .remove("open");
+
+}
+
+
+qsa("[data-close]").forEach(
+  button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          button.dataset.close
+        );
+      }
+    );
+
+  }
+);
+
+
+async function api(
+  url,
+  options = {}
+) {
+
+  const headers =
+    new Headers(
+      options.headers || {}
+    );
+
+
+  if (adminToken) {
+
+    headers.set(
+      "X-Admin-Token",
+      adminToken
+    );
+
+  }
+
+
+  const response =
+    await fetch(
+      url,
+      {
+        ...options,
+        headers
+      }
+    );
+
+
+  let data = {};
+
+
+  try {
+
+    data =
+      await response.json();
+
+  } catch {}
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      "Error del servidor"
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* =========================
+   PUBLIC CATALOG
+========================= */
+
+
+function renderCatalog() {
+
+  const search =
+    qs("#searchInput")
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  let items =
+    catalog.filter(
+      comic => {
+
+        const genre =
+          String(
+            comic.genre || ""
+          ).toLowerCase();
+
+
+        const genreMatch =
+          selectedGenre === "all" ||
+          genre === selectedGenre;
+
+
+        const searchMatch =
+          !search ||
+          comic.title
+            .toLowerCase()
+            .includes(search);
+
+
+        return (
+          genreMatch &&
+          searchMatch
+        );
+
+      }
+    );
+
+
+  if (
+    sortMode === "popular"
+  ) {
+
+    items =
+      [...items]
+      .sort(
+        (a,b) =>
+          Number(b.views || 0) -
+          Number(a.views || 0)
+      );
+
+  }
+
+
+  const grid =
+    qs("#comicGrid");
+
+
+  if (!items.length) {
+
+    grid.innerHTML = `
+      <div class="empty">
+        Todavía no hay cómics publicados.
+        Entra a Admin y crea el primero.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  grid.innerHTML =
+    items.map(
+      comic => {
+
+        let badge =
+          "Sin partes";
+
+
+        if (
+          comic.part_count === 1
+        ) {
+
+          badge =
+            "Leer ahora";
+
+        }
+
+
+        if (
+          comic.part_count > 1
+        ) {
+
+          badge =
+            comic.part_count +
+            " partes";
+
+        }
+
+
+        const cover =
+          comic.cover_url
+          ?
+          `background-image:url('${comic.cover_url}')`
+          :
+          "";
+
+
+        return `
+
+          <article
+            class="comic-card"
+            data-slug="${comic.slug}"
+          >
+
+            <div
+              class="cover"
+              style="${cover}"
+            >
+
+              <span
+                class="chapter-badge"
+              >
+                ${badge}
+              </span>
+
+              <span
+                class="cover-title"
+              >
+                ${esc(comic.title)}
+              </span>
+
+            </div>
+
+
+            <div class="card-info">
+
+              <h3 class="card-title">
+                ${esc(comic.title)}
+              </h3>
+
+              <div class="card-meta">
+
+                <span>
+                  ${esc(
+                    comic.genre ||
+                    "Sin categoría"
+                  )}
+                </span>
+
+                <span>
+                  ${Number(
+                    comic.views || 0
+                  )} vistas
+                </span>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        `;
+
+      }
+    )
+    .join("");
+
+
+  qsa(".comic-card")
+  .forEach(
+    card => {
+
+      card.addEventListener(
+        "click",
+        () => {
+
+          openComic(
+            card.dataset.slug
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+async function loadCatalog() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/comics"
+      );
+
+
+    catalog =
+      data.comics || [];
+
+
+    renderCatalog();
+
+  } catch (error) {
+
+    qs("#comicGrid")
+    .innerHTML = `
+
+      <div class="empty">
+
+        ${esc(error.message)}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   COMIC DETAIL
+========================= */
+
+
+async function openComic(
+  slug
+) {
+
+  try {
+
+    const data =
+      await api(
+        "/api/comics/" +
+        encodeURIComponent(slug)
+      );
+
+
+    const comic =
+      data.comic;
+
+    const parts =
+      data.chapters || [];
+
+
+    qs("#detailTitle")
+    .textContent =
+      comic.title;
+
+
+    qs("#detailMeta")
+    .textContent =
+      [
+        comic.author,
+        comic.genre,
+        comic.status,
+        comic.views +
+        " vistas"
+      ]
+      .filter(Boolean)
+      .join(" · ");
+
+
+    qs("#detailDescription")
+    .textContent =
+      comic.description || "";
+
+
+    qs("#detailCover")
+    .style
+    .backgroundImage =
+      comic.cover_url
+      ?
+      `url("${comic.cover_url}")`
+      :
+      "";
+
+
+    const partsBox =
+      qs("#detailParts");
+
+
+    if (!parts.length) {
+
+      partsBox.innerHTML = `
+
+        <div class="empty">
+
+          Esta obra todavía
+          no tiene partes publicadas.
+
+        </div>
+
+      `;
+
+    }
+
+    else if (
+      parts.length === 1
+    ) {
+
+      partsBox.innerHTML = `
+
+        <button
+          class="part-btn"
+          data-chapter="${parts[0].id}"
+        >
+          ▶ Leer ahora
+        </button>
+
+      `;
+
+    }
+
+    else {
+
+      partsBox.innerHTML =
+        parts.map(
+          part => `
+
+            <button
+              class="part-btn"
+              data-chapter="${part.id}"
+            >
+
+              Parte
+              ${part.chapter_number}
+
+              ${
+                part.title
+                ?
+                " · " +
+                esc(part.title)
+                :
+                ""
+              }
+
+              ·
+              ${part.page_count}
+              páginas
+
+            </button>
+
+          `
+        )
+        .join("");
+
+    }
+
+
+    qsa("[data-chapter]")
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            openReader(
+              button.dataset.chapter
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    openModal(
+      "detailModal"
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   READER
+========================= */
+
+
+async function openReader(
+  chapterId
+) {
+
+  try {
+
+    const data =
+      await api(
+        `/api/chapters/${chapterId}/pages`
+      );
+
+
+    qs("#readerTitle")
+    .textContent =
+      `${data.chapter.comic_title}
+      · Parte
+      ${data.chapter.chapter_number}`;
+
+
+    if (
+      !data.pages.length
+    ) {
+
+      qs("#readerPages")
+      .innerHTML = `
+
+        <div class="reader-empty">
+          Esta parte todavía
+          no tiene páginas.
+        </div>
+
+      `;
+
+    }
+
+    else {
+
+      qs("#readerPages")
+      .innerHTML =
+        data.pages
+        .map(
+          page => `
+
+            <img
+              src="${page.url}"
+              alt="Página ${page.page_number}"
+              loading="lazy"
+            >
+
+          `
+        )
+        .join("");
+
+    }
+
+
+    closeModal(
+      "detailModal"
+    );
+
+
+    qs("#reader")
+    .classList
+    .add("open");
+
+
+    document.body
+    .style
+    .overflow =
+      "hidden";
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+qs("#closeReader")
+.addEventListener(
+  "click",
+  () => {
+
+    qs("#reader")
+    .classList
+    .remove("open");
+
+    document.body
+    .style
+    .overflow = "";
+
+  }
+);
+
+
+/* =========================
+   FILTERS
+========================= */
+
+
+qsa(".genre-btn")
+.forEach(
+  button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        selectedGenre =
+          button.dataset.genre;
+
+
+        qsa(".genre-btn")
+        .forEach(
+          item => {
+
+            item.classList
+            .toggle(
+              "active",
+              item === button
+            );
+
+          }
+        );
+
+
+        renderCatalog();
+
+      }
+    );
+
+  }
+);
+
+
+qsa(".tab")
+.forEach(
+  button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        sortMode =
+          button.dataset.sort;
+
+
+        qsa(".tab")
+        .forEach(
+          item => {
+
+            item.classList
+            .toggle(
+              "active",
+              item === button
+            );
+
+          }
+        );
+
+
+        renderCatalog();
+
+      }
+    );
+
+  }
+);
+
+
+qs("#searchInput")
+.addEventListener(
+  "input",
+  renderCatalog
+);
+
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+
+qs("#openAdmin")
+.addEventListener(
+  "click",
+  async () => {
+
+    if (adminToken) {
+
+      try {
+
+        await showAdmin();
+        return;
+
+      } catch {
+
+        adminToken = "";
+
+        sessionStorage
+        .removeItem(
+          "nightink_admin_token"
+        );
+
+      }
+
+    }
+
+
+    openModal(
+      "loginModal"
+    );
+
+
+    qs("#adminPassword")
+    .focus();
+
+  }
+);
+
+
+qs("#loginBtn")
+.addEventListener(
+  "click",
+  loginAdmin
+);
+
+
+qs("#adminPassword")
+.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      loginAdmin();
+
+    }
+
+  }
+);
+
+
+async function loginAdmin() {
+
+  const password =
+    qs("#adminPassword")
+    .value;
+
+
+  try {
+
+    await api(
+      "/api/admin/login",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            password
+          })
+      }
+    );
+
+
+    adminToken =
+      password;
+
+
+    sessionStorage
+    .setItem(
+      "nightink_admin_token",
+      password
+    );
+
+
+    qs("#loginMsg")
+    .className =
+      "msg success";
+
+
+    qs("#loginMsg")
+    .textContent =
+      "Acceso correcto";
+
+
+    setTimeout(
+      async () => {
+
+        closeModal(
+          "loginModal"
+        );
+
+        await showAdmin();
+
+      },
+      250
+    );
+
+  } catch (error) {
+
+    qs("#loginMsg")
+    .className =
+      "msg error";
+
+
+    qs("#loginMsg")
+    .textContent =
+      error.message;
+
+  }
+
+}
+
+
+/* =========================
+   ADMIN DASHBOARD
+========================= */
+
+
+async function showAdmin() {
+
+  qs("#adminShell")
+  .classList
+  .add("visible");
+
+
+  await Promise.all([
+    loadStats(),
+    loadAdminComics()
+  ]);
+
+
+  qs("#adminShell")
+  .scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+async function loadStats() {
+
+  const data =
+    await api(
+      "/api/admin/stats"
+    );
+
+
+  const stats =
+    data.stats;
+
+
+  qs("#stats")
+  .innerHTML = `
+
+    <div class="stat">
+
+      <strong>
+        ${stats.comics}
+      </strong>
+
+      <small>
+        Cómics
+      </small>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong>
+        ${stats.chapters}
+      </strong>
+
+      <small>
+        Partes
+      </small>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong>
+        ${stats.pages}
+      </strong>
+
+      <small>
+        Páginas
+      </small>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong>
+        ${stats.views}
+      </strong>
+
+      <small>
+        Vistas
+      </small>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   ADMIN COMICS
+========================= */
+
+
+async function loadAdminComics() {
+
+  const data =
+    await api(
+      "/api/admin/comics"
+    );
+
+
+  const box =
+    qs("#adminList");
+
+
+  if (
+    !data.comics.length
+  ) {
+
+    box.innerHTML = `
+
+      <div class="empty">
+        No hay cómics creados.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    data.comics
+    .map(
+      comic => `
+
+        <div class="admin-row">
+
+          <div>
+
+            <strong>
+              ${esc(comic.title)}
+            </strong>
+
+            <small>
+
+              ${
+                esc(
+                  comic.genre ||
+                  "Sin género"
+                )
+              }
+
+              ·
+
+              ${comic.part_count}
+              parte(s)
+
+              ·
+
+              ${
+                comic.is_published
+                ?
+                "Publicado"
+                :
+                "Borrador"
+              }
+
+            </small>
+
+          </div>
+
+
+          <div class="row-actions">
+
+            <button
+              data-edit="${comic.id}"
+            >
+              Editar
+            </button>
+
+            <button
+              data-parts="${comic.id}"
+            >
+              Partes
+            </button>
+
+            <button
+              data-delete="${comic.id}"
+            >
+              Eliminar
+            </button>
+
+          </div>
+
+        </div>
+
+      `
+    )
+    .join("");
+
+
+  qsa("[data-edit]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          editComic(
+            Number(
+              button.dataset.edit
+            ),
+            data.comics
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  qsa("[data-parts]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          manageParts(
+            Number(
+              button.dataset.parts
+            ),
+            data.comics
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  qsa("[data-delete]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          deleteComic(
+            Number(
+              button.dataset.delete
+            )
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+qs("#refreshAdminBtn")
+.addEventListener(
+  "click",
+  async () => {
+
+    await Promise.all([
+      loadStats(),
+      loadAdminComics(),
+      loadCatalog()
+    ]);
+
+  }
+);
+
+
+/* NEW COMIC */
+
+
+qs("#newComicBtn")
+.addEventListener(
+  "click",
+  () => {
+
+    qs("#comicForm")
+    .reset();
+
+
+    qs("#comicId")
+    .value = "";
+
+
+    qs("#comicPublished")
+    .checked = true;
+
+
+    qs("#comicFormTitle")
+    .textContent =
+      "Nuevo cómic";
+
+
+    qs("#comicMsg")
+    .textContent = "";
+
+
+    openModal(
+      "comicModal"
+    );
+
+  }
+);
+
+
+/* EDIT */
+
+
+function editComic(
+  id,
+  comics
+) {
+
+  const comic =
+    comics.find(
+      item =>
+        item.id === id
+    );
+
+
+  if (!comic) return;
+
+
+  qs("#comicFormTitle")
+  .textContent =
+    "Editar cómic";
+
+
+  qs("#comicId")
+  .value =
+    comic.id;
+
+
+  qs("#comicTitle")
+  .value =
+    comic.title || "";
+
+
+  qs("#comicSlug")
+  .value =
+    comic.slug || "";
+
+
+  qs("#comicAuthor")
+  .value =
+    comic.author || "";
+
+
+  qs("#comicGenre")
+  .value =
+    comic.genre || "";
+
+
+  qs("#comicStatus")
+  .value =
+    comic.status ||
+    "En emisión";
+
+
+  qs("#comicDescription")
+  .value =
+    comic.description || "";
+
+
+  qs("#comicPublished")
+  .checked =
+    Boolean(
+      comic.is_published
+    );
+
+
+  qs("#comicCover")
+  .value = "";
+
+
+  qs("#comicMsg")
+  .textContent = "";
+
+
+  openModal(
+    "comicModal"
+  );
+
+}
+
+
+/* SAVE */
+
+
+qs("#comicForm")
+.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+
+    const id =
+      Number(
+        qs("#comicId")
+        .value || 0
+      );
+
+
+    const payload = {
+
+      title:
+        qs("#comicTitle")
+        .value,
+
+      slug:
+        qs("#comicSlug")
+        .value,
+
+      author:
+        qs("#comicAuthor")
+        .value,
+
+      genre:
+        qs("#comicGenre")
+        .value,
+
+      status:
+        qs("#comicStatus")
+        .value,
+
+      description:
+        qs("#comicDescription")
+        .value,
+
+      is_published:
+        qs("#comicPublished")
+        .checked
+
+    };
+
+
+    try {
+
+      let comicId = id;
+
+
+      if (id) {
+
+        await api(
+          `/api/admin/comics/${id}`,
+          {
+            method:"PUT",
+
+            headers:{
+              "Content-Type":
+              "application/json"
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              )
+          }
+        );
+
+      }
+
+      else {
+
+        const result =
+          await api(
+            "/api/admin/comics",
+            {
+              method:"POST",
+
+              headers:{
+                "Content-Type":
+                "application/json"
+              },
+
+              body:
+                JSON.stringify(
+                  payload
+                )
+            }
+          );
+
+
+        comicId =
+          result.id;
+
+      }
+
+
+      const cover =
+        qs("#comicCover")
+        .files[0];
+
+
+      if (cover) {
+
+        const formData =
+          new FormData();
+
+
+        formData.append(
+          "cover",
+          cover
+        );
+
+
+        await api(
+          `/api/admin/comics/${comicId}/cover`,
+          {
+            method:"POST",
+            body:formData
+          }
+        );
+
+      }
+
+
+      qs("#comicMsg")
+      .className =
+        "msg success";
+
+
+      qs("#comicMsg")
+      .textContent =
+        "Guardado correctamente";
+
+
+      await Promise.all([
+        loadAdminComics(),
+        loadStats(),
+        loadCatalog()
+      ]);
+
+
+      setTimeout(
+        () => {
+          closeModal(
+            "comicModal"
+          );
+        },
+        300
+      );
+
+    } catch (error) {
+
+      qs("#comicMsg")
+      .className =
+        "msg error";
+
+
+      qs("#comicMsg")
+      .textContent =
+        error.message;
+
+    }
+
+  }
+);
+
+
+/* DELETE COMIC */
+
+
+async function deleteComic(
+  id
+) {
+
+  const confirmed =
+    confirm(
+      "¿Eliminar este cómic, sus partes y sus imágenes?"
+    );
+
+
+  if (!confirmed)
+    return;
+
+
+  try {
+
+    await api(
+      `/api/admin/comics/${id}`,
+      {
+        method:"DELETE"
+      }
+    );
+
+
+    await Promise.all([
+      loadAdminComics(),
+      loadStats(),
+      loadCatalog()
+    ]);
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   PARTS / CHAPTERS
+========================= */
+
+
+async function manageParts(
+  id,
+  comics
+) {
+
+  currentComicForChapters =
+    id;
+
+
+  const comic =
+    comics.find(
+      item =>
+        item.id === id
+    );
+
+
+  qs("#chaptersTitle")
+  .textContent =
+    "Partes · " +
+    (
+      comic?.title || ""
+    );
+
+
+  qs("#chapterNumber")
+  .value = 1;
+
+
+  qs("#chapterTitle")
+  .value = "";
+
+
+  qs("#chapterPublished")
+  .checked = true;
+
+
+  qs("#chapterMsg")
+  .textContent = "";
+
+
+  openModal(
+    "chaptersModal"
+  );
+
+
+  await loadParts();
+
+}
+
+
+async function loadParts() {
+
+  const data =
+    await api(
+      `/api/admin/comics/${currentComicForChapters}/chapters`
+    );
+
+
+  const box =
+    qs("#chaptersList");
+
+
+  if (
+    !data.chapters.length
+  ) {
+
+    box.innerHTML = `
+
+      <div class="empty">
+
+        Todavía no hay partes.
+        Crea la primera.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    data.chapters
+    .map(
+      chapter => `
+
+        <div class="chapter-row">
+
+          <div>
+
+            <strong>
+
+              Parte
+              ${chapter.chapter_number}
+
+              ${
+                chapter.title
+                ?
+                " · " +
+                esc(chapter.title)
+                :
+                ""
+              }
+
+            </strong>
+
+
+            <small>
+
+              ${chapter.page_count}
+              páginas
+
+              ·
+
+              ${
+                chapter.is_published
+                ?
+                "Publicada"
+                :
+                "Borrador"
+              }
+
+            </small>
+
+
+            <div class="upload-zone">
+
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                data-files="${chapter.id}"
+              >
+
+
+              <br>
+
+
+              <button
+                class="btn secondary"
+                data-upload="${chapter.id}"
+                style="margin-top:8px"
+              >
+                Subir páginas
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="row-actions">
+
+            <button
+              data-delchapter="${chapter.id}"
+            >
+              Eliminar
+            </button>
+
+          </div>
+
+        </div>
+
+      `
+    )
+    .join("");
+
+
+  qsa("[data-upload]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          uploadPages(
+            Number(
+              button.dataset.upload
+            )
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  qsa("[data-delchapter]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          deleteChapter(
+            Number(
+              button.dataset.delchapter
+            )
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* ADD PART */
+
+
+qs("#addChapterBtn")
+.addEventListener(
+  "click",
+  async () => {
+
+    try {
+
+      await api(
+        `/api/admin/comics/${currentComicForChapters}/chapters`,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              chapter_number:
+                Number(
+                  qs("#chapterNumber")
+                  .value
+                ),
+
+              title:
+                qs("#chapterTitle")
+                .value,
+
+              is_published:
+                qs("#chapterPublished")
+                .checked
+
+            })
+
+        }
+      );
+
+
+      qs("#chapterMsg")
+      .className =
+        "msg success";
+
+
+      qs("#chapterMsg")
+      .textContent =
+        "Parte creada";
+
+
+      await Promise.all([
+        loadParts(),
+        loadStats(),
+        loadAdminComics(),
+        loadCatalog()
+      ]);
+
+    } catch (error) {
+
+      qs("#chapterMsg")
+      .className =
+        "msg error";
+
+
+      qs("#chapterMsg")
+      .textContent =
+        error.message;
+
+    }
+
+  }
+);
+
+
+/* UPLOAD PAGES */
+
+
+async function uploadPages(
+  chapterId
+) {
+
+  const input =
+    qs(
+      `[data-files="${chapterId}"]`
+    );
+
+
+  if (
+    !input ||
+    !input.files.length
+  ) {
+
+    alert(
+      "Selecciona las imágenes primero."
+    );
+
+    return;
+
+  }
+
+
+  const formData =
+    new FormData();
+
+
+  [...input.files]
+  .forEach(
+    file => {
+
+      formData.append(
+        "pages",
+        file
+      );
+
+    }
+  );
+
+
+  try {
+
+    await api(
+      `/api/admin/chapters/${chapterId}/pages`,
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+
+    input.value = "";
+
+
+    await Promise.all([
+      loadParts(),
+      loadStats()
+    ]);
+
+
+    alert(
+      "Páginas subidas correctamente."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* DELETE PART */
+
+
+async function deleteChapter(
+  id
+) {
+
+  const confirmed =
+    confirm(
+      "¿Eliminar esta parte y todas sus páginas?"
+    );
+
+
+  if (!confirmed)
+    return;
+
+
+  try {
+
+    await api(
+      `/api/admin/chapters/${id}`,
+      {
+        method:"DELETE"
+      }
+    );
+
+
+    await Promise.all([
+      loadParts(),
+      loadStats(),
+      loadAdminComics(),
+      loadCatalog()
+    ]);
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* START */
+
+loadCatalog();
+
 </script>
-</body></html>
+
+</body>
+</html>

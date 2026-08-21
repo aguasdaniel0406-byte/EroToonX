@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>NightInk Comics</title>
+
+<meta
+  id="metaDescription"
+  name="description"
+  content="NightInk Comics - catálogo de cómics para adultos."
+>
 
 <style>
 :root{
@@ -20,9 +27,13 @@
   --gold:#f3c75f;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+}
 
 body{
   margin:0;
@@ -56,7 +67,10 @@ button{
   margin:auto;
 }
 
-/* TOP */
+
+/* =========================
+   TOP
+========================= */
 
 .topline{
   background:#090a0d;
@@ -73,7 +87,10 @@ button{
   flex-wrap:wrap;
 }
 
-/* HEADER */
+
+/* =========================
+   HEADER
+========================= */
 
 header{
   position:sticky;
@@ -106,7 +123,11 @@ header{
   display:grid;
   place-items:center;
   border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
   box-shadow:0 8px 22px rgba(124,77,255,.2);
   font-size:14px;
 }
@@ -155,18 +176,28 @@ header{
   border:0;
   border-radius:9px;
   padding:0 14px;
-  background:linear-gradient(135deg,var(--accent),#5d35c8);
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    #5d35c8
+  );
   color:white;
   font-weight:700;
 }
 
-/* MAIN */
+
+/* =========================
+   MAIN
+========================= */
 
 main{
   padding:18px 0 45px;
 }
 
-/* HERO */
+
+/* =========================
+   HERO
+========================= */
 
 .hero{
   display:grid;
@@ -189,8 +220,16 @@ main{
   padding:28px;
   min-height:300px;
   background:
-    radial-gradient(circle at 80% 20%,rgba(124,77,255,.24),transparent 29%),
-    radial-gradient(circle at 15% 85%,rgba(239,71,111,.16),transparent 30%),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(124,77,255,.24),
+      transparent 29%
+    ),
+    radial-gradient(
+      circle at 15% 85%,
+      rgba(239,71,111,.16),
+      transparent 30%
+    ),
     #171920;
 }
 
@@ -250,22 +289,44 @@ main{
 }
 
 .mini-cover:nth-child(1){
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background:
+    linear-gradient(
+      150deg,
+      #4b3ca6,
+      #211a4d 60%,
+      #11101a
+    );
 }
 
 .mini-cover:nth-child(2){
-  background:linear-gradient(150deg,#9d355e,#401527 60%,#160c12);
+  background:
+    linear-gradient(
+      150deg,
+      #9d355e,
+      #401527 60%,
+      #160c12
+    );
 }
 
 .mini-cover:nth-child(3){
-  background:linear-gradient(150deg,#3e6175,#172b37 60%,#0c151b);
+  background:
+    linear-gradient(
+      150deg,
+      #3e6175,
+      #172b37 60%,
+      #0c151b
+    );
 }
 
 .mini-cover:after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.88));
+  background:
+    linear-gradient(
+      transparent 35%,
+      rgba(0,0,0,.88)
+    );
 }
 
 .mini-cover span{
@@ -274,7 +335,10 @@ main{
   font-weight:800;
 }
 
-/* MAIN LAYOUT */
+
+/* =========================
+   LAYOUT
+========================= */
 
 .layout{
   display:grid;
@@ -328,7 +392,10 @@ main{
   border-top:1px solid var(--line);
 }
 
-/* POPULAR */
+
+/* =========================
+   POPULAR
+========================= */
 
 .popular-list{
   display:grid;
@@ -377,7 +444,10 @@ main{
   font-size:10px;
 }
 
-/* SECTIONS */
+
+/* =========================
+   SECTIONS
+========================= */
 
 .section{
   padding:14px;
@@ -408,11 +478,17 @@ main{
   font-size:12px;
 }
 
-/* COMIC GRID */
+
+/* =========================
+   COMIC GRID
+========================= */
 
 .comic-grid{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(
+    5,
+    minmax(0,1fr)
+  );
   gap:12px;
 }
 
@@ -437,7 +513,13 @@ main{
   display:flex;
   align-items:flex-end;
   padding:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background:
+    linear-gradient(
+      150deg,
+      #4b3ca6,
+      #211a4d 60%,
+      #11101a
+    );
   background-size:cover;
   background-position:center;
 }
@@ -446,7 +528,11 @@ main{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(transparent 35%,rgba(0,0,0,.9));
+  background:
+    linear-gradient(
+      transparent 35%,
+      rgba(0,0,0,.9)
+    );
 }
 
 .cover-title{
@@ -496,7 +582,10 @@ main{
   border-radius:10px;
 }
 
-/* PAGINATION */
+
+/* =========================
+   PAGINATION
+========================= */
 
 .pagination{
   display:flex;
@@ -536,7 +625,10 @@ main{
   padding:0 4px;
 }
 
-/* UPDATES */
+
+/* =========================
+   UPDATES
+========================= */
 
 .updates-list{
   display:grid;
@@ -589,7 +681,10 @@ main{
   white-space:nowrap;
 }
 
-/* BUTTONS */
+
+/* =========================
+   BUTTONS
+========================= */
 
 .btn{
   border:0;
@@ -599,7 +694,12 @@ main{
 }
 
 .btn.primary{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
   color:white;
 }
 
@@ -620,7 +720,10 @@ main{
   font-size:11px;
 }
 
-/* ADMIN */
+
+/* =========================
+   ADMIN
+========================= */
 
 .admin-shell{
   display:none;
@@ -715,7 +818,10 @@ main{
   font-size:11px;
 }
 
-/* MODALS */
+
+/* =========================
+   MODALS
+========================= */
 
 .modal{
   display:none;
@@ -803,6 +909,7 @@ main{
   justify-content:flex-end;
   gap:8px;
   margin-top:14px;
+  flex-wrap:wrap;
 }
 
 .msg{
@@ -811,10 +918,36 @@ main{
   font-size:12px;
 }
 
-.error{color:#ff7488}
-.success{color:#67d99c}
+.error{
+  color:#ff7488;
+}
 
-/* CHAPTERS */
+.success{
+  color:#67d99c;
+}
+
+
+/* =========================
+   DETAIL ACTIONS
+========================= */
+
+.detail-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:10px 0 14px;
+}
+
+.share-message{
+  min-height:18px;
+  color:#67d99c;
+  font-size:11px;
+}
+
+
+/* =========================
+   CHAPTERS
+========================= */
 
 .chapters-list{
   display:grid;
@@ -849,7 +982,10 @@ main{
   max-width:100%;
 }
 
-/* PAGE MANAGER */
+
+/* =========================
+   PAGE MANAGER
+========================= */
 
 .page-manager-info{
   padding:10px 12px;
@@ -926,7 +1062,10 @@ main{
   cursor:not-allowed;
 }
 
-/* PUBLIC DETAIL */
+
+/* =========================
+   PUBLIC DETAIL
+========================= */
 
 .detail{
   display:grid;
@@ -937,7 +1076,13 @@ main{
 .detail-cover{
   aspect-ratio:3/4;
   border-radius:10px;
-  background:linear-gradient(150deg,#4b3ca6,#211a4d 60%,#11101a);
+  background:
+    linear-gradient(
+      150deg,
+      #4b3ca6,
+      #211a4d 60%,
+      #11101a
+    );
   background-size:cover;
   background-position:center;
 }
@@ -958,7 +1103,10 @@ main{
   padding:11px;
 }
 
-/* READER */
+
+/* =========================
+   READER
+========================= */
 
 .reader{
   display:none;
@@ -1013,7 +1161,10 @@ main{
   color:var(--muted);
 }
 
-/* FOOTER */
+
+/* =========================
+   FOOTER
+========================= */
 
 footer{
   margin-top:28px;
@@ -1023,7 +1174,10 @@ footer{
   font-size:12px;
 }
 
-/* MOBILE */
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:1100px){
 
@@ -1038,6 +1192,7 @@ footer{
   .hero{
     grid-template-columns:1fr;
   }
+
 }
 
 @media(max-width:900px){
@@ -1083,6 +1238,7 @@ footer{
   .stats{
     grid-template-columns:1fr 1fr;
   }
+
 }
 
 @media(max-width:640px){
@@ -1146,17 +1302,29 @@ footer{
   .update-part{
     grid-column:1/-1;
   }
+
 }
 </style>
 </head>
 
+
 <body>
 
+
 <div class="topline">
+
   <div class="wrap">
-    <div>NightInk Comics · +18</div>
-    <div>Obras únicas · Series · Nuevas partes</div>
+
+    <div>
+      NightInk Comics · +18
+    </div>
+
+    <div>
+      Obras únicas · Series · Nuevas partes
+    </div>
+
   </div>
+
 </div>
 
 
@@ -1164,17 +1332,48 @@ footer{
 
 <div class="wrap header-inner">
 
-  <a class="logo" href="#">
-    <span class="logo-mark">NI</span>
-    <span>NightInk</span>
+
+  <a
+    class="logo"
+    href="/"
+    id="homeLogo"
+  >
+
+    <span class="logo-mark">
+      NI
+    </span>
+
+    <span>
+      NightInk
+    </span>
+
   </a>
 
+
   <nav class="nav">
-    <a class="active" href="#">Inicio</a>
-    <a href="#catalogo">Últimos</a>
-    <a href="#actualizaciones">Actualizaciones</a>
-    <a href="#categorias">Categorías</a>
+
+    <a
+      class="active"
+      href="/"
+      id="homeNav"
+    >
+      Inicio
+    </a>
+
+    <a href="/#catalogo">
+      Últimos
+    </a>
+
+    <a href="/#actualizaciones">
+      Actualizaciones
+    </a>
+
+    <a href="/#categorias">
+      Categorías
+    </a>
+
   </nav>
+
 
   <div class="head-actions">
 
@@ -1198,8 +1397,13 @@ footer{
 </header>
 
 
+
 <main class="wrap">
 
+
+<!-- =========================
+     HERO
+========================= -->
 
 <section class="hero">
 
@@ -1219,11 +1423,27 @@ footer{
     </p>
 
     <div class="hero-tags">
-      <span class="pill">+18</span>
-      <span class="pill">One-shots</span>
-      <span class="pill">Series</span>
-      <span class="pill">Nuevas partes</span>
-      <span class="pill">Más vistos</span>
+
+      <span class="pill">
+        +18
+      </span>
+
+      <span class="pill">
+        One-shots
+      </span>
+
+      <span class="pill">
+        Series
+      </span>
+
+      <span class="pill">
+        Nuevas partes
+      </span>
+
+      <span class="pill">
+        Más vistos
+      </span>
+
     </div>
 
   </div>
@@ -1232,15 +1452,21 @@ footer{
   <div class="hero-side">
 
     <div class="mini-cover">
-      <span>NightInk</span>
+      <span>
+        NightInk
+      </span>
     </div>
 
     <div class="mini-cover">
-      <span>Nuevas obras</span>
+      <span>
+        Nuevas obras
+      </span>
     </div>
 
     <div class="mini-cover">
-      <span>Actualizaciones</span>
+      <span>
+        Actualizaciones
+      </span>
     </div>
 
   </div>
@@ -1248,7 +1474,10 @@ footer{
 </section>
 
 
-<!-- ADMIN -->
+
+<!-- =========================
+     ADMIN
+========================= -->
 
 <section
   id="adminShell"
@@ -1275,6 +1504,7 @@ footer{
 
 
   <div class="admin-toolbar">
+
 
     <div class="admin-toolbar-left">
 
@@ -1306,6 +1536,7 @@ footer{
 
     </div>
 
+
   </div>
 
 
@@ -1317,55 +1548,85 @@ footer{
 </section>
 
 
+
 <div class="layout">
 
 
-<!-- SIDEBAR -->
+<!-- =========================
+     SIDEBAR
+========================= -->
 
 <aside
   id="categorias"
   class="sidebar"
 >
 
+
   <div class="side-title">
     Categorías
   </div>
 
+
   <div class="genre-grid">
 
-    <button class="genre-btn active" data-genre="">
+    <button
+      class="genre-btn active"
+      data-genre=""
+    >
       Todos
     </button>
 
-    <button class="genre-btn" data-genre="Romance">
+    <button
+      class="genre-btn"
+      data-genre="Romance"
+    >
       Romance
     </button>
 
-    <button class="genre-btn" data-genre="Fantasía">
+    <button
+      class="genre-btn"
+      data-genre="Fantasía"
+    >
       Fantasía
     </button>
 
-    <button class="genre-btn" data-genre="Drama">
+    <button
+      class="genre-btn"
+      data-genre="Drama"
+    >
       Drama
     </button>
 
-    <button class="genre-btn" data-genre="Misterio">
+    <button
+      class="genre-btn"
+      data-genre="Misterio"
+    >
       Misterio
     </button>
 
-    <button class="genre-btn" data-genre="Thriller">
+    <button
+      class="genre-btn"
+      data-genre="Thriller"
+    >
       Thriller
     </button>
 
-    <button class="genre-btn" data-genre="Acción">
+    <button
+      class="genre-btn"
+      data-genre="Acción"
+    >
       Acción
     </button>
 
-    <button class="genre-btn" data-genre="Otros">
+    <button
+      class="genre-btn"
+      data-genre="Otros"
+    >
       Otros
     </button>
 
   </div>
+
 
 
   <div class="side-block">
@@ -1387,10 +1648,14 @@ footer{
 
   </div>
 
+
 </aside>
 
 
-<!-- CONTENT -->
+
+<!-- =========================
+     CONTENT
+========================= -->
 
 <div class="content">
 
@@ -1402,9 +1667,11 @@ footer{
 
   <div class="section-head">
 
+
     <h2 id="catalogTitle">
       Últimos cómics
     </h2>
+
 
     <div class="tabs">
 
@@ -1423,6 +1690,7 @@ footer{
       </button>
 
     </div>
+
 
   </div>
 
@@ -1444,10 +1712,14 @@ footer{
     class="pagination"
   ></div>
 
+
 </section>
 
 
-<!-- UPDATES -->
+
+<!-- =========================
+     UPDATES
+========================= -->
 
 <section
   id="actualizaciones"
@@ -1488,16 +1760,22 @@ footer{
 </main>
 
 
+
 <footer>
 
   <div class="wrap">
+
     NightInk Comics · Privacidad · Términos · DMCA · Reportar contenido
+
   </div>
 
 </footer>
 
 
-<!-- LOGIN -->
+
+<!-- =========================
+     LOGIN
+========================= -->
 
 <div
   id="loginModal"
@@ -1527,10 +1805,12 @@ footer{
 
     </div>
 
+
     <div
       id="loginMsg"
       class="msg"
     ></div>
+
 
     <div class="modal-actions">
 
@@ -1555,7 +1835,10 @@ footer{
 </div>
 
 
-<!-- COMIC -->
+
+<!-- =========================
+     COMIC FORM
+========================= -->
 
 <div
   id="comicModal"
@@ -1568,61 +1851,126 @@ footer{
       Nuevo cómic
     </h2>
 
+
     <form id="comicForm">
+
 
       <input
         id="comicId"
         type="hidden"
       >
 
+
       <div class="form-grid">
 
+
         <div class="field">
-          <label>Título</label>
-          <input id="comicTitle" required>
+
+          <label>
+            Título
+          </label>
+
+          <input
+            id="comicTitle"
+            required
+          >
+
         </div>
 
+
         <div class="field">
-          <label>Slug</label>
-          <input id="comicSlug" placeholder="Opcional">
+
+          <label>
+            Slug
+          </label>
+
+          <input
+            id="comicSlug"
+            placeholder="Opcional"
+          >
+
         </div>
 
+
         <div class="field">
-          <label>Autor</label>
-          <input id="comicAuthor">
+
+          <label>
+            Autor
+          </label>
+
+          <input
+            id="comicAuthor"
+          >
+
         </div>
 
+
         <div class="field">
-          <label>Género</label>
-          <input id="comicGenre" placeholder="Romance, Fantasía...">
+
+          <label>
+            Género
+          </label>
+
+          <input
+            id="comicGenre"
+            placeholder="Romance, Fantasía..."
+          >
+
         </div>
 
+
         <div class="field">
 
-          <label>Estado</label>
+          <label>
+            Estado
+          </label>
 
           <select id="comicStatus">
-            <option>En emisión</option>
-            <option>Completo</option>
-            <option>Pausado</option>
+
+            <option>
+              En emisión
+            </option>
+
+            <option>
+              Completo
+            </option>
+
+            <option>
+              Pausado
+            </option>
+
           </select>
 
         </div>
 
+
         <div class="field">
-          <label>Portada</label>
-          <input id="comicCover" type="file" accept="image/*">
+
+          <label>
+            Portada
+          </label>
+
+          <input
+            id="comicCover"
+            type="file"
+            accept="image/*"
+          >
+
         </div>
+
 
         <div class="field full">
 
-          <label>Descripción</label>
+          <label>
+            Descripción
+          </label>
 
           <textarea
             id="comicDescription"
           ></textarea>
 
         </div>
+
 
         <div class="field full">
 
@@ -1638,6 +1986,7 @@ footer{
           </label>
 
         </div>
+
 
       </div>
 
@@ -1667,6 +2016,7 @@ footer{
 
       </div>
 
+
     </form>
 
   </div>
@@ -1674,7 +2024,10 @@ footer{
 </div>
 
 
-<!-- PARTS -->
+
+<!-- =========================
+     PARTS
+========================= -->
 
 <div
   id="chaptersModal"
@@ -1682,6 +2035,7 @@ footer{
 >
 
   <div class="panel wide">
+
 
     <div class="section-head">
 
@@ -1700,6 +2054,7 @@ footer{
 
 
     <div class="form-grid">
+
 
       <div class="field">
 
@@ -1747,6 +2102,7 @@ footer{
 
       </div>
 
+
     </div>
 
 
@@ -1770,12 +2126,16 @@ footer{
       class="chapters-list"
     ></div>
 
+
   </div>
 
 </div>
 
 
-<!-- EDIT PART -->
+
+<!-- =========================
+     EDIT PART
+========================= -->
 
 <div
   id="editChapterModal"
@@ -1799,6 +2159,7 @@ footer{
 
 
     <div class="form-grid">
+
 
       <div class="field">
 
@@ -1843,6 +2204,7 @@ footer{
 
       </div>
 
+
     </div>
 
 
@@ -1870,12 +2232,16 @@ footer{
 
     </div>
 
+
   </div>
 
 </div>
 
 
-<!-- PAGES -->
+
+<!-- =========================
+     PAGES
+========================= -->
 
 <div
   id="pagesModal"
@@ -1883,6 +2249,7 @@ footer{
 >
 
   <div class="panel wide">
+
 
     <div class="section-head">
 
@@ -1901,8 +2268,11 @@ footer{
 
 
     <div class="page-manager-info">
-      Usa ← y → para cambiar el orden. Puedes eliminar una página
-      individual sin borrar la parte completa.
+
+      Usa ← y → para cambiar el orden.
+      Puedes eliminar una página individual
+      sin borrar la parte completa.
+
     </div>
 
 
@@ -1911,12 +2281,16 @@ footer{
       class="pages-grid"
     ></div>
 
+
   </div>
 
 </div>
 
 
-<!-- DETAIL -->
+
+<!-- =========================
+     PUBLIC DETAIL
+========================= -->
 
 <div
   id="detailModal"
@@ -1928,13 +2302,15 @@ footer{
     style="width:min(900px,100%)"
   >
 
+
     <div class="section-head">
 
       <h2 id="detailTitle"></h2>
 
+
       <button
+        id="closeDetailBtn"
         class="btn secondary"
-        data-close="detailModal"
       >
         Cerrar
       </button>
@@ -1944,6 +2320,7 @@ footer{
 
     <div class="detail">
 
+
       <div
         id="detailCover"
         class="detail-cover"
@@ -1952,38 +2329,75 @@ footer{
 
       <div>
 
+
         <p
           id="detailMeta"
           style="color:var(--muted)"
         ></p>
+
 
         <p
           id="detailDescription"
           style="line-height:1.7"
         ></p>
 
+
+        <div class="detail-actions">
+
+          <button
+            id="shareComicBtn"
+            class="btn primary"
+          >
+            Compartir
+          </button>
+
+
+          <button
+            id="copyComicBtn"
+            class="btn secondary"
+          >
+            Copiar enlace
+          </button>
+
+        </div>
+
+
+        <div
+          id="shareMessage"
+          class="share-message"
+        ></div>
+
+
         <div
           id="detailParts"
           class="parts"
         ></div>
 
+
       </div>
 
+
     </div>
+
 
   </div>
 
 </div>
 
 
-<!-- READER -->
+
+<!-- =========================
+     READER
+========================= -->
 
 <div
   id="reader"
   class="reader"
 >
 
+
   <div class="reader-bar">
+
 
     <div class="reader-nav">
 
@@ -2023,6 +2437,7 @@ footer{
 
     </div>
 
+
   </div>
 
 
@@ -2031,10 +2446,16 @@ footer{
     class="reader-pages"
   ></div>
 
+
 </div>
 
 
+
 <script>
+
+/* =========================
+   GLOBAL
+========================= */
 
 const qs = selector =>
   document.querySelector(selector);
@@ -2045,11 +2466,13 @@ const qsa = selector =>
 
 let catalog = [];
 
+
 let pagination = {
   page:1,
   total_pages:1,
   total:0
 };
+
 
 let currentPage = 1;
 
@@ -2061,10 +2484,12 @@ let searchQuery = "";
 
 let searchTimer = null;
 
+
 let adminToken =
   sessionStorage.getItem(
     "nightink_admin_token"
   ) || "";
+
 
 let currentComicForChapters = null;
 
@@ -2074,12 +2499,20 @@ let currentManagedChapter = null;
 
 let managedPages = [];
 
+
 let readerParts = [];
 
 let currentReaderIndex = -1;
 
 
-/* HELPERS */
+let currentPublicComic = null;
+
+let currentPublicSlug = null;
+
+
+/* =========================
+   HELPERS
+========================= */
 
 function esc(value = "") {
 
@@ -2189,7 +2622,218 @@ async function api(
 }
 
 
-/* PUBLIC DATA */
+/* =========================
+   ROUTING
+========================= */
+
+function getRoute() {
+
+  const path =
+    window.location.pathname;
+
+
+  const match =
+    path.match(
+      /^\/comic\/([^/]+)\/?$/
+    );
+
+
+  if (match) {
+
+    return {
+      type:"comic",
+      slug:
+        decodeURIComponent(
+          match[1]
+        )
+    };
+
+  }
+
+
+  return {
+    type:"home"
+  };
+
+}
+
+
+function comicPath(slug) {
+
+  return (
+    "/comic/" +
+    encodeURIComponent(slug)
+  );
+
+}
+
+
+function setHomeMetadata() {
+
+  document.title =
+    "NightInk Comics";
+
+
+  qs("#metaDescription")
+  .setAttribute(
+    "content",
+    "NightInk Comics - catálogo de cómics para adultos."
+  );
+
+}
+
+
+function setComicMetadata(comic) {
+
+  document.title =
+    comic.title +
+    " | NightInk Comics";
+
+
+  const description =
+    comic.description
+    ?
+    comic.description.slice(
+      0,
+      155
+    )
+    :
+    `Lee ${comic.title} en NightInk Comics.`;
+
+
+  qs("#metaDescription")
+  .setAttribute(
+    "content",
+    description
+  );
+
+}
+
+
+function goHome(push = true) {
+
+  currentPublicComic = null;
+
+  currentPublicSlug = null;
+
+
+  closeModal(
+    "detailModal"
+  );
+
+
+  if (push) {
+
+    history.pushState(
+      {
+        nightink:"home"
+      },
+      "",
+      "/"
+    );
+
+  }
+
+
+  setHomeMetadata();
+
+}
+
+
+async function handleRoute() {
+
+  const route =
+    getRoute();
+
+
+  if (
+    route.type === "comic"
+  ) {
+
+    await openComic(
+      route.slug,
+      false
+    );
+
+    return;
+
+  }
+
+
+  closeModal(
+    "detailModal"
+  );
+
+
+  setHomeMetadata();
+
+}
+
+
+window.addEventListener(
+  "popstate",
+  async () => {
+
+    if (
+      qs("#reader")
+      .classList
+      .contains("open")
+    ) {
+
+      closeReader();
+
+    }
+
+
+    await handleRoute();
+
+  }
+);
+
+
+/* =========================
+   HOME LINKS
+========================= */
+
+qs("#homeLogo")
+.addEventListener(
+  "click",
+  event => {
+
+    event.preventDefault();
+
+    goHome(true);
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+  }
+);
+
+
+qs("#homeNav")
+.addEventListener(
+  "click",
+  event => {
+
+    event.preventDefault();
+
+    goHome(true);
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+  }
+);
+
+
+/* =========================
+   PUBLIC DATA
+========================= */
 
 async function refreshPublicData() {
 
@@ -2202,7 +2846,9 @@ async function refreshPublicData() {
 }
 
 
-/* CATALOG */
+/* =========================
+   CATALOG
+========================= */
 
 async function loadCatalog(page = 1) {
 
@@ -2265,7 +2911,8 @@ async function loadCatalog(page = 1) {
       data.pagination || {
         page:1,
         total_pages:1,
-        total:catalog.length
+        total:
+          catalog.length
       };
 
 
@@ -2340,7 +2987,9 @@ function renderCatalog() {
 
 
       if (
-        Number(comic.part_count) === 1
+        Number(
+          comic.part_count
+        ) === 1
       ) {
 
         badge =
@@ -2350,7 +2999,9 @@ function renderCatalog() {
 
 
       if (
-        Number(comic.part_count) > 1
+        Number(
+          comic.part_count
+        ) > 1
       ) {
 
         badge =
@@ -2398,23 +3049,30 @@ function renderCatalog() {
           <div class="card-info">
 
             <h3 class="card-title">
+
               ${esc(comic.title)}
+
             </h3>
+
 
             <div class="card-meta">
 
               <span>
+
                 ${esc(
                   comic.genre ||
                   "Sin categoría"
                 )}
+
               </span>
 
               <span>
+
                 ${Number(
                   comic.views || 0
                 )}
                 vistas
+
               </span>
 
             </div>
@@ -2437,7 +3095,8 @@ function renderCatalog() {
       () => {
 
         openComic(
-          card.dataset.slug
+          card.dataset.slug,
+          true
         );
 
       }
@@ -2448,7 +3107,9 @@ function renderCatalog() {
 }
 
 
-/* PAGINATION */
+/* =========================
+   PAGINATION
+========================= */
 
 function renderPagination() {
 
@@ -2484,7 +3145,13 @@ function renderPagination() {
     <button
       class="page-btn"
       data-page="${page - 1}"
-      ${page <= 1 ? "disabled" : ""}
+      ${
+        page <= 1
+        ?
+        "disabled"
+        :
+        ""
+      }
     >
       ←
     </button>
@@ -2527,9 +3194,11 @@ function renderPagination() {
     ) {
 
       html += `
+
         <span class="page-dots">
           ...
         </span>
+
       `;
 
     }
@@ -2568,9 +3237,11 @@ function renderPagination() {
     ) {
 
       html += `
+
         <span class="page-dots">
           ...
         </span>
+
       `;
 
     }
@@ -2655,7 +3326,9 @@ function renderPagination() {
 }
 
 
-/* POPULAR */
+/* =========================
+   POPULAR
+========================= */
 
 async function loadPopular() {
 
@@ -2700,20 +3373,27 @@ async function loadPopular() {
           >
 
             <div class="popular-rank">
+
               ${index + 1}
+
             </div>
+
 
             <div>
 
               <strong>
+
                 ${esc(comic.title)}
+
               </strong>
 
               <small>
+
                 ${Number(
                   comic.views || 0
                 )}
                 vistas
+
               </small>
 
             </div>
@@ -2733,7 +3413,8 @@ async function loadPopular() {
         () => {
 
           openComic(
-            item.dataset.popularSlug
+            item.dataset.popularSlug,
+            true
           );
 
         }
@@ -2749,7 +3430,9 @@ async function loadPopular() {
     .innerHTML = `
 
       <div class="empty">
+
         ${esc(error.message)}
+
       </div>
 
     `;
@@ -2759,7 +3442,9 @@ async function loadPopular() {
 }
 
 
-/* UPDATES */
+/* =========================
+   UPDATES
+========================= */
 
 async function loadUpdates() {
 
@@ -2832,8 +3517,13 @@ async function loadUpdates() {
             <div>
 
               <div class="update-title">
-                ${esc(update.comic_title)}
+
+                ${esc(
+                  update.comic_title
+                )}
+
               </div>
+
 
               <div class="update-meta">
 
@@ -2860,6 +3550,7 @@ async function loadUpdates() {
 
             </div>
 
+
           </div>
 
         `;
@@ -2876,7 +3567,8 @@ async function loadUpdates() {
         () => {
 
           openComic(
-            item.dataset.updateSlug
+            item.dataset.updateSlug,
+            true
           );
 
         }
@@ -2892,7 +3584,9 @@ async function loadUpdates() {
     .innerHTML = `
 
       <div class="empty">
+
         ${esc(error.message)}
+
       </div>
 
     `;
@@ -2902,7 +3596,9 @@ async function loadUpdates() {
 }
 
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
 
 qs("#searchInput")
 .addEventListener(
@@ -2939,7 +3635,9 @@ qs("#searchInput")
 );
 
 
-/* GENRES */
+/* =========================
+   GENRES
+========================= */
 
 qsa(".genre-btn")
 .forEach(button => {
@@ -2976,7 +3674,9 @@ qsa(".genre-btn")
 });
 
 
-/* SORT */
+/* =========================
+   SORT
+========================= */
 
 qsa(".tab")
 .forEach(button => {
@@ -3013,9 +3713,14 @@ qsa(".tab")
 });
 
 
-/* PUBLIC COMIC */
+/* =========================
+   OPEN PUBLIC COMIC
+========================= */
 
-async function openComic(slug) {
+async function openComic(
+  slug,
+  pushRoute = true
+) {
 
   try {
 
@@ -3034,8 +3739,34 @@ async function openComic(slug) {
       data.chapters || [];
 
 
+    currentPublicComic =
+      comic;
+
+
+    currentPublicSlug =
+      comic.slug;
+
+
     readerParts =
       parts;
+
+
+    if (pushRoute) {
+
+      history.pushState(
+        {
+          nightink:"comic",
+          slug:
+            comic.slug,
+          fromSite:true
+        },
+        "",
+        comicPath(
+          comic.slug
+        )
+      );
+
+    }
 
 
     qs("#detailTitle")
@@ -3071,6 +3802,15 @@ async function openComic(slug) {
       "";
 
 
+    qs("#shareMessage")
+    .textContent = "";
+
+
+    setComicMetadata(
+      comic
+    );
+
+
     const box =
       qs("#detailParts");
 
@@ -3102,7 +3842,10 @@ async function openComic(slug) {
         >
 
           ▶ Leer ahora
-          · ${parts[0].page_count}
+
+          ·
+
+          ${parts[0].page_count}
           páginas
 
         </button>
@@ -3182,14 +3925,192 @@ async function openComic(slug) {
       error.message
     );
 
+
+    if (
+      getRoute().type === "comic"
+    ) {
+
+      history.replaceState(
+        {
+          nightink:"home"
+        },
+        "",
+        "/"
+      );
+
+
+      setHomeMetadata();
+
+    }
+
   }
 
 }
 
 
-/* READER */
+/* =========================
+   CLOSE COMIC
+========================= */
 
-async function openReaderByIndex(index) {
+qs("#closeDetailBtn")
+.addEventListener(
+  "click",
+  () => {
+
+    const state =
+      history.state;
+
+
+    if (
+      state?.nightink === "comic" &&
+      state?.fromSite === true
+    ) {
+
+      history.back();
+
+      return;
+
+    }
+
+
+    goHome(true);
+
+  }
+);
+
+
+/* =========================
+   SHARE
+========================= */
+
+function currentComicUrl() {
+
+  if (!currentPublicSlug) {
+
+    return window.location.href;
+
+  }
+
+
+  return (
+    window.location.origin +
+    comicPath(
+      currentPublicSlug
+    )
+  );
+
+}
+
+
+qs("#shareComicBtn")
+.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentPublicComic) {
+
+      return;
+
+    }
+
+
+    const url =
+      currentComicUrl();
+
+
+    try {
+
+      if (
+        navigator.share
+      ) {
+
+        await navigator.share({
+
+          title:
+            currentPublicComic.title,
+
+          text:
+            `Mira ${currentPublicComic.title} en NightInk Comics`,
+
+          url
+
+        });
+
+
+        return;
+
+      }
+
+
+      await navigator.clipboard
+      .writeText(url);
+
+
+      qs("#shareMessage")
+      .textContent =
+        "Enlace copiado.";
+
+    }
+
+    catch(error) {
+
+      if (
+        error?.name !==
+        "AbortError"
+      ) {
+
+        qs("#shareMessage")
+        .textContent =
+          "No se pudo compartir.";
+
+      }
+
+    }
+
+  }
+);
+
+
+qs("#copyComicBtn")
+.addEventListener(
+  "click",
+  async () => {
+
+    const url =
+      currentComicUrl();
+
+
+    try {
+
+      await navigator.clipboard
+      .writeText(url);
+
+
+      qs("#shareMessage")
+      .textContent =
+        "Enlace copiado al portapapeles.";
+
+    }
+
+    catch {
+
+      qs("#shareMessage")
+      .textContent =
+        url;
+
+    }
+
+  }
+);
+
+
+/* =========================
+   READER
+========================= */
+
+async function openReaderByIndex(
+  index
+) {
 
   if (
     index < 0 ||
@@ -3331,25 +4252,41 @@ qs("#readerNext")
 );
 
 
+function closeReader() {
+
+  qs("#reader")
+  .classList
+  .remove("open");
+
+
+  document.body
+  .classList
+  .remove("locked");
+
+
+  if (
+    currentPublicComic
+  ) {
+
+    openModal(
+      "detailModal"
+    );
+
+  }
+
+}
+
+
 qs("#closeReader")
 .addEventListener(
   "click",
-  () => {
-
-    qs("#reader")
-    .classList
-    .remove("open");
-
-
-    document.body
-    .classList
-    .remove("locked");
-
-  }
+  closeReader
 );
 
 
-/* ADMIN LOGIN */
+/* =========================
+   ADMIN LOGIN
+========================= */
 
 qs("#openAdmin")
 .addEventListener(
@@ -3369,6 +4306,7 @@ qs("#openAdmin")
       catch {
 
         adminToken = "";
+
 
         sessionStorage.removeItem(
           "nightink_admin_token"
@@ -3486,6 +4424,7 @@ async function loginAdmin() {
           "loginModal"
         );
 
+
         await showAdmin();
 
       },
@@ -3510,7 +4449,9 @@ async function loginAdmin() {
 }
 
 
-/* LOGOUT */
+/* =========================
+   LOGOUT
+========================= */
 
 qs("#logoutAdminBtn")
 .addEventListener(
@@ -3533,7 +4474,9 @@ qs("#logoutAdminBtn")
 );
 
 
-/* ADMIN DASHBOARD */
+/* =========================
+   ADMIN DASHBOARD
+========================= */
 
 async function showAdmin() {
 
@@ -3572,23 +4515,54 @@ async function loadStats() {
   .innerHTML = `
 
     <div class="stat">
-      <strong>${s.comics}</strong>
-      <small>Cómics</small>
+
+      <strong>
+        ${s.comics}
+      </strong>
+
+      <small>
+        Cómics
+      </small>
+
     </div>
 
-    <div class="stat">
-      <strong>${s.chapters}</strong>
-      <small>Partes</small>
-    </div>
 
     <div class="stat">
-      <strong>${s.pages}</strong>
-      <small>Páginas</small>
+
+      <strong>
+        ${s.chapters}
+      </strong>
+
+      <small>
+        Partes
+      </small>
+
     </div>
 
+
     <div class="stat">
-      <strong>${s.views}</strong>
-      <small>Vistas</small>
+
+      <strong>
+        ${s.pages}
+      </strong>
+
+      <small>
+        Páginas
+      </small>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong>
+        ${s.views}
+      </strong>
+
+      <small>
+        Vistas
+      </small>
+
     </div>
 
   `;
@@ -3596,7 +4570,9 @@ async function loadStats() {
 }
 
 
-/* ADMIN COMICS */
+/* =========================
+   ADMIN COMICS
+========================= */
 
 async function loadAdminComics() {
 
@@ -3617,7 +4593,9 @@ async function loadAdminComics() {
     box.innerHTML = `
 
       <div class="empty">
+
         No hay cómics creados.
+
       </div>
 
     `;
@@ -3643,6 +4621,7 @@ async function loadAdminComics() {
 
         <div class="admin-row">
 
+
           <div
             class="admin-cover"
             style="${cover}"
@@ -3652,7 +4631,9 @@ async function loadAdminComics() {
           <div>
 
             <strong>
+
               ${esc(comic.title)}
+
             </strong>
 
             <small>
@@ -3703,6 +4684,7 @@ async function loadAdminComics() {
             </button>
 
           </div>
+
 
         </div>
 
@@ -3788,7 +4770,9 @@ qs("#refreshAdminBtn")
 );
 
 
-/* NEW COMIC */
+/* =========================
+   NEW COMIC
+========================= */
 
 qs("#newComicBtn")
 .addEventListener(
@@ -3824,7 +4808,9 @@ qs("#newComicBtn")
 );
 
 
-/* EDIT COMIC */
+/* =========================
+   EDIT COMIC
+========================= */
 
 function editComic(
   id,
@@ -3839,7 +4825,9 @@ function editComic(
 
 
   if (!comic) {
+
     return;
+
   }
 
 
@@ -3906,7 +4894,9 @@ function editComic(
 }
 
 
-/* SAVE COMIC */
+/* =========================
+   SAVE COMIC
+========================= */
 
 qs("#comicForm")
 .addEventListener(
@@ -4085,7 +5075,9 @@ qs("#comicForm")
 );
 
 
-/* DELETE COMIC */
+/* =========================
+   DELETE COMIC
+========================= */
 
 async function deleteComic(id) {
 
@@ -4132,7 +5124,9 @@ async function deleteComic(id) {
 }
 
 
-/* PARTS */
+/* =========================
+   PARTS
+========================= */
 
 async function manageParts(
   id,
@@ -4226,7 +5220,9 @@ async function loadParts() {
 
       <div class="chapter-row">
 
+
         <div>
+
 
           <strong>
 
@@ -4272,6 +5268,7 @@ async function loadParts() {
               data-files="${chapter.id}"
             >
 
+
             <div
               style="
                 color:var(--muted);
@@ -4279,9 +5276,12 @@ async function loadParts() {
                 margin-top:6px
               "
             >
+
               Consejo: usa nombres
               001.jpg, 002.jpg, 003.jpg...
+
             </div>
+
 
             <button
               class="btn secondary small"
@@ -4292,6 +5292,7 @@ async function loadParts() {
             </button>
 
           </div>
+
 
         </div>
 
@@ -4317,6 +5318,7 @@ async function loadParts() {
           </button>
 
         </div>
+
 
       </div>
 
@@ -4402,7 +5404,9 @@ async function loadParts() {
 }
 
 
-/* ADD PART */
+/* =========================
+   ADD PART
+========================= */
 
 qs("#addChapterBtn")
 .addEventListener(
@@ -4479,7 +5483,9 @@ qs("#addChapterBtn")
 );
 
 
-/* EDIT PART */
+/* =========================
+   EDIT PART
+========================= */
 
 function openEditChapter(id) {
 
@@ -4492,7 +5498,9 @@ function openEditChapter(id) {
 
 
   if (!chapter) {
+
     return;
+
   }
 
 
@@ -4625,7 +5633,9 @@ qs("#saveChapterBtn")
 );
 
 
-/* UPLOAD */
+/* =========================
+   UPLOAD PAGES
+========================= */
 
 async function uploadPages(
   chapterId
@@ -4719,7 +5729,9 @@ async function uploadPages(
 }
 
 
-/* DELETE PART */
+/* =========================
+   DELETE PART
+========================= */
 
 async function deleteChapter(id) {
 
@@ -4764,7 +5776,9 @@ async function deleteChapter(id) {
 }
 
 
-/* PAGE MANAGER */
+/* =========================
+   PAGE MANAGER
+========================= */
 
 async function openPagesManager(
   chapterId
@@ -4870,6 +5884,7 @@ function renderManagedPages() {
 
         <div class="page-card">
 
+
           <div class="page-thumb">
 
             <img
@@ -4883,6 +5898,7 @@ function renderManagedPages() {
 
           <div class="page-bottom">
 
+
             <div class="page-number">
 
               Página
@@ -4892,6 +5908,7 @@ function renderManagedPages() {
 
 
             <div class="page-actions">
+
 
               <button
                 data-page-left="${page.id}"
@@ -4929,9 +5946,12 @@ function renderManagedPages() {
                 Eliminar
               </button>
 
+
             </div>
 
+
           </div>
+
 
         </div>
 
@@ -5000,6 +6020,10 @@ function renderManagedPages() {
 
 }
 
+
+/* =========================
+   MOVE PAGE
+========================= */
 
 async function movePage(
   pageId,
@@ -5105,6 +6129,10 @@ async function movePage(
 }
 
 
+/* =========================
+   DELETE PAGE
+========================= */
+
 async function deletePage(
   pageId
 ) {
@@ -5151,9 +6179,57 @@ async function deletePage(
 }
 
 
-/* START */
+/* =========================
+   START
+========================= */
 
-refreshPublicData();
+async function startNightInk() {
+
+  const route =
+    getRoute();
+
+
+  if (
+    route.type === "comic"
+  ) {
+
+    history.replaceState(
+      {
+        nightink:"comic",
+        slug:
+          route.slug,
+        fromSite:false
+      },
+      "",
+      window.location.pathname
+    );
+
+  }
+
+  else {
+
+    history.replaceState(
+      {
+        nightink:"home"
+      },
+      "",
+      window.location.pathname +
+      window.location.search +
+      window.location.hash
+    );
+
+  }
+
+
+  await refreshPublicData();
+
+
+  await handleRoute();
+
+}
+
+
+startNightInk();
 
 </script>
 

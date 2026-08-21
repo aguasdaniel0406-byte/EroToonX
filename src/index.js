@@ -13,7 +13,14 @@ function getAdminToken(request) {
 
 function isAdmin(request, env) {
   return Boolean(env.ADMIN_TOKEN) &&
-         getAdminToken(request) === env.ADMIN_TOKEN;
+    getAdminToken(request) === env.ADMIN_TOKEN;
+}
+
+function toBool(value) {
+  return value === true ||
+    value === 1 ||
+    value === "1" ||
+    value === "true";
 }
 
 function slugify(value = "") {
@@ -23,27 +30,64 @@ function slugify(value = "") {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 90);
+    .slice(0, 120);
+}
+
+function safeName(value = "file") {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "file";
+}
+
+async function touchComic(env, comicId) {
+  await env.DB.prepare(
+    "UPDATE comics SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  ).bind(comicId).run();
+}
+
+async function touchChapter(env, chapterId) {
+  await env.DB.prepare(
+    "UPDATE chapters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  ).bind(chapterId).run();
+}
+
+async function renumberPages(env, chapterId) {
+  const rows = await env.DB.prepare(
+    "SELECT id FROM pages WHERE chapter_id = ? ORDER BY page_number ASC, id ASC"
+  ).bind(chapterId).all();
+
+  const pages = rows.results || [];
+
+  if (!pages.length) {
+    return;
+  }
+
+  for (let i = 0; i < pages.length; i++) {
+    await env.DB.prepare(
+      "UPDATE pages SET page_number = ? WHERE id = ?"
+    ).bind(-(i + 1), pages[i].id).run();
+  }
+
+  for (let i = 0; i < pages.length; i++) {
+    await env.DB.prepare(
+      "UPDATE pages SET page_number = ? WHERE id = ?"
+    ).bind(i + 1, pages[i].id).run();
+  }
 }
 
 async function deleteComicMedia(env, comicId) {
-  const pages = await env.DB.prepare(`
+  const comic = await env.DB.prepare(
+    "SELECT cover_key FROM comics WHERE id = ?"
+  ).bind(comicId).first();
+
+  const rows = await env.DB.prepare(`
     SELECT p.object_key
     FROM pages p
-    JOIN chapters ch
-      ON ch.id = p.chapter_id
+    JOIN chapters ch ON ch.id = p.chapter_id
     WHERE ch.comic_id = ?
-  `)
-  .bind(comicId)
-  .all();
-
-  const comic = await env.DB.prepare(`
-    SELECT cover_key
-    FROM comics
-    WHERE id = ?
-  `)
-  .bind(comicId)
-  .first();
+  `).bind(comicId).all();
 
   const keys = [];
 
@@ -51,9 +95,9 @@ async function deleteComicMedia(env, comicId) {
     keys.push(comic.cover_key);
   }
 
-  for (const page of pages.results || []) {
-    if (page.object_key) {
-      keys.push(page.object_key);
+  for (const row of rows.results || []) {
+    if (row.object_key) {
+      keys.push(row.object_key);
     }
   }
 
@@ -62,67 +106,8 @@ async function deleteComicMedia(env, comicId) {
   }
 }
 
-async function touchComic(env, comicId) {
-  await env.DB.prepare(`
-    UPDATE comics
-    SET updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `)
-  .bind(comicId)
-  .run();
-}
-
-async function touchChapter(env, chapterId) {
-  await env.DB.prepare(`
-    UPDATE chapters
-    SET updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `)
-  .bind(chapterId)
-  .run();
-}
-
-async function renumberPages(env, chapterId) {
-  const result = await env.DB.prepare(`
-    SELECT id
-    FROM pages
-    WHERE chapter_id = ?
-    ORDER BY page_number ASC, id ASC
-  `)
-  .bind(chapterId)
-  .all();
-
-  const pages = result.results || [];
-
-  if (!pages.length) {
-    return;
-  }
-
-  const tempStatements = pages.map((page, index) =>
-    env.DB.prepare(`
-      UPDATE pages
-      SET page_number = ?
-      WHERE id = ?
-    `)
-    .bind(-(index + 1), page.id)
-  );
-
-  await env.DB.batch(tempStatements);
-
-  const finalStatements = pages.map((page, index) =>
-    env.DB.prepare(`
-      UPDATE pages
-      SET page_number = ?
-      WHERE id = ?
-    `)
-    .bind(index + 1, page.id)
-  );
-
-  await env.DB.batch(finalStatements);
-}
-
 async function publicComics(env, url) {
-  const requestedPage = Math.max(
+  const page = Math.max(
     1,
     Number(url.searchParams.get("page") || 1)
   );
@@ -131,7 +116,7 @@ async function publicComics(env, url) {
     50,
     Math.max(
       1,
-      Number(url.searchParams.get("limit") || 20)
+      Number(url.searchParams.get("limit") || 10)
     )
   );
 
@@ -140,956 +125,463 @@ async function publicComics(env, url) {
       ? "popular"
       : "latest";
 
-  const search = String(
-    url.searchParams.get("q") || ""
-  ).trim();
+  const q =
+    (url.searchParams.get("q") || "").trim();
 
-  const genre = String(
-    url.searchParams.get("genre") || ""
-  ).trim();
+  const genre =
+    (url.searchParams.get("genre") || "").trim();
 
   const where = [
     "c.is_published = 1"
   ];
 
-  const bindings = [];
+  const binds = [];
 
-  if (search) {
-    where.push(`
-      (
-        c.title LIKE ?
-        OR c.author LIKE ?
-        OR c.description LIKE ?
-      )
-    `);
+  if (q) {
+    where.push(
+      "(LOWER(c.title) LIKE LOWER(?) OR LOWER(c.author) LIKE LOWER(?) OR LOWER(c.description) LIKE LOWER(?))"
+    );
 
-    const value = `%${search}%`;
+    const like = `%${q}%`;
 
-    bindings.push(
-      value,
-      value,
-      value
+    binds.push(
+      like,
+      like,
+      like
     );
   }
 
   if (genre) {
-    where.push(`
-      LOWER(c.genre) = LOWER(?)
-    `);
+    where.push(
+      "LOWER(c.genre) = LOWER(?)"
+    );
 
-    bindings.push(genre);
+    binds.push(
+      genre
+    );
   }
 
-  const whereSql = where.join(" AND ");
+  const whereSql =
+    where.join(" AND ");
 
-  const countResult = await env.DB.prepare(`
-    SELECT COUNT(*) AS total
-    FROM comics c
-    WHERE ${whereSql}
-  `)
-  .bind(...bindings)
-  .first();
+  const countRow =
+    await env.DB.prepare(
+      `SELECT COUNT(*) AS total
+       FROM comics c
+       WHERE ${whereSql}`
+    )
+    .bind(...binds)
+    .first();
 
-  const total = Number(
-    countResult?.total || 0
-  );
+  const total =
+    Number(
+      countRow?.total || 0
+    );
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(total / limit)
-  );
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(total / limit)
+    );
 
-  const page = Math.min(
-    requestedPage,
-    totalPages
-  );
+  const safePage =
+    Math.min(
+      page,
+      totalPages
+    );
 
   const offset =
-    (page - 1) * limit;
+    (safePage - 1) * limit;
 
   const orderSql =
     sort === "popular"
-      ? `
-        c.views DESC,
-        c.updated_at DESC,
-        c.id DESC
-      `
-      : `
-        c.updated_at DESC,
-        c.id DESC
-      `;
+      ? "c.views DESC, c.updated_at DESC, c.id DESC"
+      : "c.updated_at DESC, c.id DESC";
 
-  const result = await env.DB.prepare(`
-    SELECT
-      c.id,
-      c.slug,
-      c.title,
-      c.description,
-      c.genre,
-      c.author,
-      c.status,
-      c.cover_key,
-      c.views,
-      c.is_published,
-      c.created_at,
-      c.updated_at,
+  const rows =
+    await env.DB.prepare(`
+      SELECT
+        c.*,
 
-      COUNT(ch.id) AS part_count,
+        (
+          SELECT COUNT(*)
+          FROM chapters ch
+          WHERE ch.comic_id = c.id
+          AND ch.is_published = 1
+        ) AS part_count,
 
-      MAX(ch.chapter_number) AS latest_part
+        CASE
+          WHEN c.cover_key IS NOT NULL
+          AND c.cover_key != ''
+          THEN '/media/' || c.cover_key
+          ELSE NULL
+        END AS cover_url
 
-    FROM comics c
+      FROM comics c
 
-    LEFT JOIN chapters ch
-      ON ch.comic_id = c.id
-      AND ch.is_published = 1
+      WHERE ${whereSql}
 
-    WHERE ${whereSql}
+      ORDER BY ${orderSql}
 
-    GROUP BY c.id
+      LIMIT ?
+      OFFSET ?
+    `)
+    .bind(
+      ...binds,
+      limit,
+      offset
+    )
+    .all();
 
-    ORDER BY ${orderSql}
+  return json({
+    ok: true,
 
-    LIMIT ?
-    OFFSET ?
-  `)
-  .bind(
-    ...bindings,
-    limit,
-    offset
-  )
-  .all();
-
-  const comics = (result.results || []).map(comic => ({
-    ...comic,
-
-    cover_url:
-      comic.cover_key
-        ? `/media/${encodeURIComponent(comic.cover_key)}`
-        : null,
-
-    views:
-      Number(comic.views || 0),
-
-    part_count:
-      Number(comic.part_count || 0),
-
-    latest_part:
-      comic.latest_part == null
-        ? null
-        : Number(comic.latest_part)
-  }));
-
-  return {
-    comics,
+    comics:
+      rows.results || [],
 
     pagination: {
-      page,
+      page: safePage,
       limit,
       total,
       total_pages: totalPages
     }
-  };
+  });
 }
 
 async function adminComics(env) {
-  const result = await env.DB.prepare(`
-    SELECT
-      c.*,
-      COUNT(ch.id) AS part_count
-    FROM comics c
-    LEFT JOIN chapters ch
-      ON ch.comic_id = c.id
-    GROUP BY c.id
-    ORDER BY
-      c.updated_at DESC,
-      c.id DESC
-  `)
-  .all();
+  const rows =
+    await env.DB.prepare(`
+      SELECT
+        c.*,
 
-  return (result.results || []).map(comic => ({
-    ...comic,
+        (
+          SELECT COUNT(*)
+          FROM chapters ch
+          WHERE ch.comic_id = c.id
+        ) AS part_count,
 
-    cover_url:
-      comic.cover_key
-        ? `/media/${encodeURIComponent(comic.cover_key)}`
-        : null,
+        CASE
+          WHEN c.cover_key IS NOT NULL
+          AND c.cover_key != ''
+          THEN '/media/' || c.cover_key
+          ELSE NULL
+        END AS cover_url
 
-    views:
-      Number(comic.views || 0),
+      FROM comics c
 
-    part_count:
-      Number(comic.part_count || 0)
-  }));
+      ORDER BY
+        c.updated_at DESC,
+        c.id DESC
+    `)
+    .all();
+
+  return json({
+    ok: true,
+    comics:
+      rows.results || []
+  });
 }
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
 
+  async fetch(
+    request,
+    env
+  ) {
 
-    /* =====================================
-       HEALTH
-    ===================================== */
+    const url =
+      new URL(
+        request.url
+      );
 
-    if (
-      path === "/api/health" &&
-      request.method === "GET"
-    ) {
-      let databaseConnected = false;
-      let mediaConnected = false;
+    const path =
+      url.pathname;
 
-      try {
-        const result = await env.DB
-          .prepare("SELECT 1 AS ok")
-          .first();
+    const method =
+      request.method.toUpperCase();
 
-        databaseConnected =
-          result?.ok === 1;
-      } catch {}
+    try {
 
-      try {
-        const result = await env.MEDIA.list({
-          limit: 1
-        });
-
-        mediaConnected =
-          Array.isArray(result.objects);
-      } catch {}
-
-      return json({
-        ok:
-          databaseConnected &&
-          mediaConnected,
-
-        app: "nightink-app",
-
-        worker: true,
-
-        databaseConnected,
-
-        mediaConnected,
-
-        adminConfigured:
-          Boolean(env.ADMIN_TOKEN)
-      });
-    }
-
-
-    /* =====================================
-       ADMIN LOGIN
-    ===================================== */
-
-    if (
-      path === "/api/admin/login" &&
-      request.method === "POST"
-    ) {
-      let body = {};
-
-      try {
-        body = await request.json();
-      } catch {}
-
-      if (!env.ADMIN_TOKEN) {
-        return json(
-          {
-            ok: false,
-            error:
-              "ADMIN_TOKEN no configurado"
-          },
-          500
-        );
-      }
+      /*
+      =========================
+      HEALTH
+      =========================
+      */
 
       if (
-        (body.password || "") !==
-        env.ADMIN_TOKEN
+        method === "GET" &&
+        path === "/api/health"
       ) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Clave incorrecta"
-          },
-          401
-        );
-      }
 
-      return json({
-        ok: true
-      });
-    }
+        let databaseConnected =
+          false;
 
+        let mediaConnected =
+          false;
 
-    /* =====================================
-       PUBLIC COMICS + PAGINATION
-    ===================================== */
+        try {
 
-    if (
-      path === "/api/comics" &&
-      request.method === "GET"
-    ) {
-      const result =
-        await publicComics(
-          env,
-          url
-        );
+          await env.DB.prepare(
+            "SELECT 1 AS ok"
+          ).first();
 
-      return json({
-        ok: true,
+          databaseConnected =
+            true;
 
-        comics:
-          result.comics,
+        } catch {}
 
-        pagination:
-          result.pagination
-      });
-    }
+        try {
 
+          await env.MEDIA.list({
+            limit: 1
+          });
 
-    /* =====================================
-       LATEST UPDATES
-    ===================================== */
+          mediaConnected =
+            true;
 
-    if (
-      path === "/api/updates" &&
-      request.method === "GET"
-    ) {
-      const limit = Math.min(
-        30,
-        Math.max(
-          1,
-          Number(
-            url.searchParams.get("limit") || 10
-          )
-        )
-      );
+        } catch {}
 
-      const result = await env.DB.prepare(`
-        SELECT
-
-          ch.id AS chapter_id,
-
-          ch.chapter_number,
-
-          ch.title AS chapter_title,
-
-          ch.updated_at,
-
-          c.id AS comic_id,
-
-          c.slug,
-
-          c.title AS comic_title,
-
-          c.genre,
-
-          c.author,
-
-          c.cover_key,
-
-          c.views,
-
-          (
-            SELECT COUNT(*)
-            FROM pages p
-            WHERE p.chapter_id = ch.id
-          ) AS page_count
-
-        FROM chapters ch
-
-        JOIN comics c
-          ON c.id = ch.comic_id
-
-        WHERE
-          ch.is_published = 1
-          AND c.is_published = 1
-
-        ORDER BY
-          ch.updated_at DESC,
-          ch.id DESC
-
-        LIMIT ?
-      `)
-      .bind(limit)
-      .all();
-
-      return json({
-        ok: true,
-
-        updates:
-          (result.results || [])
-          .map(item => ({
-            ...item,
-
-            chapter_number:
-              Number(
-                item.chapter_number
-              ),
-
-            views:
-              Number(
-                item.views || 0
-              ),
-
-            page_count:
-              Number(
-                item.page_count || 0
-              ),
-
-            cover_url:
-              item.cover_key
-                ? `/media/${encodeURIComponent(item.cover_key)}`
-                : null
-          }))
-      });
-    }
-
-
-    /* =====================================
-       PUBLIC COMIC DETAIL
-    ===================================== */
-
-    const publicComicMatch =
-      path.match(
-        /^\/api\/comics\/([^/]+)$/
-      );
-
-    if (
-      publicComicMatch &&
-      request.method === "GET"
-    ) {
-      const slug =
-        decodeURIComponent(
-          publicComicMatch[1]
-        );
-
-      const comic =
-        await env.DB.prepare(`
-          SELECT *
-          FROM comics
-          WHERE slug = ?
-            AND is_published = 1
-        `)
-        .bind(slug)
-        .first();
-
-      if (!comic) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Cómic no encontrado"
-          },
-          404
-        );
-      }
-
-      await env.DB.prepare(`
-        UPDATE comics
-        SET views = views + 1
-        WHERE id = ?
-      `)
-      .bind(comic.id)
-      .run();
-
-      const chapters =
-        await env.DB.prepare(`
-          SELECT
-
-            ch.id,
-
-            ch.chapter_number,
-
-            ch.title,
-
-            ch.is_published,
-
-            ch.created_at,
-
-            ch.updated_at,
-
-            COUNT(p.id)
-              AS page_count
-
-          FROM chapters ch
-
-          LEFT JOIN pages p
-            ON p.chapter_id = ch.id
-
-          WHERE
-            ch.comic_id = ?
-            AND ch.is_published = 1
-
-          GROUP BY ch.id
-
-          ORDER BY
-            ch.chapter_number ASC
-        `)
-        .bind(comic.id)
-        .all();
-
-      return json({
-        ok: true,
-
-        comic: {
-          ...comic,
-
-          views:
-            Number(
-              comic.views || 0
-            ) + 1,
-
-          cover_url:
-            comic.cover_key
-              ? `/media/${encodeURIComponent(comic.cover_key)}`
-              : null
-        },
-
-        chapters:
-          (chapters.results || [])
-          .map(chapter => ({
-            ...chapter,
-
-            chapter_number:
-              Number(
-                chapter.chapter_number
-              ),
-
-            page_count:
-              Number(
-                chapter.page_count || 0
-              )
-          }))
-      });
-    }
-
-
-    /* =====================================
-       PUBLIC CHAPTER PAGES
-    ===================================== */
-
-    const publicChapterMatch =
-      path.match(
-        /^\/api\/chapters\/(\d+)\/pages$/
-      );
-
-    if (
-      publicChapterMatch &&
-      request.method === "GET"
-    ) {
-      const chapterId =
-        Number(
-          publicChapterMatch[1]
-        );
-
-      const chapter =
-        await env.DB.prepare(`
-          SELECT
-
-            ch.*,
-
-            c.title
-              AS comic_title,
-
-            c.slug
-              AS comic_slug
-
-          FROM chapters ch
-
-          JOIN comics c
-            ON c.id =
-               ch.comic_id
-
-          WHERE
-            ch.id = ?
-            AND ch.is_published = 1
-            AND c.is_published = 1
-        `)
-        .bind(chapterId)
-        .first();
-
-      if (!chapter) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Parte no encontrada"
-          },
-          404
-        );
-      }
-
-      const pages =
-        await env.DB.prepare(`
-          SELECT
-            id,
-            page_number,
-            object_key
-          FROM pages
-          WHERE chapter_id = ?
-          ORDER BY
-            page_number ASC,
-            id ASC
-        `)
-        .bind(chapterId)
-        .all();
-
-      return json({
-        ok: true,
-
-        chapter: {
-          ...chapter,
-
-          chapter_number:
-            Number(
-              chapter.chapter_number
-            )
-        },
-
-        pages:
-          (pages.results || [])
-          .map(page => ({
-            id:
-              Number(page.id),
-
-            page_number:
-              Number(
-                page.page_number
-              ),
-
-            url:
-              `/media/${encodeURIComponent(page.object_key)}`
-          }))
-      });
-    }
-
-
-    /* =====================================
-       MEDIA
-    ===================================== */
-
-    if (
-      path.startsWith("/media/") &&
-      request.method === "GET"
-    ) {
-      const key =
-        decodeURIComponent(
-          path.slice(
-            "/media/".length
-          )
-        );
-
-      const object =
-        await env.MEDIA.get(key);
-
-      if (!object) {
-        return new Response(
-          "Not found",
-          {
-            status: 404
-          }
-        );
-      }
-
-      const headers =
-        new Headers();
-
-      object.writeHttpMetadata(
-        headers
-      );
-
-      headers.set(
-        "etag",
-        object.httpEtag
-      );
-
-      headers.set(
-        "Cache-Control",
-        "public, max-age=86400"
-      );
-
-      return new Response(
-        object.body,
-        {
-          headers
-        }
-      );
-    }
-
-
-    /* =====================================
-       ADMIN SECURITY
-    ===================================== */
-
-    if (
-      path.startsWith("/api/admin/") &&
-      !isAdmin(request, env)
-    ) {
-      return json(
-        {
-          ok: false,
-          error:
-            "No autorizado"
-        },
-        401
-      );
-    }
-
-
-    /* =====================================
-       ADMIN STATS
-    ===================================== */
-
-    if (
-      path === "/api/admin/stats" &&
-      request.method === "GET"
-    ) {
-      const comics =
-        await env.DB.prepare(`
-          SELECT COUNT(*) AS n
-          FROM comics
-        `)
-        .first();
-
-      const chapters =
-        await env.DB.prepare(`
-          SELECT COUNT(*) AS n
-          FROM chapters
-        `)
-        .first();
-
-      const pages =
-        await env.DB.prepare(`
-          SELECT COUNT(*) AS n
-          FROM pages
-        `)
-        .first();
-
-      const views =
-        await env.DB.prepare(`
-          SELECT
-            COALESCE(
-              SUM(views),
-              0
-            ) AS n
-          FROM comics
-        `)
-        .first();
-
-      return json({
-        ok: true,
-
-        stats: {
-          comics:
-            Number(
-              comics?.n || 0
-            ),
-
-          chapters:
-            Number(
-              chapters?.n || 0
-            ),
-
-          pages:
-            Number(
-              pages?.n || 0
-            ),
-
-          views:
-            Number(
-              views?.n || 0
-            )
-        }
-      });
-    }
-
-
-    /* =====================================
-       ADMIN COMICS LIST
-    ===================================== */
-
-    if (
-      path === "/api/admin/comics" &&
-      request.method === "GET"
-    ) {
-      return json({
-        ok: true,
-
-        comics:
-          await adminComics(env)
-      });
-    }
-
-
-    /* =====================================
-       CREATE COMIC
-    ===================================== */
-
-    if (
-      path === "/api/admin/comics" &&
-      request.method === "POST"
-    ) {
-      let body = {};
-
-      try {
-        body = await request.json();
-      } catch {}
-
-      const title =
-        String(
-          body.title || ""
-        ).trim();
-
-      if (!title) {
-        return json(
-          {
-            ok: false,
-            error:
-              "El título es obligatorio"
-          },
-          400
-        );
-      }
-
-      const slug =
-        slugify(
-          body.slug || title
-        );
-
-      if (!slug) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Slug inválido"
-          },
-          400
-        );
-      }
-
-      try {
-        const result =
-          await env.DB.prepare(`
-            INSERT INTO comics
-            (
-              slug,
-              title,
-              description,
-              genre,
-              author,
-              status,
-              views,
-              is_published,
-              created_at,
-              updated_at
-            )
-            VALUES
-            (
-              ?, ?, ?, ?, ?, ?,
-              0,
-              ?,
-              CURRENT_TIMESTAMP,
-              CURRENT_TIMESTAMP
-            )
-          `)
-          .bind(
-            slug,
-            title,
-            String(
-              body.description || ""
-            ),
-            String(
-              body.genre || ""
-            ),
-            String(
-              body.author || ""
-            ),
-            String(
-              body.status ||
-              "En emisión"
-            ),
-            body.is_published
-              ? 1
-              : 0
-          )
-          .run();
 
         return json({
+
           ok: true,
 
-          id:
-            result.meta
-            .last_row_id,
+          app:
+            "nightink-app",
 
-          slug
+          worker:
+            true,
+
+          databaseConnected,
+
+          mediaConnected,
+
+          adminConfigured:
+            Boolean(
+              env.ADMIN_TOKEN
+            )
+
         });
+
       }
 
-      catch(error) {
+
+      /*
+      =========================
+      ADMIN LOGIN
+      =========================
+      */
+
+      if (
+        method === "POST" &&
+        path === "/api/admin/login"
+      ) {
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
+
         if (
-          String(error)
-          .toLowerCase()
-          .includes("unique")
+          !env.ADMIN_TOKEN ||
+          body.password !==
+          env.ADMIN_TOKEN
         ) {
+
           return json(
             {
               ok: false,
               error:
-                "Ya existe una obra con ese título o slug"
+                "Contraseña incorrecta"
             },
-            409
+            401
           );
+
         }
 
-        return json(
-          {
-            ok: false,
-            error:
-              "No se pudo crear el cómic"
-          },
-          500
-        );
+
+        return json({
+          ok: true
+        });
+
       }
-    }
 
 
-    /* =====================================
-       UPDATE / DELETE COMIC
-    ===================================== */
-
-    const adminComicMatch =
-      path.match(
-        /^\/api\/admin\/comics\/(\d+)$/
-      );
-
-    if (adminComicMatch) {
-      const id =
-        Number(
-          adminComicMatch[1]
-        );
+      /*
+      =========================
+      PUBLIC COMICS
+      =========================
+      */
 
       if (
-        request.method === "PUT"
+        method === "GET" &&
+        path === "/api/comics"
       ) {
-        let body = {};
 
-        try {
-          body =
-            await request.json();
-        } catch {}
+        return publicComics(
+          env,
+          url
+        );
 
-        const existing =
+      }
+
+
+      /*
+      =========================
+      UPDATES
+      =========================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/updates"
+      ) {
+
+        const limit =
+          Math.min(
+            30,
+            Math.max(
+              1,
+              Number(
+                url.searchParams
+                  .get("limit") ||
+                8
+              )
+            )
+          );
+
+
+        const rows =
           await env.DB.prepare(`
-            SELECT *
-            FROM comics
-            WHERE id = ?
+            SELECT
+
+              ch.id
+                AS chapter_id,
+
+              ch.chapter_number,
+
+              ch.title
+                AS chapter_title,
+
+              ch.updated_at,
+
+              c.id
+                AS comic_id,
+
+              c.slug,
+
+              c.title
+                AS comic_title,
+
+              c.genre,
+
+              c.cover_key,
+
+              CASE
+                WHEN c.cover_key IS NOT NULL
+                AND c.cover_key != ''
+                THEN '/media/' || c.cover_key
+                ELSE NULL
+              END AS cover_url,
+
+              (
+                SELECT COUNT(*)
+                FROM pages p
+                WHERE p.chapter_id = ch.id
+              ) AS page_count
+
+            FROM chapters ch
+
+            JOIN comics c
+              ON c.id = ch.comic_id
+
+            WHERE
+              ch.is_published = 1
+
+            AND
+              c.is_published = 1
+
+            AND EXISTS (
+              SELECT 1
+              FROM pages p2
+              WHERE p2.chapter_id = ch.id
+            )
+
+            ORDER BY
+              ch.updated_at DESC,
+              ch.id DESC
+
+            LIMIT ?
           `)
-          .bind(id)
+          .bind(limit)
+          .all();
+
+
+        return json({
+
+          ok: true,
+
+          updates:
+            rows.results || []
+
+        });
+
+      }
+
+
+      /*
+      =========================
+      PUBLIC COMIC DETAIL
+      =========================
+      */
+
+      const comicPublicMatch =
+        path.match(
+          /^\/api\/comics\/([^/]+)$/
+        );
+
+
+      if (
+        method === "GET" &&
+        comicPublicMatch
+      ) {
+
+        const slug =
+          decodeURIComponent(
+            comicPublicMatch[1]
+          );
+
+
+        const comic =
+          await env.DB.prepare(`
+            SELECT
+
+              c.*,
+
+              CASE
+                WHEN c.cover_key IS NOT NULL
+                AND c.cover_key != ''
+                THEN '/media/' || c.cover_key
+                ELSE NULL
+              END AS cover_url
+
+            FROM comics c
+
+            WHERE
+              c.slug = ?
+
+            AND
+              c.is_published = 1
+          `)
+          .bind(slug)
           .first();
 
-        if (!existing) {
+
+        if (!comic) {
+
           return json(
             {
               ok: false,
@@ -1098,84 +590,513 @@ export default {
             },
             404
           );
+
         }
+
+
+        await env.DB.prepare(
+          "UPDATE comics SET views = views + 1 WHERE id = ?"
+        )
+        .bind(
+          comic.id
+        )
+        .run();
+
+
+        comic.views =
+          Number(
+            comic.views || 0
+          ) + 1;
+
+
+        const chapters =
+          await env.DB.prepare(`
+            SELECT
+
+              ch.*,
+
+              (
+                SELECT COUNT(*)
+                FROM pages p
+                WHERE p.chapter_id = ch.id
+              ) AS page_count
+
+            FROM chapters ch
+
+            WHERE
+              ch.comic_id = ?
+
+            AND
+              ch.is_published = 1
+
+            ORDER BY
+              ch.chapter_number ASC,
+              ch.id ASC
+          `)
+          .bind(
+            comic.id
+          )
+          .all();
+
+
+        return json({
+
+          ok: true,
+
+          comic,
+
+          chapters:
+            chapters.results || []
+
+        });
+
+      }
+
+
+      /*
+      =========================
+      PUBLIC READER
+      =========================
+      */
+
+      const chapterPagesPublicMatch =
+        path.match(
+          /^\/api\/chapters\/(\d+)\/pages$/
+        );
+
+
+      if (
+        method === "GET" &&
+        chapterPagesPublicMatch
+      ) {
+
+        const chapterId =
+          Number(
+            chapterPagesPublicMatch[1]
+          );
+
+
+        const chapter =
+          await env.DB.prepare(`
+            SELECT
+
+              ch.*,
+
+              c.title
+                AS comic_title,
+
+              c.slug
+                AS comic_slug
+
+            FROM chapters ch
+
+            JOIN comics c
+              ON c.id = ch.comic_id
+
+            WHERE
+              ch.id = ?
+
+            AND
+              ch.is_published = 1
+
+            AND
+              c.is_published = 1
+          `)
+          .bind(
+            chapterId
+          )
+          .first();
+
+
+        if (!chapter) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+
+        }
+
+
+        const rows =
+          await env.DB.prepare(`
+            SELECT
+
+              id,
+
+              chapter_id,
+
+              page_number,
+
+              object_key,
+
+              '/media/' || object_key
+                AS url
+
+            FROM pages
+
+            WHERE
+              chapter_id = ?
+
+            ORDER BY
+              page_number ASC,
+              id ASC
+          `)
+          .bind(
+            chapterId
+          )
+          .all();
+
+
+        return json({
+
+          ok: true,
+
+          chapter,
+
+          pages:
+            rows.results || []
+
+        });
+
+      }
+
+
+      /*
+      =========================
+      R2 MEDIA
+      =========================
+      */
+
+      if (
+        method === "GET" &&
+        path.startsWith(
+          "/media/"
+        )
+      ) {
+
+        const key =
+          decodeURIComponent(
+            path.slice(
+              "/media/".length
+            )
+          );
+
+
+        if (!key) {
+
+          return new Response(
+            "Not found",
+            {
+              status: 404
+            }
+          );
+
+        }
+
+
+        const object =
+          await env.MEDIA.get(
+            key
+          );
+
+
+        if (!object) {
+
+          return new Response(
+            "Not found",
+            {
+              status: 404
+            }
+          );
+
+        }
+
+
+        const headers =
+          new Headers();
+
+
+        object.writeHttpMetadata(
+          headers
+        );
+
+
+        headers.set(
+          "ETag",
+          object.httpEtag
+        );
+
+
+        headers.set(
+          "Cache-Control",
+          "public, max-age=31536000, immutable"
+        );
+
+
+        return new Response(
+          object.body,
+          {
+            headers
+          }
+        );
+
+      }
+
+
+      /*
+      =========================
+      PROTECT ADMIN API
+      =========================
+      */
+
+      if (
+        path.startsWith(
+          "/api/admin/"
+        ) &&
+        !isAdmin(
+          request,
+          env
+        )
+      ) {
+
+        return json(
+          {
+            ok: false,
+            error:
+              "No autorizado"
+          },
+          401
+        );
+
+      }
+
+
+      /*
+      =========================
+      ADMIN STATS
+      =========================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/admin/stats"
+      ) {
+
+        const row =
+          await env.DB.prepare(`
+            SELECT
+
+              (
+                SELECT COUNT(*)
+                FROM comics
+              ) AS comics,
+
+              (
+                SELECT COUNT(*)
+                FROM chapters
+              ) AS chapters,
+
+              (
+                SELECT COUNT(*)
+                FROM pages
+              ) AS pages,
+
+              (
+                SELECT
+                  COALESCE(
+                    SUM(views),
+                    0
+                  )
+                FROM comics
+              ) AS views
+          `)
+          .first();
+
+
+        return json({
+
+          ok: true,
+
+          stats:
+            row || {
+              comics: 0,
+              chapters: 0,
+              pages: 0,
+              views: 0
+            }
+
+        });
+
+      }
+
+
+      /*
+      =========================
+      ADMIN COMICS LIST
+      =========================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/admin/comics"
+      ) {
+
+        return adminComics(
+          env
+        );
+
+      }
+
+
+      /*
+      =========================
+      CREATE COMIC
+      =========================
+      */
+
+      if (
+        method === "POST" &&
+        path === "/api/admin/comics"
+      ) {
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
 
         const title =
           String(
-            body.title ??
-            existing.title
+            body.title || ""
           ).trim();
+
+
+        if (!title) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "El título es obligatorio"
+            },
+            400
+          );
+
+        }
+
 
         const slug =
           slugify(
-            body.slug ??
-            existing.slug ??
+            body.slug ||
             title
           );
 
+
+        if (!slug) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Slug inválido"
+            },
+            400
+          );
+
+        }
+
+
         try {
-          await env.DB.prepare(`
-            UPDATE comics
-            SET
-              slug = ?,
-              title = ?,
-              description = ?,
-              genre = ?,
-              author = ?,
-              status = ?,
-              is_published = ?,
-              updated_at =
+
+          const result =
+            await env.DB.prepare(`
+              INSERT INTO comics (
+                slug,
+                title,
+                description,
+                genre,
+                author,
+                status,
+                is_published,
+                created_at,
+                updated_at
+              )
+
+              VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                CURRENT_TIMESTAMP,
                 CURRENT_TIMESTAMP
-            WHERE id = ?
-          `)
-          .bind(
-            slug,
+              )
+            `)
+            .bind(
 
-            title,
+              slug,
 
-            String(
-              body.description ??
-              existing.description ??
-              ""
-            ),
+              title,
 
-            String(
-              body.genre ??
-              existing.genre ??
-              ""
-            ),
+              String(
+                body.description || ""
+              ),
 
-            String(
-              body.author ??
-              existing.author ??
-              ""
-            ),
+              String(
+                body.genre || ""
+              ),
 
-            String(
-              body.status ??
-              existing.status ??
-              "En emisión"
-            ),
+              String(
+                body.author || ""
+              ),
 
-            body.is_published
-              ? 1
-              : 0,
+              String(
+                body.status ||
+                "En emisión"
+              ),
 
-            id
-          )
-          .run();
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0
 
-          return json({
-            ok: true
-          });
+            )
+            .run();
+
+
+          return json(
+            {
+              ok: true,
+
+              id:
+                result.meta
+                  .last_row_id,
+
+              slug
+            },
+            201
+          );
+
         }
 
         catch(error) {
+
           if (
             String(error)
-            .toLowerCase()
-            .includes("unique")
+              .toLowerCase()
+              .includes("unique")
           ) {
+
             return json(
               {
                 ok: false,
@@ -1184,699 +1105,271 @@ export default {
               },
               409
             );
+
           }
+
+
+          throw error;
+
+        }
+
+      }
+
+
+      /*
+      =========================
+      UPDATE / DELETE COMIC
+      =========================
+      */
+
+      const adminComicMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)$/
+        );
+
+
+      if (
+        adminComicMatch &&
+        method === "PUT"
+      ) {
+
+        const id =
+          Number(
+            adminComicMatch[1]
+          );
+
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
+
+        const title =
+          String(
+            body.title || ""
+          ).trim();
+
+
+        if (!title) {
 
           return json(
             {
               ok: false,
               error:
-                "No se pudo actualizar"
+                "El título es obligatorio"
             },
-            500
+            400
           );
+
         }
+
+
+        const slug =
+          slugify(
+            body.slug ||
+            title
+          );
+
+
+        try {
+
+          await env.DB.prepare(`
+            UPDATE comics
+
+            SET
+              slug = ?,
+              title = ?,
+              description = ?,
+              genre = ?,
+              author = ?,
+              status = ?,
+              is_published = ?,
+              updated_at = CURRENT_TIMESTAMP
+
+            WHERE
+              id = ?
+          `)
+          .bind(
+
+            slug,
+
+            title,
+
+            String(
+              body.description || ""
+            ),
+
+            String(
+              body.genre || ""
+            ),
+
+            String(
+              body.author || ""
+            ),
+
+            String(
+              body.status ||
+              "En emisión"
+            ),
+
+            toBool(
+              body.is_published
+            )
+              ? 1
+              : 0,
+
+            id
+
+          )
+          .run();
+
+
+          return json({
+            ok: true,
+            id,
+            slug
+          });
+
+        }
+
+        catch(error) {
+
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese slug ya existe"
+              },
+              409
+            );
+
+          }
+
+
+          throw error;
+
+        }
+
       }
 
+
       if (
-        request.method === "DELETE"
+        adminComicMatch &&
+        method === "DELETE"
       ) {
+
+        const id =
+          Number(
+            adminComicMatch[1]
+          );
+
+
         await deleteComicMedia(
           env,
           id
         );
 
-        await env.DB.prepare(`
-          DELETE FROM comics
-          WHERE id = ?
-        `)
+
+        await env.DB.prepare(
+          "DELETE FROM comics WHERE id = ?"
+        )
         .bind(id)
         .run();
 
+
         return json({
           ok: true
         });
-      }
-    }
 
-
-    /* =====================================
-       COVER
-    ===================================== */
-
-    const coverMatch =
-      path.match(
-        /^\/api\/admin\/comics\/(\d+)\/cover$/
-      );
-
-    if (
-      coverMatch &&
-      request.method === "POST"
-    ) {
-      const comicId =
-        Number(
-          coverMatch[1]
-        );
-
-      const comic =
-        await env.DB.prepare(`
-          SELECT *
-          FROM comics
-          WHERE id = ?
-        `)
-        .bind(comicId)
-        .first();
-
-      if (!comic) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Cómic no encontrado"
-          },
-          404
-        );
       }
 
-      const form =
-        await request.formData();
 
-      const file =
-        form.get("cover");
+      /*
+      =========================
+      COVER
+      =========================
+      */
 
-      if (!(file instanceof File)) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Falta la portada"
-          },
-          400
-        );
-      }
-
-      const extension =
-        (
-          file.name
-          .split(".")
-          .pop() ||
-          "jpg"
-        )
-        .toLowerCase()
-        .replace(
-          /[^a-z0-9]/g,
-          ""
+      const coverMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)\/cover$/
         );
 
-      const key =
-        `covers/${comicId}/${crypto.randomUUID()}.${extension || "jpg"}`;
-
-      if (comic.cover_key) {
-        await env.MEDIA.delete(
-          comic.cover_key
-        );
-      }
-
-      await env.MEDIA.put(
-        key,
-        file.stream(),
-        {
-          httpMetadata: {
-            contentType:
-              file.type ||
-              "image/jpeg"
-          }
-        }
-      );
-
-      await env.DB.prepare(`
-        UPDATE comics
-        SET
-          cover_key = ?,
-          updated_at =
-            CURRENT_TIMESTAMP
-        WHERE id = ?
-      `)
-      .bind(
-        key,
-        comicId
-      )
-      .run();
-
-      return json({
-        ok: true,
-
-        cover_url:
-          `/media/${encodeURIComponent(key)}`
-      });
-    }
-
-
-    /* =====================================
-       LIST / CREATE CHAPTERS
-    ===================================== */
-
-    const chapterListMatch =
-      path.match(
-        /^\/api\/admin\/comics\/(\d+)\/chapters$/
-      );
-
-    if (
-      chapterListMatch &&
-      request.method === "GET"
-    ) {
-      const comicId =
-        Number(
-          chapterListMatch[1]
-        );
-
-      const result =
-        await env.DB.prepare(`
-          SELECT
-
-            ch.*,
-
-            COUNT(p.id)
-              AS page_count
-
-          FROM chapters ch
-
-          LEFT JOIN pages p
-            ON p.chapter_id =
-               ch.id
-
-          WHERE
-            ch.comic_id = ?
-
-          GROUP BY ch.id
-
-          ORDER BY
-            ch.chapter_number ASC
-        `)
-        .bind(comicId)
-        .all();
-
-      return json({
-        ok: true,
-
-        chapters:
-          (result.results || [])
-          .map(chapter => ({
-            ...chapter,
-
-            chapter_number:
-              Number(
-                chapter.chapter_number
-              ),
-
-            page_count:
-              Number(
-                chapter.page_count || 0
-              )
-          }))
-      });
-    }
-
-    if (
-      chapterListMatch &&
-      request.method === "POST"
-    ) {
-      const comicId =
-        Number(
-          chapterListMatch[1]
-        );
-
-      let body = {};
-
-      try {
-        body =
-          await request.json();
-      } catch {}
-
-      const number =
-        Number(
-          body.chapter_number
-        );
 
       if (
-        !Number.isFinite(number)
+        coverMatch &&
+        method === "POST"
       ) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Número de parte inválido"
-          },
-          400
-        );
-      }
 
-      try {
-        const result =
-          await env.DB.prepare(`
-            INSERT INTO chapters
-            (
-              comic_id,
-              chapter_number,
-              title,
-              is_published,
-              created_at,
-              updated_at
-            )
-            VALUES
-            (
-              ?, ?, ?, ?,
-              CURRENT_TIMESTAMP,
-              CURRENT_TIMESTAMP
-            )
-          `)
-          .bind(
-            comicId,
-
-            number,
-
-            String(
-              body.title || ""
-            ),
-
-            body.is_published
-              ? 1
-              : 0
-          )
-          .run();
-
-        await touchComic(
-          env,
-          comicId
-        );
-
-        return json({
-          ok: true,
-
-          id:
-            result.meta
-            .last_row_id
-        });
-      }
-
-      catch(error) {
-        if (
-          String(error)
-          .toLowerCase()
-          .includes("unique")
-        ) {
-          return json(
-            {
-              ok: false,
-              error:
-                "Ya existe esa parte"
-            },
-            409
+        const comicId =
+          Number(
+            coverMatch[1]
           );
-        }
-
-        return json(
-          {
-            ok: false,
-            error:
-              "No se pudo crear la parte"
-          },
-          500
-        );
-      }
-    }
 
 
-    /* =====================================
-       UPDATE / DELETE CHAPTER
-    ===================================== */
-
-    const chapterMatch =
-      path.match(
-        /^\/api\/admin\/chapters\/(\d+)$/
-      );
-
-    if (chapterMatch) {
-      const chapterId =
-        Number(
-          chapterMatch[1]
-        );
-
-      if (
-        request.method === "PUT"
-      ) {
-        const existing =
-          await env.DB.prepare(`
-            SELECT *
-            FROM chapters
-            WHERE id = ?
-          `)
-          .bind(chapterId)
+        const comic =
+          await env.DB.prepare(
+            "SELECT id, cover_key FROM comics WHERE id = ?"
+          )
+          .bind(
+            comicId
+          )
           .first();
 
-        if (!existing) {
+
+        if (!comic) {
+
           return json(
             {
               ok: false,
               error:
-                "Parte no encontrada"
+                "Cómic no encontrado"
             },
             404
           );
+
         }
 
-        let body = {};
 
-        try {
-          body =
-            await request.json();
-        } catch {}
+        const form =
+          await request.formData();
 
-        const number =
-          Number(
-            body.chapter_number ??
-            existing.chapter_number
+
+        const file =
+          form.get(
+            "cover"
           );
 
+
         if (
-          !Number.isFinite(number)
+          !file ||
+          typeof file === "string"
         ) {
+
           return json(
             {
               ok: false,
               error:
-                "Número de parte inválido"
+                "Selecciona una portada"
             },
             400
           );
+
         }
 
-        try {
-          await env.DB.prepare(`
-            UPDATE chapters
-            SET
-              chapter_number = ?,
-              title = ?,
-              is_published = ?,
-              updated_at =
-                CURRENT_TIMESTAMP
-            WHERE id = ?
-          `)
-          .bind(
-            number,
-
-            String(
-              body.title ??
-              existing.title ??
-              ""
-            ),
-
-            body.is_published
-              ? 1
-              : 0,
-
-            chapterId
-          )
-          .run();
-
-          await touchComic(
-            env,
-            existing.comic_id
-          );
-
-          return json({
-            ok: true
-          });
-        }
-
-        catch(error) {
-          if (
-            String(error)
-            .toLowerCase()
-            .includes("unique")
-          ) {
-            return json(
-              {
-                ok: false,
-                error:
-                  "Ya existe una parte con ese número"
-              },
-              409
-            );
-          }
-
-          return json(
-            {
-              ok: false,
-              error:
-                "No se pudo editar la parte"
-            },
-            500
-          );
-        }
-      }
-
-      if (
-        request.method === "DELETE"
-      ) {
-        const chapter =
-          await env.DB.prepare(`
-            SELECT *
-            FROM chapters
-            WHERE id = ?
-          `)
-          .bind(chapterId)
-          .first();
-
-        if (!chapter) {
-          return json(
-            {
-              ok: false,
-              error:
-                "Parte no encontrada"
-            },
-            404
-          );
-        }
-
-        const pages =
-          await env.DB.prepare(`
-            SELECT object_key
-            FROM pages
-            WHERE chapter_id = ?
-          `)
-          .bind(chapterId)
-          .all();
-
-        const keys =
-          (pages.results || [])
-          .map(
-            page =>
-              page.object_key
-          )
-          .filter(Boolean);
-
-        if (keys.length) {
-          await env.MEDIA.delete(
-            keys
-          );
-        }
-
-        await env.DB.prepare(`
-          DELETE FROM chapters
-          WHERE id = ?
-        `)
-        .bind(chapterId)
-        .run();
-
-        await touchComic(
-          env,
-          chapter.comic_id
-        );
-
-        return json({
-          ok: true
-        });
-      }
-    }
-
-
-    /* =====================================
-       ADMIN PAGES
-    ===================================== */
-
-    const adminPagesMatch =
-      path.match(
-        /^\/api\/admin\/chapters\/(\d+)\/pages$/
-      );
-
-    if (
-      adminPagesMatch &&
-      request.method === "GET"
-    ) {
-      const chapterId =
-        Number(
-          adminPagesMatch[1]
-        );
-
-      const chapter =
-        await env.DB.prepare(`
-          SELECT *
-          FROM chapters
-          WHERE id = ?
-        `)
-        .bind(chapterId)
-        .first();
-
-      if (!chapter) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Parte no encontrada"
-          },
-          404
-        );
-      }
-
-      const result =
-        await env.DB.prepare(`
-          SELECT
-            id,
-            chapter_id,
-            page_number,
-            object_key,
-            created_at
-          FROM pages
-          WHERE chapter_id = ?
-          ORDER BY
-            page_number ASC,
-            id ASC
-        `)
-        .bind(chapterId)
-        .all();
-
-      return json({
-        ok: true,
-
-        chapter,
-
-        pages:
-          (result.results || [])
-          .map(page => ({
-            ...page,
-
-            id:
-              Number(page.id),
-
-            page_number:
-              Number(
-                page.page_number
-              ),
-
-            url:
-              `/media/${encodeURIComponent(page.object_key)}`
-          }))
-      });
-    }
-
-
-    /* =====================================
-       UPLOAD PAGES
-    ===================================== */
-
-    if (
-      adminPagesMatch &&
-      request.method === "POST"
-    ) {
-      const chapterId =
-        Number(
-          adminPagesMatch[1]
-        );
-
-      const chapter =
-        await env.DB.prepare(`
-          SELECT
-            ch.*,
-            c.id AS comic_id
-          FROM chapters ch
-          JOIN comics c
-            ON c.id =
-               ch.comic_id
-          WHERE ch.id = ?
-        `)
-        .bind(chapterId)
-        .first();
-
-      if (!chapter) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Parte no encontrada"
-          },
-          404
-        );
-      }
-
-      const current =
-        await env.DB.prepare(`
-          SELECT
-            COALESCE(
-              MAX(page_number),
-              0
-            ) AS max_page
-          FROM pages
-          WHERE chapter_id = ?
-        `)
-        .bind(chapterId)
-        .first();
-
-      let pageNumber =
-        Number(
-          current?.max_page || 0
-        );
-
-      const form =
-        await request.formData();
-
-      const files =
-        form.getAll("pages")
-        .filter(
-          value =>
-            value instanceof File
-        );
-
-      if (!files.length) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Selecciona al menos una imagen"
-          },
-          400
-        );
-      }
-
-      const added = [];
-
-      for (const file of files) {
-        pageNumber += 1;
-
-        const extension =
-          (
-            file.name
-            .split(".")
-            .pop() ||
-            "jpg"
-          )
-          .toLowerCase()
-          .replace(
-            /[^a-z0-9]/g,
-            ""
-          );
 
         const key =
-          `chapters/${chapterId}/${String(pageNumber).padStart(4, "0")}-${crypto.randomUUID()}.${extension || "jpg"}`;
+          `covers/${comicId}/${crypto.randomUUID()}-${safeName(file.name)}`;
+
 
         await env.MEDIA.put(
           key,
@@ -1885,316 +1378,1024 @@ export default {
             httpMetadata: {
               contentType:
                 file.type ||
-                "image/jpeg"
+                "application/octet-stream"
             }
           }
         );
 
-        const result =
+
+        if (
+          comic.cover_key &&
+          comic.cover_key !== key
+        ) {
+
+          await env.MEDIA.delete(
+            comic.cover_key
+          );
+
+        }
+
+
+        await env.DB.prepare(
+          "UPDATE comics SET cover_key = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        )
+        .bind(
+          key,
+          comicId
+        )
+        .run();
+
+
+        return json({
+
+          ok: true,
+
+          cover_url:
+            `/media/${key}`
+
+        });
+
+      }
+
+
+      /*
+      =========================
+      COMIC CHAPTERS
+      =========================
+      */
+
+      const comicChaptersMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)\/chapters$/
+        );
+
+
+      if (
+        comicChaptersMatch &&
+        method === "GET"
+      ) {
+
+        const comicId =
+          Number(
+            comicChaptersMatch[1]
+          );
+
+
+        const rows =
           await env.DB.prepare(`
-            INSERT INTO pages
-            (
-              chapter_id,
-              page_number,
-              object_key,
-              created_at
-            )
-            VALUES
-            (
-              ?, ?, ?,
-              CURRENT_TIMESTAMP
-            )
+            SELECT
+
+              ch.*,
+
+              (
+                SELECT COUNT(*)
+                FROM pages p
+                WHERE p.chapter_id = ch.id
+              ) AS page_count
+
+            FROM chapters ch
+
+            WHERE
+              ch.comic_id = ?
+
+            ORDER BY
+              ch.chapter_number ASC,
+              ch.id ASC
           `)
           .bind(
-            chapterId,
-            pageNumber,
-            key
+            comicId
+          )
+          .all();
+
+
+        return json({
+
+          ok: true,
+
+          chapters:
+            rows.results || []
+
+        });
+
+      }
+
+
+      if (
+        comicChaptersMatch &&
+        method === "POST"
+      ) {
+
+        const comicId =
+          Number(
+            comicChaptersMatch[1]
+          );
+
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
+
+        const chapterNumber =
+          Number(
+            body.chapter_number
+          );
+
+
+        if (
+          !Number.isFinite(
+            chapterNumber
+          )
+        ) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de parte inválido"
+            },
+            400
+          );
+
+        }
+
+
+        try {
+
+          const result =
+            await env.DB.prepare(`
+              INSERT INTO chapters (
+                comic_id,
+                chapter_number,
+                title,
+                is_published,
+                created_at,
+                updated_at
+              )
+
+              VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+            `)
+            .bind(
+
+              comicId,
+
+              chapterNumber,
+
+              String(
+                body.title || ""
+              ),
+
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0
+
+            )
+            .run();
+
+
+          await touchComic(
+            env,
+            comicId
+          );
+
+
+          return json(
+            {
+              ok: true,
+              id:
+                result.meta
+                  .last_row_id
+            },
+            201
+          );
+
+        }
+
+        catch(error) {
+
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese número de parte ya existe"
+              },
+              409
+            );
+
+          }
+
+
+          throw error;
+
+        }
+
+      }
+
+
+      /*
+      =========================
+      UPDATE / DELETE CHAPTER
+      =========================
+      */
+
+      const adminChapterMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)$/
+        );
+
+
+      if (
+        adminChapterMatch &&
+        method === "PUT"
+      ) {
+
+        const id =
+          Number(
+            adminChapterMatch[1]
+          );
+
+
+        const old =
+          await env.DB.prepare(
+            "SELECT comic_id FROM chapters WHERE id = ?"
+          )
+          .bind(id)
+          .first();
+
+
+        if (!old) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+
+        }
+
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
+
+        const chapterNumber =
+          Number(
+            body.chapter_number
+          );
+
+
+        if (
+          !Number.isFinite(
+            chapterNumber
+          )
+        ) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de parte inválido"
+            },
+            400
+          );
+
+        }
+
+
+        try {
+
+          await env.DB.prepare(`
+            UPDATE chapters
+
+            SET
+              chapter_number = ?,
+              title = ?,
+              is_published = ?,
+              updated_at = CURRENT_TIMESTAMP
+
+            WHERE
+              id = ?
+          `)
+          .bind(
+
+            chapterNumber,
+
+            String(
+              body.title || ""
+            ),
+
+            toBool(
+              body.is_published
+            )
+              ? 1
+              : 0,
+
+            id
+
           )
           .run();
 
-        added.push({
-          id:
-            result.meta
-            .last_row_id,
 
-          page_number:
-            pageNumber,
+          await touchComic(
+            env,
+            old.comic_id
+          );
 
-          url:
-            `/media/${encodeURIComponent(key)}`
-        });
+
+          return json({
+            ok: true
+          });
+
+        }
+
+        catch(error) {
+
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese número de parte ya existe"
+              },
+              409
+            );
+
+          }
+
+
+          throw error;
+
+        }
+
       }
 
-      await touchChapter(
-        env,
-        chapterId
-      );
 
-      await touchComic(
-        env,
-        chapter.comic_id
-      );
+      if (
+        adminChapterMatch &&
+        method === "DELETE"
+      ) {
 
-      return json({
-        ok: true,
-        added
-      });
-    }
+        const id =
+          Number(
+            adminChapterMatch[1]
+          );
 
 
-    /* =====================================
-       REORDER PAGES
-    ===================================== */
+        const chapter =
+          await env.DB.prepare(
+            "SELECT comic_id FROM chapters WHERE id = ?"
+          )
+          .bind(id)
+          .first();
 
-    const reorderMatch =
-      path.match(
-        /^\/api\/admin\/chapters\/(\d+)\/pages\/reorder$/
-      );
 
-    if (
-      reorderMatch &&
-      request.method === "POST"
-    ) {
-      const chapterId =
-        Number(
-          reorderMatch[1]
-        );
+        if (!chapter) {
 
-      let body = {};
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
 
-      try {
-        body =
-          await request.json();
-      } catch {}
+        }
 
-      const pageIds =
-        Array.isArray(
-          body.page_ids
+
+        const pages =
+          await env.DB.prepare(
+            "SELECT object_key FROM pages WHERE chapter_id = ?"
+          )
+          .bind(id)
+          .all();
+
+
+        const keys =
+          (
+            pages.results || []
+          )
+          .map(
+            row =>
+              row.object_key
+          )
+          .filter(Boolean);
+
+
+        if (keys.length) {
+
+          await env.MEDIA.delete(
+            keys
+          );
+
+        }
+
+
+        await env.DB.prepare(
+          "DELETE FROM chapters WHERE id = ?"
         )
-        ? body.page_ids.map(Number)
-        : [];
+        .bind(id)
+        .run();
 
-      const current =
-        await env.DB.prepare(`
-          SELECT id
-          FROM pages
-          WHERE chapter_id = ?
-          ORDER BY page_number ASC
-        `)
-        .bind(chapterId)
-        .all();
 
-      const currentIds =
-        (current.results || [])
-        .map(
-          page =>
-            Number(page.id)
-        );
-
-      if (
-        pageIds.length !==
-        currentIds.length
-      ) {
-        return json(
-          {
-            ok: false,
-            error:
-              "La lista de páginas no coincide"
-          },
-          400
-        );
-      }
-
-      const expected =
-        [...currentIds]
-        .sort((a,b) => a-b);
-
-      const received =
-        [...pageIds]
-        .sort((a,b) => a-b);
-
-      if (
-        expected.join(",") !==
-        received.join(",")
-      ) {
-        return json(
-          {
-            ok: false,
-            error:
-              "Hay páginas inválidas"
-          },
-          400
-        );
-      }
-
-      const temporaryStatements =
-        pageIds.map(
-          (pageId, index) =>
-            env.DB.prepare(`
-              UPDATE pages
-              SET page_number = ?
-              WHERE id = ?
-                AND chapter_id = ?
-            `)
-            .bind(
-              -(index + 1),
-              pageId,
-              chapterId
-            )
-        );
-
-      if (
-        temporaryStatements.length
-      ) {
-        await env.DB.batch(
-          temporaryStatements
-        );
-      }
-
-      const finalStatements =
-        pageIds.map(
-          (pageId, index) =>
-            env.DB.prepare(`
-              UPDATE pages
-              SET page_number = ?
-              WHERE id = ?
-                AND chapter_id = ?
-            `)
-            .bind(
-              index + 1,
-              pageId,
-              chapterId
-            )
-        );
-
-      if (
-        finalStatements.length
-      ) {
-        await env.DB.batch(
-          finalStatements
-        );
-      }
-
-      const chapter =
-        await env.DB.prepare(`
-          SELECT comic_id
-          FROM chapters
-          WHERE id = ?
-        `)
-        .bind(chapterId)
-        .first();
-
-      await touchChapter(
-        env,
-        chapterId
-      );
-
-      if (chapter?.comic_id) {
         await touchComic(
           env,
           chapter.comic_id
         );
+
+
+        return json({
+          ok: true
+        });
+
       }
 
-      return json({
-        ok: true
-      });
-    }
 
+      /*
+      =========================
+      ADMIN PAGES
+      =========================
+      */
 
-    /* =====================================
-       DELETE ONE PAGE
-    ===================================== */
-
-    const deletePageMatch =
-      path.match(
-        /^\/api\/admin\/pages\/(\d+)$/
-      );
-
-    if (
-      deletePageMatch &&
-      request.method === "DELETE"
-    ) {
-      const pageId =
-        Number(
-          deletePageMatch[1]
+      const adminChapterPagesMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)\/pages$/
         );
 
-      const page =
-        await env.DB.prepare(`
-          SELECT *
-          FROM pages
-          WHERE id = ?
-        `)
-        .bind(pageId)
-        .first();
 
-      if (!page) {
+      if (
+        adminChapterPagesMatch &&
+        method === "GET"
+      ) {
+
+        const chapterId =
+          Number(
+            adminChapterPagesMatch[1]
+          );
+
+
+        const rows =
+          await env.DB.prepare(`
+            SELECT
+
+              id,
+
+              chapter_id,
+
+              page_number,
+
+              object_key,
+
+              '/media/' || object_key
+                AS url
+
+            FROM pages
+
+            WHERE
+              chapter_id = ?
+
+            ORDER BY
+              page_number ASC,
+              id ASC
+          `)
+          .bind(
+            chapterId
+          )
+          .all();
+
+
+        return json({
+
+          ok: true,
+
+          pages:
+            rows.results || []
+
+        });
+
+      }
+
+
+      if (
+        adminChapterPagesMatch &&
+        method === "POST"
+      ) {
+
+        const chapterId =
+          Number(
+            adminChapterPagesMatch[1]
+          );
+
+
+        const chapter =
+          await env.DB.prepare(
+            "SELECT comic_id FROM chapters WHERE id = ?"
+          )
+          .bind(
+            chapterId
+          )
+          .first();
+
+
+        if (!chapter) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+
+        }
+
+
+        const form =
+          await request.formData();
+
+
+        const files =
+          form.getAll(
+            "pages"
+          )
+          .filter(
+            file =>
+              file &&
+              typeof file !== "string"
+          );
+
+
+        if (!files.length) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Selecciona páginas"
+            },
+            400
+          );
+
+        }
+
+
+        const maxRow =
+          await env.DB.prepare(
+            "SELECT COALESCE(MAX(page_number), 0) AS max_page FROM pages WHERE chapter_id = ?"
+          )
+          .bind(
+            chapterId
+          )
+          .first();
+
+
+        let pageNumber =
+          Number(
+            maxRow?.max_page || 0
+          );
+
+
+        const uploaded = [];
+
+
+        for (
+          const file of files
+        ) {
+
+          pageNumber += 1;
+
+
+          const key =
+            `comics/${chapter.comic_id}/chapters/${chapterId}/${crypto.randomUUID()}-${safeName(file.name)}`;
+
+
+          await env.MEDIA.put(
+            key,
+            file.stream(),
+            {
+              httpMetadata: {
+                contentType:
+                  file.type ||
+                  "application/octet-stream"
+              }
+            }
+          );
+
+
+          const result =
+            await env.DB.prepare(`
+              INSERT INTO pages (
+                chapter_id,
+                page_number,
+                object_key,
+                created_at
+              )
+
+              VALUES (
+                ?,
+                ?,
+                ?,
+                CURRENT_TIMESTAMP
+              )
+            `)
+            .bind(
+              chapterId,
+              pageNumber,
+              key
+            )
+            .run();
+
+
+          uploaded.push({
+
+            id:
+              result.meta
+                .last_row_id,
+
+            page_number:
+              pageNumber,
+
+            url:
+              `/media/${key}`
+
+          });
+
+        }
+
+
+        await touchChapter(
+          env,
+          chapterId
+        );
+
+
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+
+
+        return json(
+          {
+            ok: true,
+            uploaded
+          },
+          201
+        );
+
+      }
+
+
+      /*
+      =========================
+      REORDER PAGES
+      =========================
+      */
+
+      const reorderMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)\/pages\/reorder$/
+        );
+
+
+      if (
+        reorderMatch &&
+        method === "POST"
+      ) {
+
+        const chapterId =
+          Number(
+            reorderMatch[1]
+          );
+
+
+        const body =
+          await request
+            .json()
+            .catch(
+              () => ({})
+            );
+
+
+        const ids =
+          Array.isArray(
+            body.page_ids
+          )
+            ? body.page_ids
+                .map(Number)
+                .filter(
+                  Number.isFinite
+                )
+            : [];
+
+
+        const current =
+          await env.DB.prepare(
+            "SELECT id FROM pages WHERE chapter_id = ? ORDER BY page_number ASC"
+          )
+          .bind(
+            chapterId
+          )
+          .all();
+
+
+        const currentIds =
+          (
+            current.results || []
+          )
+          .map(
+            row =>
+              Number(row.id)
+          );
+
+
+        if (
+          ids.length !==
+          currentIds.length ||
+
+          [...ids]
+            .sort(
+              (a,b) =>
+                a - b
+            )
+            .join(",")
+          !==
+          [...currentIds]
+            .sort(
+              (a,b) =>
+                a - b
+            )
+            .join(",")
+        ) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Orden de páginas inválido"
+            },
+            400
+          );
+
+        }
+
+
+        for (
+          let i = 0;
+          i < ids.length;
+          i++
+        ) {
+
+          await env.DB.prepare(
+            "UPDATE pages SET page_number = ? WHERE id = ? AND chapter_id = ?"
+          )
+          .bind(
+            -(i + 1),
+            ids[i],
+            chapterId
+          )
+          .run();
+
+        }
+
+
+        for (
+          let i = 0;
+          i < ids.length;
+          i++
+        ) {
+
+          await env.DB.prepare(
+            "UPDATE pages SET page_number = ? WHERE id = ? AND chapter_id = ?"
+          )
+          .bind(
+            i + 1,
+            ids[i],
+            chapterId
+          )
+          .run();
+
+        }
+
+
+        const chapter =
+          await env.DB.prepare(
+            "SELECT comic_id FROM chapters WHERE id = ?"
+          )
+          .bind(
+            chapterId
+          )
+          .first();
+
+
+        await touchChapter(
+          env,
+          chapterId
+        );
+
+
+        if (chapter) {
+
+          await touchComic(
+            env,
+            chapter.comic_id
+          );
+
+        }
+
+
+        return json({
+          ok: true
+        });
+
+      }
+
+
+      /*
+      =========================
+      DELETE PAGE
+      =========================
+      */
+
+      const pageDeleteMatch =
+        path.match(
+          /^\/api\/admin\/pages\/(\d+)$/
+        );
+
+
+      if (
+        pageDeleteMatch &&
+        method === "DELETE"
+      ) {
+
+        const id =
+          Number(
+            pageDeleteMatch[1]
+          );
+
+
+        const page =
+          await env.DB.prepare(`
+            SELECT
+
+              p.object_key,
+
+              p.chapter_id,
+
+              ch.comic_id
+
+            FROM pages p
+
+            JOIN chapters ch
+              ON ch.id = p.chapter_id
+
+            WHERE
+              p.id = ?
+          `)
+          .bind(id)
+          .first();
+
+
+        if (!page) {
+
+          return json(
+            {
+              ok: false,
+              error:
+                "Página no encontrada"
+            },
+            404
+          );
+
+        }
+
+
+        if (page.object_key) {
+
+          await env.MEDIA.delete(
+            page.object_key
+          );
+
+        }
+
+
+        await env.DB.prepare(
+          "DELETE FROM pages WHERE id = ?"
+        )
+        .bind(id)
+        .run();
+
+
+        await renumberPages(
+          env,
+          page.chapter_id
+        );
+
+
+        await touchChapter(
+          env,
+          page.chapter_id
+        );
+
+
+        await touchComic(
+          env,
+          page.comic_id
+        );
+
+
+        return json({
+          ok: true
+        });
+
+      }
+
+
+      /*
+      =========================
+      UNKNOWN API
+      =========================
+      */
+
+      if (
+        path.startsWith(
+          "/api/"
+        )
+      ) {
+
         return json(
           {
             ok: false,
             error:
-              "Página no encontrada"
+              "Ruta no encontrada"
           },
           404
         );
+
       }
 
-      if (page.object_key) {
-        await env.MEDIA.delete(
-          page.object_key
-        );
-      }
 
-      await env.DB.prepare(`
-        DELETE FROM pages
-        WHERE id = ?
-      `)
-      .bind(pageId)
-      .run();
+      /*
+      =========================
+      STATIC SITE
+      =========================
+      */
 
-      await renumberPages(
-        env,
-        page.chapter_id
+      return env.ASSETS.fetch(
+        request
       );
 
-      const chapter =
-        await env.DB.prepare(`
-          SELECT comic_id
-          FROM chapters
-          WHERE id = ?
-        `)
-        .bind(
-          page.chapter_id
-        )
-        .first();
-
-      await touchChapter(
-        env,
-        page.chapter_id
-      );
-
-      if (
-        chapter?.comic_id
-      ) {
-        await touchComic(
-          env,
-          chapter.comic_id
-        );
-      }
-
-      return json({
-        ok: true
-      });
     }
 
+    catch(error) {
 
-    /* =====================================
-       STATIC WEBSITE
-    ===================================== */
+      console.error(
+        error
+      );
 
-    return env.ASSETS.fetch(
-      request
-    );
+
+      return json(
+        {
+          ok: false,
+          error:
+            "Error interno del servidor"
+        },
+        500
+      );
+
+    }
+
   }
+
 };

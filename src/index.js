@@ -9,19 +9,24 @@ export default {
       try {
         const result = await env.DB.prepare("SELECT 1 AS ok").first();
         databaseConnected = result?.ok === 1;
-      } catch (err) {}
+      } catch (err) {
+        databaseConnected = false;
+      }
 
       try {
         const result = await env.MEDIA.list({ limit: 1 });
         mediaConnected = Array.isArray(result.objects);
-      } catch (err) {}
+      } catch (err) {
+        mediaConnected = false;
+      }
 
       return Response.json({
         ok: databaseConnected && mediaConnected,
         app: "nightink-app",
         worker: true,
         databaseConnected,
-        mediaConnected
+        mediaConnected,
+        adminConfigured: Boolean(env.ADMIN_TOKEN)
       });
     }
 

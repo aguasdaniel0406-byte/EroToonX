@@ -17,6 +17,7 @@
   --accent2:#ef476f;
   --danger:#d94b62;
   --green:#2cb67d;
+  --gold:#f3c75f;
 }
 
 *{box-sizing:border-box}
@@ -30,28 +31,32 @@ body{
   font-family:Arial,Helvetica,sans-serif;
 }
 
-body.locked{overflow:hidden}
+body.locked{
+  overflow:hidden;
+}
 
 a{
   color:inherit;
   text-decoration:none;
 }
 
-button,input,select,textarea{
+button,
+input,
+select,
+textarea{
   font:inherit;
 }
 
-button{cursor:pointer}
+button{
+  cursor:pointer;
+}
 
 .wrap{
   width:min(1280px,calc(100% - 24px));
   margin:auto;
 }
 
-
-/* =========================
-   TOP
-========================= */
+/* TOP */
 
 .topline{
   background:#090a0d;
@@ -68,10 +73,7 @@ button{cursor:pointer}
   flex-wrap:wrap;
 }
 
-
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 header{
   position:sticky;
@@ -105,12 +107,14 @@ header{
   place-items:center;
   border-radius:10px;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 8px 22px rgba(124,77,255,.2);
   font-size:14px;
 }
 
 .nav{
   display:flex;
   gap:5px;
+  flex-wrap:wrap;
 }
 
 .nav a{
@@ -142,6 +146,10 @@ header{
   outline:none;
 }
 
+.search:focus{
+  border-color:#6850ba;
+}
+
 .admin-btn{
   height:40px;
   border:0;
@@ -152,14 +160,13 @@ header{
   font-weight:700;
 }
 
-
-/* =========================
-   HERO
-========================= */
+/* MAIN */
 
 main{
   padding:18px 0 45px;
 }
+
+/* HERO */
 
 .hero{
   display:grid;
@@ -267,10 +274,7 @@ main{
   font-weight:800;
 }
 
-
-/* =========================
-   PORTAL
-========================= */
+/* MAIN LAYOUT */
 
 .layout{
   display:grid;
@@ -318,6 +322,63 @@ main{
   border-color:var(--accent);
 }
 
+.side-block{
+  margin-top:18px;
+  padding-top:15px;
+  border-top:1px solid var(--line);
+}
+
+/* POPULAR */
+
+.popular-list{
+  display:grid;
+  gap:8px;
+}
+
+.popular-item{
+  display:grid;
+  grid-template-columns:30px 1fr;
+  gap:8px;
+  align-items:center;
+  padding:9px;
+  border-radius:8px;
+  background:#20232b;
+  border:1px solid transparent;
+  cursor:pointer;
+}
+
+.popular-item:hover{
+  border-color:#3c4250;
+}
+
+.popular-rank{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:7px;
+  background:#2b2f3a;
+  font-weight:800;
+  font-size:11px;
+}
+
+.popular-item strong{
+  display:block;
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.popular-item small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+/* SECTIONS */
+
 .section{
   padding:14px;
   margin-bottom:16px;
@@ -347,10 +408,7 @@ main{
   font-size:12px;
 }
 
-
-/* =========================
-   COMIC CARDS
-========================= */
+/* COMIC GRID */
 
 .comic-grid{
   display:grid;
@@ -438,10 +496,100 @@ main{
   border-radius:10px;
 }
 
+/* PAGINATION */
 
-/* =========================
-   BUTTONS
-========================= */
+.pagination{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.page-btn{
+  min-width:36px;
+  height:36px;
+  border-radius:8px;
+  border:1px solid #373b47;
+  background:#22252d;
+  color:white;
+  padding:0 10px;
+}
+
+.page-btn:hover{
+  border-color:#656b7b;
+}
+
+.page-btn.active{
+  background:var(--accent);
+  border-color:var(--accent);
+}
+
+.page-btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.page-dots{
+  color:var(--muted);
+  padding:0 4px;
+}
+
+/* UPDATES */
+
+.updates-list{
+  display:grid;
+  gap:8px;
+}
+
+.update-item{
+  display:grid;
+  grid-template-columns:54px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:9px;
+  background:#20232b;
+  border:1px solid #303541;
+  border-radius:9px;
+  cursor:pointer;
+}
+
+.update-item:hover{
+  border-color:#505667;
+}
+
+.update-cover{
+  width:54px;
+  height:70px;
+  border-radius:7px;
+  background:#111318;
+  background-size:cover;
+  background-position:center;
+  border:1px solid #353946;
+}
+
+.update-title{
+  font-weight:800;
+  font-size:13px;
+}
+
+.update-meta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.update-part{
+  padding:6px 8px;
+  border-radius:7px;
+  background:#292d38;
+  border:1px solid #383d49;
+  font-size:10px;
+  white-space:nowrap;
+}
+
+/* BUTTONS */
 
 .btn{
   border:0;
@@ -472,10 +620,7 @@ main{
   font-size:11px;
 }
 
-
-/* =========================
-   ADMIN
-========================= */
+/* ADMIN */
 
 .admin-shell{
   display:none;
@@ -570,10 +715,7 @@ main{
   font-size:11px;
 }
 
-
-/* =========================
-   MODALS
-========================= */
+/* MODALS */
 
 .modal{
   display:none;
@@ -672,10 +814,7 @@ main{
 .error{color:#ff7488}
 .success{color:#67d99c}
 
-
-/* =========================
-   PARTS
-========================= */
+/* CHAPTERS */
 
 .chapters-list{
   display:grid;
@@ -710,10 +849,7 @@ main{
   max-width:100%;
 }
 
-
-/* =========================
-   PAGE MANAGER
-========================= */
+/* PAGE MANAGER */
 
 .page-manager-info{
   padding:10px 12px;
@@ -790,10 +926,7 @@ main{
   cursor:not-allowed;
 }
 
-
-/* =========================
-   DETAIL
-========================= */
+/* PUBLIC DETAIL */
 
 .detail{
   display:grid;
@@ -825,10 +958,7 @@ main{
   padding:11px;
 }
 
-
-/* =========================
-   READER
-========================= */
+/* READER */
 
 .reader{
   display:none;
@@ -883,10 +1013,7 @@ main{
   color:var(--muted);
 }
 
-
-/* =========================
-   FOOTER
-========================= */
+/* FOOTER */
 
 footer{
   margin-top:28px;
@@ -896,10 +1023,7 @@ footer{
   font-size:12px;
 }
 
-
-/* =========================
-   MOBILE
-========================= */
+/* MOBILE */
 
 @media(max-width:1100px){
 
@@ -914,7 +1038,6 @@ footer{
   .hero{
     grid-template-columns:1fr;
   }
-
 }
 
 @media(max-width:900px){
@@ -960,7 +1083,6 @@ footer{
   .stats{
     grid-template-columns:1fr 1fr;
   }
-
 }
 
 @media(max-width:640px){
@@ -1017,6 +1139,13 @@ footer{
     justify-content:center;
   }
 
+  .update-item{
+    grid-template-columns:48px 1fr;
+  }
+
+  .update-part{
+    grid-column:1/-1;
+  }
 }
 </style>
 </head>
@@ -1033,45 +1162,44 @@ footer{
 
 <header>
 
-  <div class="wrap header-inner">
+<div class="wrap header-inner">
 
-    <a class="logo" href="#">
-      <span class="logo-mark">NI</span>
-      <span>NightInk</span>
-    </a>
+  <a class="logo" href="#">
+    <span class="logo-mark">NI</span>
+    <span>NightInk</span>
+  </a>
 
-    <nav class="nav">
-      <a class="active" href="#">Inicio</a>
-      <a href="#catalogo">Últimos</a>
-      <a href="#categorias">Categorías</a>
-    </nav>
+  <nav class="nav">
+    <a class="active" href="#">Inicio</a>
+    <a href="#catalogo">Últimos</a>
+    <a href="#actualizaciones">Actualizaciones</a>
+    <a href="#categorias">Categorías</a>
+  </nav>
 
-    <div class="head-actions">
+  <div class="head-actions">
 
-      <input
-        id="searchInput"
-        class="search"
-        placeholder="Buscar cómic..."
-      >
+    <input
+      id="searchInput"
+      class="search"
+      placeholder="Buscar cómic..."
+    >
 
-      <button
-        id="openAdmin"
-        class="admin-btn"
-      >
-        ⚙ Admin
-      </button>
-
-    </div>
+    <button
+      id="openAdmin"
+      class="admin-btn"
+    >
+      ⚙ Admin
+    </button>
 
   </div>
+
+</div>
 
 </header>
 
 
 <main class="wrap">
 
-
-<!-- HERO -->
 
 <section class="hero">
 
@@ -1082,20 +1210,20 @@ footer{
     </span>
 
     <h1>
-      Historias completas y series que pueden seguir creciendo.
+      Descubre nuevas historias y sigue tus series favoritas.
     </h1>
 
     <p>
-      Si una obra tiene una sola parte podrás entrar directamente
-      a leerla. Si recibe nuevas continuaciones NightInk mostrará
-      automáticamente todas sus partes.
+      Explora obras completas, nuevas publicaciones y las últimas
+      partes añadidas al catálogo de NightInk.
     </p>
 
     <div class="hero-tags">
       <span class="pill">+18</span>
       <span class="pill">One-shots</span>
       <span class="pill">Series</span>
-      <span class="pill">Últimas partes</span>
+      <span class="pill">Nuevas partes</span>
+      <span class="pill">Más vistos</span>
     </div>
 
   </div>
@@ -1189,9 +1317,10 @@ footer{
 </section>
 
 
-<!-- PORTAL -->
-
 <div class="layout">
+
+
+<!-- SIDEBAR -->
 
 <aside
   id="categorias"
@@ -1204,44 +1333,67 @@ footer{
 
   <div class="genre-grid">
 
-    <button class="genre-btn active" data-genre="all">
+    <button class="genre-btn active" data-genre="">
       Todos
     </button>
 
-    <button class="genre-btn" data-genre="romance">
+    <button class="genre-btn" data-genre="Romance">
       Romance
     </button>
 
-    <button class="genre-btn" data-genre="fantasía">
+    <button class="genre-btn" data-genre="Fantasía">
       Fantasía
     </button>
 
-    <button class="genre-btn" data-genre="drama">
+    <button class="genre-btn" data-genre="Drama">
       Drama
     </button>
 
-    <button class="genre-btn" data-genre="misterio">
+    <button class="genre-btn" data-genre="Misterio">
       Misterio
     </button>
 
-    <button class="genre-btn" data-genre="thriller">
+    <button class="genre-btn" data-genre="Thriller">
       Thriller
     </button>
 
-    <button class="genre-btn" data-genre="acción">
+    <button class="genre-btn" data-genre="Acción">
       Acción
     </button>
 
-    <button class="genre-btn" data-genre="otros">
+    <button class="genre-btn" data-genre="Otros">
       Otros
     </button>
+
+  </div>
+
+
+  <div class="side-block">
+
+    <div class="side-title">
+      Más vistos
+    </div>
+
+    <div
+      id="popularList"
+      class="popular-list"
+    >
+
+      <div class="empty">
+        Cargando...
+      </div>
+
+    </div>
 
   </div>
 
 </aside>
 
 
+<!-- CONTENT -->
+
 <div class="content">
+
 
 <section
   id="catalogo"
@@ -1250,7 +1402,7 @@ footer{
 
   <div class="section-head">
 
-    <h2>
+    <h2 id="catalogTitle">
       Últimos cómics
     </h2>
 
@@ -1286,7 +1438,48 @@ footer{
 
   </div>
 
+
+  <div
+    id="pagination"
+    class="pagination"
+  ></div>
+
 </section>
+
+
+<!-- UPDATES -->
+
+<section
+  id="actualizaciones"
+  class="section"
+>
+
+  <div class="section-head">
+
+    <h2>
+      Últimas actualizaciones
+    </h2>
+
+    <span class="pill">
+      Partes recientes
+    </span>
+
+  </div>
+
+
+  <div
+    id="updatesList"
+    class="updates-list"
+  >
+
+    <div class="empty">
+      Cargando actualizaciones...
+    </div>
+
+  </div>
+
+</section>
+
 
 </div>
 
@@ -1296,15 +1489,15 @@ footer{
 
 
 <footer>
+
   <div class="wrap">
     NightInk Comics · Privacidad · Términos · DMCA · Reportar contenido
   </div>
+
 </footer>
 
 
-<!-- =========================
-     LOGIN
-========================= -->
+<!-- LOGIN -->
 
 <div
   id="loginModal"
@@ -1362,9 +1555,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     COMIC FORM
-========================= -->
+<!-- COMIC -->
 
 <div
   id="comicModal"
@@ -1377,7 +1568,6 @@ footer{
       Nuevo cómic
     </h2>
 
-
     <form id="comicForm">
 
       <input
@@ -1385,116 +1575,54 @@ footer{
         type="hidden"
       >
 
-
       <div class="form-grid">
 
         <div class="field">
-
-          <label>
-            Título
-          </label>
-
-          <input
-            id="comicTitle"
-            required
-          >
-
+          <label>Título</label>
+          <input id="comicTitle" required>
         </div>
 
+        <div class="field">
+          <label>Slug</label>
+          <input id="comicSlug" placeholder="Opcional">
+        </div>
+
+        <div class="field">
+          <label>Autor</label>
+          <input id="comicAuthor">
+        </div>
+
+        <div class="field">
+          <label>Género</label>
+          <input id="comicGenre" placeholder="Romance, Fantasía...">
+        </div>
 
         <div class="field">
 
-          <label>
-            Slug
-          </label>
-
-          <input
-            id="comicSlug"
-            placeholder="Opcional"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Autor
-          </label>
-
-          <input
-            id="comicAuthor"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Género
-          </label>
-
-          <input
-            id="comicGenre"
-            placeholder="Romance, Fantasía..."
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Estado
-          </label>
+          <label>Estado</label>
 
           <select id="comicStatus">
-
-            <option>
-              En emisión
-            </option>
-
-            <option>
-              Completo
-            </option>
-
-            <option>
-              Pausado
-            </option>
-
+            <option>En emisión</option>
+            <option>Completo</option>
+            <option>Pausado</option>
           </select>
 
         </div>
 
-
         <div class="field">
-
-          <label>
-            Portada
-          </label>
-
-          <input
-            id="comicCover"
-            type="file"
-            accept="image/*"
-          >
-
+          <label>Portada</label>
+          <input id="comicCover" type="file" accept="image/*">
         </div>
-
 
         <div class="field full">
 
-          <label>
-            Descripción
-          </label>
+          <label>Descripción</label>
 
           <textarea
             id="comicDescription"
           ></textarea>
 
         </div>
-
 
         <div class="field full">
 
@@ -1546,9 +1674,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     PARTS
-========================= -->
+<!-- PARTS -->
 
 <div
   id="chaptersModal"
@@ -1649,9 +1775,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     EDIT PART
-========================= -->
+<!-- EDIT PART -->
 
 <div
   id="editChapterModal"
@@ -1751,9 +1875,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     PAGE MANAGER
-========================= -->
+<!-- PAGES -->
 
 <div
   id="pagesModal"
@@ -1779,8 +1901,8 @@ footer{
 
 
     <div class="page-manager-info">
-      Usa ← y → para cambiar el orden. También puedes eliminar
-      una sola página sin borrar toda la parte.
+      Usa ← y → para cambiar el orden. Puedes eliminar una página
+      individual sin borrar la parte completa.
     </div>
 
 
@@ -1794,9 +1916,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     PUBLIC DETAIL
-========================= -->
+<!-- DETAIL -->
 
 <div
   id="detailModal"
@@ -1856,9 +1976,7 @@ footer{
 </div>
 
 
-<!-- =========================
-     READER
-========================= -->
+<!-- READER -->
 
 <div
   id="reader"
@@ -1918,10 +2036,6 @@ footer{
 
 <script>
 
-/* =========================
-   HELPERS
-========================= */
-
 const qs = selector =>
   document.querySelector(selector);
 
@@ -1931,9 +2045,21 @@ const qsa = selector =>
 
 let catalog = [];
 
-let selectedGenre = "all";
+let pagination = {
+  page:1,
+  total_pages:1,
+  total:0
+};
+
+let currentPage = 1;
+
+let selectedGenre = "";
 
 let sortMode = "latest";
+
+let searchQuery = "";
+
+let searchTimer = null;
 
 let adminToken =
   sessionStorage.getItem(
@@ -1952,6 +2078,8 @@ let readerParts = [];
 
 let currentReaderIndex = -1;
 
+
+/* HELPERS */
 
 function esc(value = "") {
 
@@ -2061,77 +2189,139 @@ async function api(
 }
 
 
-/* =========================
-   CATALOG
-========================= */
+/* PUBLIC DATA */
 
-function renderCatalog() {
+async function refreshPublicData() {
 
-  const search =
-    qs("#searchInput")
-    .value
-    .trim()
-    .toLowerCase();
+  await Promise.all([
+    loadCatalog(currentPage),
+    loadPopular(),
+    loadUpdates()
+  ]);
 
-
-  let items =
-    catalog.filter(comic => {
-
-      const genre =
-        String(
-          comic.genre || ""
-        )
-        .trim()
-        .toLowerCase();
+}
 
 
-      const genreMatch =
-        selectedGenre === "all" ||
-        genre === selectedGenre;
+/* CATALOG */
+
+async function loadCatalog(page = 1) {
+
+  try {
+
+    const params =
+      new URLSearchParams();
 
 
-      const searchMatch =
-        !search ||
-        comic.title
-          .toLowerCase()
-          .includes(search);
+    params.set(
+      "page",
+      String(page)
+    );
 
 
-      return (
-        genreMatch &&
-        searchMatch
+    params.set(
+      "limit",
+      "10"
+    );
+
+
+    params.set(
+      "sort",
+      sortMode
+    );
+
+
+    if (searchQuery) {
+
+      params.set(
+        "q",
+        searchQuery
       );
 
-    });
+    }
 
 
-  if (
-    sortMode === "popular"
-  ) {
+    if (selectedGenre) {
 
-    items =
-      [...items]
-      .sort(
-        (a,b) =>
-          Number(b.views || 0) -
-          Number(a.views || 0)
+      params.set(
+        "genre",
+        selectedGenre
       );
+
+    }
+
+
+    const data =
+      await api(
+        "/api/comics?" +
+        params.toString()
+      );
+
+
+    catalog =
+      data.comics || [];
+
+
+    pagination =
+      data.pagination || {
+        page:1,
+        total_pages:1,
+        total:catalog.length
+      };
+
+
+    currentPage =
+      Number(
+        pagination.page || 1
+      );
+
+
+    renderCatalog();
+
+    renderPagination();
 
   }
 
+  catch(error) {
+
+    qs("#comicGrid")
+    .innerHTML = `
+
+      <div class="empty">
+
+        ${esc(error.message)}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+function renderCatalog() {
 
   const grid =
     qs("#comicGrid");
 
 
-  if (!items.length) {
+  qs("#catalogTitle")
+  .textContent =
+    sortMode === "popular"
+    ?
+    "Cómics más populares"
+    :
+    "Últimos cómics";
+
+
+  if (!catalog.length) {
 
     grid.innerHTML = `
 
       <div class="empty">
 
-        Todavía no hay cómics
-        publicados.
+        No encontramos cómics
+        con esos filtros.
 
       </div>
 
@@ -2143,7 +2333,7 @@ function renderCatalog() {
 
 
   grid.innerHTML =
-    items.map(comic => {
+    catalog.map(comic => {
 
       let badge =
         "Sin partes";
@@ -2208,30 +2398,23 @@ function renderCatalog() {
           <div class="card-info">
 
             <h3 class="card-title">
-
               ${esc(comic.title)}
-
             </h3>
-
 
             <div class="card-meta">
 
               <span>
-
                 ${esc(
                   comic.genre ||
                   "Sin categoría"
                 )}
-
               </span>
 
               <span>
-
                 ${Number(
                   comic.views || 0
                 )}
                 vistas
-
               </span>
 
             </div>
@@ -2265,33 +2448,308 @@ function renderCatalog() {
 }
 
 
-async function loadCatalog() {
+/* PAGINATION */
+
+function renderPagination() {
+
+  const box =
+    qs("#pagination");
+
+
+  const totalPages =
+    Number(
+      pagination.total_pages || 1
+    );
+
+
+  const page =
+    Number(
+      pagination.page || 1
+    );
+
+
+  if (
+    totalPages <= 1
+  ) {
+
+    box.innerHTML = "";
+
+    return;
+
+  }
+
+
+  let html = `
+
+    <button
+      class="page-btn"
+      data-page="${page - 1}"
+      ${page <= 1 ? "disabled" : ""}
+    >
+      ←
+    </button>
+
+  `;
+
+
+  let start =
+    Math.max(
+      1,
+      page - 2
+    );
+
+
+  let end =
+    Math.min(
+      totalPages,
+      page + 2
+    );
+
+
+  if (
+    start > 1
+  ) {
+
+    html += `
+
+      <button
+        class="page-btn"
+        data-page="1"
+      >
+        1
+      </button>
+
+    `;
+
+
+    if (
+      start > 2
+    ) {
+
+      html += `
+        <span class="page-dots">
+          ...
+        </span>
+      `;
+
+    }
+
+  }
+
+
+  for (
+    let i = start;
+    i <= end;
+    i++
+  ) {
+
+    html += `
+
+      <button
+        class="page-btn
+        ${i === page ? "active" : ""}"
+        data-page="${i}"
+      >
+        ${i}
+      </button>
+
+    `;
+
+  }
+
+
+  if (
+    end < totalPages
+  ) {
+
+    if (
+      end <
+      totalPages - 1
+    ) {
+
+      html += `
+        <span class="page-dots">
+          ...
+        </span>
+      `;
+
+    }
+
+
+    html += `
+
+      <button
+        class="page-btn"
+        data-page="${totalPages}"
+      >
+        ${totalPages}
+      </button>
+
+    `;
+
+  }
+
+
+  html += `
+
+    <button
+      class="page-btn"
+      data-page="${page + 1}"
+      ${
+        page >= totalPages
+        ?
+        "disabled"
+        :
+        ""
+      }
+    >
+      →
+    </button>
+
+  `;
+
+
+  box.innerHTML =
+    html;
+
+
+  qsa("[data-page]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const next =
+          Number(
+            button.dataset.page
+          );
+
+
+        if (
+          next < 1 ||
+          next > totalPages
+        ) {
+
+          return;
+
+        }
+
+
+        await loadCatalog(
+          next
+        );
+
+
+        qs("#catalogo")
+        .scrollIntoView({
+          behavior:"smooth",
+          block:"start"
+        });
+
+      }
+    );
+
+  });
+
+}
+
+
+/* POPULAR */
+
+async function loadPopular() {
 
   try {
 
     const data =
       await api(
-        "/api/comics"
+        "/api/comics?page=1&limit=5&sort=popular"
       );
 
 
-    catalog =
+    const items =
       data.comics || [];
 
 
-    renderCatalog();
+    const box =
+      qs("#popularList");
+
+
+    if (!items.length) {
+
+      box.innerHTML = `
+
+        <div class="empty">
+          Sin datos todavía.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    box.innerHTML =
+      items.map(
+        (comic,index) => `
+
+          <div
+            class="popular-item"
+            data-popular-slug="${esc(comic.slug)}"
+          >
+
+            <div class="popular-rank">
+              ${index + 1}
+            </div>
+
+            <div>
+
+              <strong>
+                ${esc(comic.title)}
+              </strong>
+
+              <small>
+                ${Number(
+                  comic.views || 0
+                )}
+                vistas
+              </small>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+    qsa("[data-popular-slug]")
+    .forEach(item => {
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          openComic(
+            item.dataset.popularSlug
+          );
+
+        }
+      );
+
+    });
 
   }
 
   catch(error) {
 
-    qs("#comicGrid")
+    qs("#popularList")
     .innerHTML = `
 
       <div class="empty">
-
         ${esc(error.message)}
-
       </div>
 
     `;
@@ -2301,9 +2759,261 @@ async function loadCatalog() {
 }
 
 
-/* =========================
-   PUBLIC COMIC
-========================= */
+/* UPDATES */
+
+async function loadUpdates() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/updates?limit=8"
+      );
+
+
+    const updates =
+      data.updates || [];
+
+
+    const box =
+      qs("#updatesList");
+
+
+    if (!updates.length) {
+
+      box.innerHTML = `
+
+        <div class="empty">
+
+          Todavía no hay
+          actualizaciones publicadas.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    box.innerHTML =
+      updates.map(update => {
+
+        const cover =
+          update.cover_url
+          ?
+          `background-image:url('${update.cover_url}')`
+          :
+          "";
+
+
+        const chapterText =
+          update.chapter_title
+          ?
+          `Parte ${update.chapter_number} · ${esc(update.chapter_title)}`
+          :
+          `Parte ${update.chapter_number}`;
+
+
+        return `
+
+          <div
+            class="update-item"
+            data-update-slug="${esc(update.slug)}"
+          >
+
+            <div
+              class="update-cover"
+              style="${cover}"
+            ></div>
+
+
+            <div>
+
+              <div class="update-title">
+                ${esc(update.comic_title)}
+              </div>
+
+              <div class="update-meta">
+
+                ${esc(
+                  update.genre ||
+                  "Sin categoría"
+                )}
+
+                ·
+
+                ${Number(
+                  update.page_count || 0
+                )}
+                páginas
+
+              </div>
+
+            </div>
+
+
+            <div class="update-part">
+
+              ${chapterText}
+
+            </div>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+
+    qsa("[data-update-slug]")
+    .forEach(item => {
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          openComic(
+            item.dataset.updateSlug
+          );
+
+        }
+      );
+
+    });
+
+  }
+
+  catch(error) {
+
+    qs("#updatesList")
+    .innerHTML = `
+
+      <div class="empty">
+        ${esc(error.message)}
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* SEARCH */
+
+qs("#searchInput")
+.addEventListener(
+  "input",
+  event => {
+
+    clearTimeout(
+      searchTimer
+    );
+
+
+    searchTimer =
+      setTimeout(
+        async () => {
+
+          searchQuery =
+            event.target
+            .value
+            .trim();
+
+
+          currentPage = 1;
+
+
+          await loadCatalog(
+            1
+          );
+
+        },
+        350
+      );
+
+  }
+);
+
+
+/* GENRES */
+
+qsa(".genre-btn")
+.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    async () => {
+
+      selectedGenre =
+        button.dataset.genre;
+
+
+      currentPage = 1;
+
+
+      qsa(".genre-btn")
+      .forEach(item => {
+
+        item.classList.toggle(
+          "active",
+          item === button
+        );
+
+      });
+
+
+      await loadCatalog(
+        1
+      );
+
+    }
+  );
+
+});
+
+
+/* SORT */
+
+qsa(".tab")
+.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    async () => {
+
+      sortMode =
+        button.dataset.sort;
+
+
+      currentPage = 1;
+
+
+      qsa(".tab")
+      .forEach(item => {
+
+        item.classList.toggle(
+          "active",
+          item === button
+        );
+
+      });
+
+
+      await loadCatalog(
+        1
+      );
+
+    }
+  );
+
+});
+
+
+/* PUBLIC COMIC */
 
 async function openComic(slug) {
 
@@ -2318,6 +3028,7 @@ async function openComic(slug) {
 
     const comic =
       data.comic;
+
 
     const parts =
       data.chapters || [];
@@ -2338,7 +3049,8 @@ async function openComic(slug) {
         comic.author,
         comic.genre,
         comic.status,
-        comic.views + " vistas"
+        comic.views +
+        " vistas"
       ]
       .filter(Boolean)
       .join(" · ");
@@ -2370,7 +3082,7 @@ async function openComic(slug) {
         <div class="empty">
 
           Esta obra todavía
-          no tiene páginas publicadas.
+          no tiene partes publicadas.
 
         </div>
 
@@ -2459,6 +3171,9 @@ async function openComic(slug) {
       "detailModal"
     );
 
+
+    loadPopular();
+
   }
 
   catch(error) {
@@ -2472,13 +3187,9 @@ async function openComic(slug) {
 }
 
 
-/* =========================
-   READER
-========================= */
+/* READER */
 
-async function openReaderByIndex(
-  index
-) {
+async function openReaderByIndex(index) {
 
   if (
     index < 0 ||
@@ -2638,80 +3349,7 @@ qs("#closeReader")
 );
 
 
-/* =========================
-   FILTERS
-========================= */
-
-qsa(".genre-btn")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      selectedGenre =
-        button.dataset.genre;
-
-
-      qsa(".genre-btn")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
-
-
-      renderCatalog();
-
-    }
-  );
-
-});
-
-
-qsa(".tab")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      sortMode =
-        button.dataset.sort;
-
-
-      qsa(".tab")
-      .forEach(item => {
-
-        item.classList.toggle(
-          "active",
-          item === button
-        );
-
-      });
-
-
-      renderCatalog();
-
-    }
-  );
-
-});
-
-
-qs("#searchInput")
-.addEventListener(
-  "input",
-  renderCatalog
-);
-
-
-/* =========================
-   LOGIN
-========================= */
+/* ADMIN LOGIN */
 
 qs("#openAdmin")
 .addEventListener(
@@ -2895,9 +3533,7 @@ qs("#logoutAdminBtn")
 );
 
 
-/* =========================
-   ADMIN
-========================= */
+/* ADMIN DASHBOARD */
 
 async function showAdmin() {
 
@@ -2936,54 +3572,23 @@ async function loadStats() {
   .innerHTML = `
 
     <div class="stat">
-
-      <strong>
-        ${s.comics}
-      </strong>
-
-      <small>
-        Cómics
-      </small>
-
+      <strong>${s.comics}</strong>
+      <small>Cómics</small>
     </div>
 
-
     <div class="stat">
-
-      <strong>
-        ${s.chapters}
-      </strong>
-
-      <small>
-        Partes
-      </small>
-
+      <strong>${s.chapters}</strong>
+      <small>Partes</small>
     </div>
 
-
     <div class="stat">
-
-      <strong>
-        ${s.pages}
-      </strong>
-
-      <small>
-        Páginas
-      </small>
-
+      <strong>${s.pages}</strong>
+      <small>Páginas</small>
     </div>
 
-
     <div class="stat">
-
-      <strong>
-        ${s.views}
-      </strong>
-
-      <small>
-        Vistas
-      </small>
-
+      <strong>${s.views}</strong>
+      <small>Vistas</small>
     </div>
 
   `;
@@ -2991,9 +3596,7 @@ async function loadStats() {
 }
 
 
-/* =========================
-   ADMIN COMICS
-========================= */
+/* ADMIN COMICS */
 
 async function loadAdminComics() {
 
@@ -3014,9 +3617,7 @@ async function loadAdminComics() {
     box.innerHTML = `
 
       <div class="empty">
-
         No hay cómics creados.
-
       </div>
 
     `;
@@ -3119,7 +3720,9 @@ async function loadAdminComics() {
       () => {
 
         editComic(
-          Number(button.dataset.edit),
+          Number(
+            button.dataset.edit
+          ),
           data.comics
         );
 
@@ -3137,7 +3740,9 @@ async function loadAdminComics() {
       () => {
 
         manageParts(
-          Number(button.dataset.parts),
+          Number(
+            button.dataset.parts
+          ),
           data.comics
         );
 
@@ -3155,7 +3760,9 @@ async function loadAdminComics() {
       () => {
 
         deleteComic(
-          Number(button.dataset.delete)
+          Number(
+            button.dataset.delete
+          )
         );
 
       }
@@ -3174,16 +3781,14 @@ qs("#refreshAdminBtn")
     await Promise.all([
       loadStats(),
       loadAdminComics(),
-      loadCatalog()
+      refreshPublicData()
     ]);
 
   }
 );
 
 
-/* =========================
-   NEW COMIC
-========================= */
+/* NEW COMIC */
 
 qs("#newComicBtn")
 .addEventListener(
@@ -3219,9 +3824,7 @@ qs("#newComicBtn")
 );
 
 
-/* =========================
-   EDIT COMIC
-========================= */
+/* EDIT COMIC */
 
 function editComic(
   id,
@@ -3235,7 +3838,9 @@ function editComic(
     );
 
 
-  if (!comic) return;
+  if (!comic) {
+    return;
+  }
 
 
   qs("#comicFormTitle")
@@ -3301,9 +3906,7 @@ function editComic(
 }
 
 
-/* =========================
-   SAVE COMIC
-========================= */
+/* SAVE COMIC */
 
 qs("#comicForm")
 .addEventListener(
@@ -3448,7 +4051,7 @@ qs("#comicForm")
       await Promise.all([
         loadAdminComics(),
         loadStats(),
-        loadCatalog()
+        refreshPublicData()
       ]);
 
 
@@ -3507,10 +4110,13 @@ async function deleteComic(id) {
     );
 
 
+    currentPage = 1;
+
+
     await Promise.all([
       loadAdminComics(),
       loadStats(),
-      loadCatalog()
+      refreshPublicData()
     ]);
 
   }
@@ -3526,9 +4132,7 @@ async function deleteComic(id) {
 }
 
 
-/* =========================
-   PARTS
-========================= */
+/* PARTS */
 
 async function manageParts(
   id,
@@ -3675,12 +4279,9 @@ async function loadParts() {
                 margin-top:6px
               "
             >
-
-              Consejo: nombra tus imágenes
+              Consejo: usa nombres
               001.jpg, 002.jpg, 003.jpg...
-
             </div>
-
 
             <button
               class="btn secondary small"
@@ -3856,7 +4457,7 @@ qs("#addChapterBtn")
         loadParts(),
         loadStats(),
         loadAdminComics(),
-        loadCatalog()
+        refreshPublicData()
       ]);
 
     }
@@ -3878,9 +4479,7 @@ qs("#addChapterBtn")
 );
 
 
-/* =========================
-   EDIT PART
-========================= */
+/* EDIT PART */
 
 function openEditChapter(id) {
 
@@ -3892,7 +4491,9 @@ function openEditChapter(id) {
     );
 
 
-  if (!chapter) return;
+  if (!chapter) {
+    return;
+  }
 
 
   qs("#editChapterId")
@@ -3987,7 +4588,9 @@ qs("#saveChapterBtn")
 
       await Promise.all([
         loadParts(),
-        loadCatalog(),
+        loadCatalog(currentPage),
+        loadUpdates(),
+        loadPopular(),
         loadStats()
       ]);
 
@@ -4022,9 +4625,7 @@ qs("#saveChapterBtn")
 );
 
 
-/* =========================
-   UPLOAD PAGES
-========================= */
+/* UPLOAD */
 
 async function uploadPages(
   chapterId
@@ -4095,7 +4696,9 @@ async function uploadPages(
 
     await Promise.all([
       loadParts(),
-      loadStats()
+      loadStats(),
+      loadUpdates(),
+      loadCatalog(currentPage)
     ]);
 
 
@@ -4116,9 +4719,7 @@ async function uploadPages(
 }
 
 
-/* =========================
-   DELETE PART
-========================= */
+/* DELETE PART */
 
 async function deleteChapter(id) {
 
@@ -4147,7 +4748,7 @@ async function deleteChapter(id) {
       loadParts(),
       loadStats(),
       loadAdminComics(),
-      loadCatalog()
+      refreshPublicData()
     ]);
 
   }
@@ -4163,9 +4764,7 @@ async function deleteChapter(id) {
 }
 
 
-/* =========================
-   PAGE MANAGER
-========================= */
+/* PAGE MANAGER */
 
 async function openPagesManager(
   chapterId
@@ -4296,7 +4895,13 @@ function renderManagedPages() {
 
               <button
                 data-page-left="${page.id}"
-                ${index === 0 ? "disabled" : ""}
+                ${
+                  index === 0
+                  ?
+                  "disabled"
+                  :
+                  ""
+                }
               >
                 ←
               </button>
@@ -4396,8 +5001,6 @@ function renderManagedPages() {
 }
 
 
-/* MOVE PAGE */
-
 async function movePage(
   pageId,
   direction
@@ -4410,8 +5013,13 @@ async function movePage(
     );
 
 
-  if (index === -1)
+  if (
+    index === -1
+  ) {
+
     return;
+
+  }
 
 
   const newIndex =
@@ -4420,7 +5028,8 @@ async function movePage(
 
   if (
     newIndex < 0 ||
-    newIndex >= managedPages.length
+    newIndex >=
+    managedPages.length
   ) {
 
     return;
@@ -4432,16 +5041,13 @@ async function movePage(
     [...managedPages];
 
 
-  const temporary =
-    copy[index];
-
-
-  copy[index] =
-    copy[newIndex];
-
-
-  copy[newIndex] =
-    temporary;
+  [
+    copy[index],
+    copy[newIndex]
+  ] = [
+    copy[newIndex],
+    copy[index]
+  ];
 
 
   managedPages =
@@ -4478,7 +5084,10 @@ async function movePage(
     );
 
 
-    await loadManagedPages();
+    await Promise.all([
+      loadManagedPages(),
+      loadUpdates()
+    ]);
 
   }
 
@@ -4495,8 +5104,6 @@ async function movePage(
 
 }
 
-
-/* DELETE ONE PAGE */
 
 async function deletePage(
   pageId
@@ -4526,7 +5133,9 @@ async function deletePage(
     await Promise.all([
       loadManagedPages(),
       loadParts(),
-      loadStats()
+      loadStats(),
+      loadUpdates(),
+      loadCatalog(currentPage)
     ]);
 
   }
@@ -4542,11 +5151,9 @@ async function deletePage(
 }
 
 
-/* =========================
-   START
-========================= */
+/* START */
 
-loadCatalog();
+refreshPublicData();
 
 </script>
 

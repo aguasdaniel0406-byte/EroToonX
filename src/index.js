@@ -3,10 +3,25 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/health") {
+      let databaseConnected = false;
+      let mediaConnected = false;
+
+      try {
+        const result = await env.DB.prepare("SELECT 1 AS ok").first();
+        databaseConnected = result?.ok === 1;
+      } catch (err) {}
+
+      try {
+        const result = await env.MEDIA.list({ limit: 1 });
+        mediaConnected = Array.isArray(result.objects);
+      } catch (err) {}
+
       return Response.json({
-        ok: true,
+        ok: databaseConnected && mediaConnected,
         app: "nightink-app",
-        worker: true
+        worker: true,
+        databaseConnected,
+        mediaConnected
       });
     }
 

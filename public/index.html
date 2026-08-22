@@ -250,13 +250,29 @@ footer{padding:25px 0 38px;border-top:1px solid #292f43;color:#81899d;font-size:
   <div class="reader-float-nav"><button id="readerGoTop" aria-label="Ir arriba">↑</button><button id="readerGoBottom" aria-label="Ir abajo">↓</button></div>
 </div>
 <script>
-const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],AGE_KEY="nightink_age_verified_v4";
+const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],AGE_KEY="erotoonx_age_verified_v1";
 let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedGenre="",sortMode="latest",searchQuery="",searchTimer=null,randomPool=[];
 let adminToken=sessionStorage.getItem("nightink_admin_token")||"",currentAdminComics=[],currentManagedComic=null,currentManagedChapter=null,managedPages=[];
 let currentPublicComic=null,currentPublicSlug=null;
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function openModal(id){qs("#"+id)?.classList.add("open")}function closeModal(id){qs("#"+id)?.classList.remove("open")}qsa("[data-close]").forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.close)));
-function showAgeGate(){if(localStorage.getItem(AGE_KEY)!=="yes"){qs("#ageGate").classList.add("open");document.body.classList.add("age-locked")}}qs("#ageEnter").onclick=()=>{localStorage.setItem(AGE_KEY,"yes");qs("#ageGate").classList.remove("open");document.body.classList.remove("age-locked")};qs("#ageExit").onclick=()=>location.replace("https://www.google.com/");
+function isGoogleCrawler(){
+  const ua=navigator.userAgent||"";
+  return /Googlebot|Google-InspectionTool|GoogleOther/i.test(ua);
+}
+function showAgeGate(){
+  if(isGoogleCrawler())return;
+  if(localStorage.getItem(AGE_KEY)!=="yes"){
+    qs("#ageGate").classList.add("open");
+    document.body.classList.add("age-locked");
+  }
+}
+qs("#ageEnter").onclick=()=>{
+  localStorage.setItem(AGE_KEY,"yes");
+  qs("#ageGate").classList.remove("open");
+  document.body.classList.remove("age-locked");
+};
+qs("#ageExit").onclick=()=>location.replace("https://www.google.com/");
 async function api(url,options={}){const headers=new Headers(options.headers||{});if(adminToken)headers.set("X-Admin-Token",adminToken);const response=await fetch(url,{...options,headers});let data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.error||"Error del servidor");return data}
 function getRoute(){const m=location.pathname.match(/^\/comic\/([^/]+)\/?$/);return m?{type:"comic",slug:decodeURIComponent(m[1])}:{type:"home"}}function comicPath(slug){return "/comic/"+encodeURIComponent(slug)}
 function applySeoMetadata(title,description,url,type="website"){

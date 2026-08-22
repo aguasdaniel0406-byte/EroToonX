@@ -15,19 +15,30 @@
 <style>
 
 :root{
-  --bg:#101220;
-  --bg2:#15182a;
-  --panel:#1a1e33;
-  --panel2:#232842;
-  --line:#373d63;
-  --text:#f6f7fb;
-  --muted:#a9afc5;
-  --accent:#ec4bb4;
-  --accent2:#7d5cff;
-  --accent3:#ffb021;
-  --good:#36c78d;
-  --warn:#f0ad4e;
-  --danger:#ef5d77;
+  --bg:#0d0f18;
+  --bg-soft:#121522;
+  --surface:#181c2a;
+  --surface-2:#202536;
+  --surface-3:#272d42;
+
+  --border:#343b53;
+  --border-soft:#292f43;
+
+  --text:#f5f6fb;
+  --muted:#9da5b9;
+
+  --pink:#e74ca9;
+  --purple:#7657ed;
+  --violet:#4d3cb8;
+  --orange:#f2a53b;
+
+  --good:#45c98e;
+  --warning:#edb05c;
+  --danger:#ef6a80;
+
+  --shadow:
+    0 14px 36px
+    rgba(0,0,0,.22);
 }
 
 *{
@@ -40,9 +51,21 @@ html{
 
 body{
   margin:0;
-  background:var(--bg);
+
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(118,87,237,.08),
+      transparent 30%
+    ),
+    var(--bg);
+
   color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
 body.age-locked,
@@ -72,8 +95,8 @@ img{
 
 .wrap{
   width:min(
-    1260px,
-    calc(100% - 24px)
+    1380px,
+    calc(100% - 26px)
   );
 
   margin:auto;
@@ -84,32 +107,35 @@ img{
 }
 
 
-/* =========================
-   +18
-========================= */
+/* ========================================
+   AGE GATE
+======================================== */
 
 .age-gate{
   display:none;
 
   position:fixed;
-
   inset:0;
 
   z-index:99999;
 
   align-items:center;
-
   justify-content:center;
 
   padding:20px;
 
   background:
     radial-gradient(
-      circle at 50% 20%,
-      rgba(125,92,255,.24),
-      transparent 35%
+      circle at 50% 15%,
+      rgba(231,76,169,.16),
+      transparent 30%
     ),
-    rgba(5,6,12,.98);
+    radial-gradient(
+      circle at 25% 75%,
+      rgba(118,87,237,.14),
+      transparent 30%
+    ),
+    rgba(7,8,13,.985);
 }
 
 .age-gate.open{
@@ -122,53 +148,61 @@ img{
     100%
   );
 
-  padding:32px;
-
-  border-radius:20px;
-
-  background:#171a2b;
+  padding:34px 30px;
 
   border:
     1px solid
-    #3e456e;
+    #3b4260;
 
-  text-align:center;
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      160deg,
+      #1b1f30,
+      #141722
+    );
 
   box-shadow:
-    0 25px 90px
-    rgba(0,0,0,.58);
+    0 32px 100px
+    rgba(0,0,0,.6);
+
+  text-align:center;
 }
 
 .age-badge{
-  width:76px;
-  height:76px;
+  width:74px;
+  height:74px;
+
+  display:grid;
+  place-items:center;
 
   margin:
     0 auto 18px;
 
-  display:grid;
-
-  place-items:center;
-
-  border-radius:20px;
+  border-radius:16px;
 
   background:
     linear-gradient(
       135deg,
-      var(--accent),
-      var(--accent2)
+      var(--pink),
+      var(--purple)
     );
 
   font-weight:900;
 
-  font-size:23px;
+  font-size:22px;
+
+  box-shadow:
+    0 12px 38px
+    rgba(231,76,169,.22);
 }
 
 .age-card h1{
   margin:
     0 0 12px;
 
-  font-size:30px;
+  font-size:29px;
 }
 
 .age-card p{
@@ -177,7 +211,7 @@ img{
   color:
     var(--muted);
 
-  line-height:1.7;
+  line-height:1.65;
 }
 
 .age-warning{
@@ -188,15 +222,14 @@ img{
 
   border:
     1px solid
-    #3d4366;
+    #383f5b;
 
-  border-radius:10px;
+  border-radius:8px;
 
   background:
-    #20243a;
+    #202436;
 
-  color:
-    #dce0ee;
+  color:#d9ddea;
 
   font-size:12px;
 
@@ -205,15 +238,14 @@ img{
 
 .age-actions{
   display:grid;
-
   gap:9px;
 }
 
 .age-enter,
 .age-exit{
-  min-height:48px;
+  min-height:47px;
 
-  border-radius:10px;
+  border-radius:8px;
 
   font-weight:800;
 }
@@ -221,57 +253,57 @@ img{
 .age-enter{
   border:0;
 
-  color:#fff;
-
   background:
     linear-gradient(
       135deg,
-      var(--accent),
-      var(--accent2)
+      var(--pink),
+      var(--purple)
     );
+
+  color:#fff;
 }
 
 .age-exit{
   border:
     1px solid
-    #404665;
+    #3d445e;
 
   background:
-    #24283d;
+    #24293a;
 
-  color:#e4e7ef;
+  color:#e8eaf2;
 }
 
 .age-note{
   margin-top:15px;
 
-  color:#7d849e;
+  color:#767e94;
 
   font-size:10px;
 }
 
 
-/* =========================
-   HEADER
-========================= */
+/* ========================================
+   TOP HEADER
+======================================== */
 
-.topbar{
-  background:#0b0d18;
+.site-header{
+  background:#0b0d15;
 
   border-bottom:
     1px solid
-    #242945;
+    #242a3c;
 }
 
-.topbar .wrap{
-  min-height:76px;
+.header-main{
+  min-height:78px;
 
   display:grid;
 
   grid-template-columns:
-    auto
-    minmax(260px,520px)
-    auto;
+    250px
+    minmax(320px,620px)
+    1fr;
 
   align-items:center;
 
@@ -283,56 +315,61 @@ img{
 
   align-items:center;
 
-  gap:10px;
+  gap:11px;
 
-  font-size:28px;
+  font-size:27px;
 
   font-weight:900;
 
   letter-spacing:-.04em;
 }
 
-.brand-mark{
-  width:46px;
-  height:46px;
+.brand-icon{
+  width:45px;
+  height:45px;
 
   display:grid;
 
   place-items:center;
 
-  border-radius:11px;
+  border-radius:9px;
 
   background:
     linear-gradient(
       135deg,
-      var(--accent3),
-      var(--accent),
-      var(--accent2)
+      var(--orange),
+      var(--pink) 48%,
+      var(--purple)
     );
 
-  font-size:15px;
+  color:#fff;
+
+  font-size:13px;
 
   box-shadow:
-    0 8px 30px
-    rgba(236,75,180,.2);
+    0 8px 28px
+    rgba(231,76,169,.2);
 }
 
-.brand span:last-child{
-  background:
-    linear-gradient(
-      90deg,
-      #fff,
-      #ffc2ea
-    );
-
-  -webkit-background-clip:text;
-
-  background-clip:text;
-
-  color:transparent;
+.brand-name{
+  position:relative;
 }
 
-.search-wrap{
+.brand-name small{
+  display:block;
+
+  margin-top:-2px;
+
+  color:#858da3;
+
+  font-size:8px;
+
+  letter-spacing:.18em;
+
+  font-weight:700;
+}
+
+.search-area{
   display:flex;
 
   gap:7px;
@@ -346,14 +383,13 @@ img{
   padding:
     0 14px;
 
-  border-radius:9px;
-
   border:
     1px solid
-    #343a5a;
+    #353c54;
 
-  background:
-    #202438;
+  border-radius:7px;
+
+  background:#1b1f2e;
 
   color:#fff;
 
@@ -361,51 +397,78 @@ img{
 }
 
 .search-input:focus{
-  border-color:#6b6fa1;
+  border-color:
+    #6659c7;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(118,87,237,.08);
 }
 
 .search-button{
+  width:46px;
   height:44px;
 
-  min-width:44px;
-
-  border-radius:9px;
+  border-radius:7px;
 
   border:
     1px solid
-    #3b4166;
+    #3a415b;
 
   background:
-    #252a45;
+    #252a3d;
 
   color:#fff;
 
-  font-weight:800;
+  font-weight:900;
 }
 
-.header-tools{
+.header-side{
   display:flex;
 
-  gap:8px;
-
   justify-content:flex-end;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.header-chip{
+  padding:
+    9px 11px;
+
+  border:
+    1px solid
+    #353b53;
+
+  border-radius:7px;
+
+  background:
+    #181c29;
+
+  color:
+    #bfc4d3;
+
+  font-size:10px;
+
+  font-weight:700;
 }
 
 .admin-button{
-  height:44px;
+  height:42px;
 
   padding:
     0 14px;
 
   border:0;
 
-  border-radius:9px;
+  border-radius:7px;
 
   background:
     linear-gradient(
       135deg,
-      var(--accent),
-      var(--accent2)
+      var(--pink),
+      var(--purple)
     );
 
   color:#fff;
@@ -414,37 +477,41 @@ img{
 }
 
 
-/* =========================
-   NAV
-========================= */
+/* ========================================
+   NAVIGATION
+======================================== */
 
 .navbar{
-  background:#171a2a;
-
-  border-bottom:
-    2px solid
-    #292e4e;
-
   position:sticky;
 
   top:0;
 
   z-index:50;
+
+  background:#171a27;
+
+  border-bottom:
+    1px solid
+    #30364c;
+
+  box-shadow:
+    0 4px 18px
+    rgba(0,0,0,.12);
 }
 
-.navbar .wrap{
+.navbar-inner{
   display:flex;
 
   align-items:center;
 
-  gap:2px;
+  gap:0;
 
   overflow-x:auto;
 
   scrollbar-width:none;
 }
 
-.navbar .wrap::-webkit-scrollbar{
+.navbar-inner::-webkit-scrollbar{
   display:none;
 }
 
@@ -452,825 +519,169 @@ img{
   flex:
     0 0 auto;
 
-  padding:
-    16px 18px;
+  position:relative;
 
-  font-size:14px;
+  padding:
+    15px 17px;
+
+  font-size:13px;
 
   font-weight:800;
 
-  color:#e8eaf3;
-
-  border-bottom:
-    3px solid
-    transparent;
+  color:#d9dce6;
 }
 
-.nav-link:hover,
-.nav-link.active{
-  background:#20243a;
-
-  border-bottom-color:
-    var(--accent);
-}
-
-
-/* =========================
-   BANNER
-========================= */
-
-.promo{
-  margin:
-    16px auto 20px;
-
-  min-height:116px;
-
-  border-radius:12px;
-
-  border:
-    1px solid
-    #333958;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  text-align:center;
-
-  padding:20px;
-
+.nav-link:hover{
   background:
-    linear-gradient(
-      120deg,
-      rgba(236,75,180,.22),
-      rgba(125,92,255,.24)
-    ),
-    linear-gradient(
-      160deg,
-      #252949,
-      #171a2a
-    );
+    #202536;
 }
 
-.promo strong{
-  font-size:28px;
+.nav-link.active{
+  background:
+    #202536;
 
-  letter-spacing:.02em;
+  color:#fff;
 }
 
-.promo small{
-  display:block;
-
-  margin-top:7px;
-
-  color:#c0c5d8;
-}
-
-
-/* =========================
-   LAYOUT
-========================= */
-
-.content-layout{
-  display:grid;
-
-  grid-template-columns:
-    minmax(0,1fr)
-    300px;
-
-  gap:18px;
-
-  padding-bottom:40px;
-}
-
-.main-column{
-  min-width:0;
-}
-
-.sidebar{
-  min-width:0;
-}
-
-.section{
-  margin-bottom:26px;
-}
-
-.section-heading{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:
-    space-between;
-
-  gap:12px;
-
-  margin-bottom:13px;
-
-  padding-bottom:10px;
-
-  border-bottom:
-    3px solid
-    #322f62;
-
-  position:relative;
-}
-
-.section-heading:after{
+.nav-link.active:after{
   content:"";
 
   position:absolute;
 
-  left:0;
-
-  bottom:-3px;
-
-  width:120px;
+  left:12px;
+  right:12px;
+  bottom:0;
 
   height:3px;
+
+  border-radius:
+    4px 4px 0 0;
 
   background:
     linear-gradient(
       90deg,
-      var(--accent),
-      var(--accent2)
+      var(--pink),
+      var(--purple)
     );
 }
 
-.section-heading h2{
-  margin:0;
 
-  font-size:26px;
+/* ========================================
+   INTRO STRIP
+======================================== */
 
-  letter-spacing:-.02em;
-}
-
-.section-heading small{
-  color:
-    var(--muted);
-
-  font-size:11px;
-}
-
-.section-tools{
-  display:flex;
-
-  align-items:center;
-
-  gap:8px;
-
-  flex-wrap:wrap;
-}
-
-.tab{
-  padding:
-    8px 12px;
-
-  border-radius:8px;
-
-  border:
-    1px solid
-    #3d4366;
-
-  background:
-    #24283d;
-
-  color:#e7e9f3;
-
-  font-size:12px;
-
-  font-weight:800;
-}
-
-.tab.active{
-  background:
-    linear-gradient(
-      135deg,
-      var(--accent),
-      var(--accent2)
-    );
-
-  border-color:
-    transparent;
-}
-
-
-/* =========================
-   COMICS
-========================= */
-
-.comic-grid{
-  display:grid;
-
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(0,1fr)
-    );
-
-  gap:15px;
-}
-
-.comic-card{
-  min-width:0;
-
-  background:
-    #20243a;
-
-  border:
-    1px solid
-    #363c60;
-
-  border-radius:4px;
-
-  overflow:hidden;
-
-  cursor:pointer;
-
-  transition:.18s;
-}
-
-.comic-card:hover{
-  transform:
-    translateY(-3px);
-
-  border-color:
-    #646ca2;
-
-  box-shadow:
-    0 12px 28px
-    rgba(0,0,0,.2);
-}
-
-.cover{
-  position:relative;
-
-  aspect-ratio:3/4;
-
-  background:
-    linear-gradient(
-      145deg,
-      #56358b,
-      #25193e 55%,
-      #12131f
-    );
-
-  background-size:cover;
-
-  background-position:center;
-
-  overflow:hidden;
-}
-
-.cover:after{
-  content:"";
-
-  position:absolute;
-
-  inset:
-    55% 0 0;
-
-  background:
-    linear-gradient(
-      transparent,
-      rgba(0,0,0,.82)
-    );
-}
-
-.cover-placeholder{
-  position:absolute;
-
-  inset:0;
-
-  display:grid;
-
-  place-items:center;
-
-  color:#d8d8ec;
-
-  font-weight:900;
-
-  font-size:18px;
-
-  text-align:center;
-
-  padding:18px;
-}
-
-.card-badge{
-  position:absolute;
-
-  right:8px;
-
-  bottom:8px;
-
-  z-index:2;
-
-  padding:
-    5px 8px;
-
-  border-radius:999px;
-
-  background:
-    rgba(18,18,27,.9);
-
-  border:
-    1px solid
-    rgba(255,255,255,.15);
-
-  font-size:10px;
-
-  font-weight:900;
-}
-
-.card-body{
-  padding:
-    10px 11px 12px;
-}
-
-.card-title{
-  margin:0;
-
-  font-size:14px;
-
-  line-height:1.35;
-
-  min-height:38px;
-
-  display:-webkit-box;
-
-  -webkit-line-clamp:2;
-
-  -webkit-box-orient:vertical;
-
-  overflow:hidden;
-}
-
-.card-meta{
-  display:flex;
-
-  justify-content:
-    space-between;
-
-  gap:6px;
-
-  margin-top:8px;
-
-  color:
-    var(--muted);
-
-  font-size:10px;
-}
-
-.empty{
-  padding:30px;
-
-  border:
-    1px dashed
-    #3b4166;
-
-  border-radius:8px;
-
-  color:
-    var(--muted);
-
-  text-align:center;
-
-  grid-column:
-    1/-1;
-}
-
-
-/* =========================
-   PAGINATION
-========================= */
-
-.pagination{
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  gap:7px;
-
-  flex-wrap:wrap;
-
+.intro-strip{
   margin:
-    22px 0 4px;
-}
+    15px auto 18px;
 
-.page-btn{
-  min-width:42px;
+  min-height:96px;
 
-  height:42px;
-
-  padding:
-    0 12px;
-
-  border-radius:10px;
-
-  border:
-    1px solid
-    #3d4366;
-
-  background:
-    #24283d;
-
-  color:#fff;
-
-  font-weight:800;
-}
-
-.page-btn.active{
-  border-color:
-    transparent;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--accent),
-      var(--accent2)
-    );
-}
-
-.page-btn:disabled{
-  opacity:.35;
-
-  cursor:not-allowed;
-}
-
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.side-card{
-  margin-bottom:16px;
-
-  padding:14px;
-
-  background:
-    #181c2e;
-
-  border:
-    1px solid
-    #323858;
-
-  border-radius:8px;
-}
-
-.side-title{
-  margin:
-    -14px -14px 13px;
-
-  padding:
-    12px 14px;
-
-  background:
-    #20243b;
-
-  border-bottom:
-    1px solid
-    #343a5c;
-
-  font-weight:900;
-}
-
-.category-list{
   display:grid;
 
   grid-template-columns:
-    1fr 1fr;
-
-  gap:7px;
-}
-
-.category-btn{
-  padding:10px;
-
-  border-radius:7px;
-
-  border:
-    1px solid
-    #353b5f;
-
-  background:
-    #22263d;
-
-  color:#edf0f7;
-
-  text-align:left;
-
-  font-size:12px;
-}
-
-.category-btn:hover,
-.category-btn.active{
-  background:
-    #312d59;
-
-  border-color:
-    #6f63d5;
-}
-
-.tags{
-  display:flex;
-
-  gap:7px;
-
-  flex-wrap:wrap;
-}
-
-.tag{
-  padding:
-    7px 9px;
-
-  border-radius:6px;
-
-  background:
-    #24283f;
-
-  border:
-    1px solid
-    #3b4164;
-
-  color:#e6e9f2;
-
-  font-size:11px;
-
-  cursor:pointer;
-}
-
-.tag:hover{
-  background:#302d55;
-}
-
-.popular-list{
-  display:grid;
-
-  gap:8px;
-}
-
-.popular-item{
-  display:grid;
-
-  grid-template-columns:
-    30px 1fr;
-
-  gap:9px;
-
-  align-items:center;
-
-  padding:9px;
-
-  border:
-    1px solid
-    #303653;
-
-  background:
-    #20243a;
-
-  border-radius:7px;
-
-  cursor:pointer;
-}
-
-.popular-item:hover{
-  border-color:#555d91;
-}
-
-.popular-rank{
-  width:30px;
-
-  height:30px;
-
-  border-radius:7px;
-
-  display:grid;
-
-  place-items:center;
-
-  background:
-    #2d3150;
-
-  color:#fff;
-
-  font-weight:900;
-
-  font-size:12px;
-}
-
-.popular-copy{
-  min-width:0;
-}
-
-.popular-copy strong{
-  display:block;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:
-    ellipsis;
-
-  font-size:12px;
-}
-
-.popular-copy small{
-  display:block;
-
-  margin-top:3px;
-
-  color:
-    var(--muted);
-
-  font-size:10px;
-}
-
-
-/* =========================
-   UPDATES
-========================= */
-
-.updates-list{
-  display:grid;
-
-  gap:9px;
-}
-
-.update-item{
-  display:grid;
-
-  grid-template-columns:
-    60px
     minmax(0,1fr)
     auto;
 
-  gap:12px;
-
   align-items:center;
 
-  padding:9px;
+  gap:18px;
+
+  padding:
+    18px 22px;
 
   border:
     1px solid
-    #343a5c;
-
-  background:
-    #1f2338;
+    #323950;
 
   border-radius:8px;
 
-  cursor:pointer;
-}
-
-.update-item:hover{
-  border-color:
-    #59618f;
-}
-
-.update-cover{
-  width:60px;
-
-  height:78px;
-
-  border-radius:6px;
-
   background:
-    #111421
-    center/cover
-    no-repeat;
-
-  border:
-    1px solid
-    #3b4165;
+    linear-gradient(
+      110deg,
+      rgba(231,76,169,.11),
+      rgba(118,87,237,.08) 48%,
+      transparent 80%
+    ),
+    #171b29;
 }
 
-.update-main{
-  min-width:0;
+.intro-strip h1{
+  margin:
+    0 0 5px;
+
+  font-size:24px;
 }
 
-.update-title{
-  font-weight:900;
-
-  font-size:13px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:
-    ellipsis;
-}
-
-.update-meta{
-  margin-top:5px;
+.intro-strip p{
+  margin:0;
 
   color:
     var(--muted);
 
-  font-size:10px;
+  font-size:12px;
+
+  line-height:1.6;
 }
 
-.update-part{
+.intro-stat{
+  display:flex;
+
+  gap:8px;
+}
+
+.intro-stat span{
+  min-width:82px;
+
   padding:
-    7px 10px;
-
-  border-radius:8px;
-
-  background:
-    #292e4a;
+    10px 12px;
 
   border:
     1px solid
-    #3c4266;
+    #363d56;
+
+  border-radius:7px;
+
+  background:
+    #202436;
+
+  text-align:center;
 
   font-size:10px;
 
-  font-weight:900;
+  color:#b9bfce;
 }
 
+.intro-stat strong{
+  display:block;
 
-/* =========================
-   BUTTONS
-========================= */
-
-.btn{
-  border:0;
-
-  border-radius:8px;
-
-  padding:
-    10px 13px;
-
-  font-weight:800;
-}
-
-.btn.primary{
-  background:
-    linear-gradient(
-      135deg,
-      var(--accent),
-      var(--accent2)
-    );
+  margin-bottom:3px;
 
   color:#fff;
-}
 
-.btn.secondary{
-  background:
-    #292e47;
-
-  border:
-    1px solid
-    #3c4264;
-
-  color:#fff;
-}
-
-.btn.danger{
-  background:
-    #4a2433;
-
-  border:
-    1px solid
-    #7d3850;
-
-  color:#ffb6c2;
-}
-
-.btn.small{
-  padding:
-    7px 9px;
-
-  font-size:11px;
+  font-size:16px;
 }
 
 
-/* =========================
+/* ========================================
    ADMIN
-========================= */
+======================================== */
 
 .admin-shell{
   display:none;
 
   margin:
-    18px 0 24px;
+    18px 0;
 
   padding:16px;
 
-  background:
-    #171b2d;
-
   border:
     1px solid
-    #3b4165;
+    #383f59;
 
-  border-radius:10px;
+  border-radius:8px;
+
+  background:
+    #151925;
 }
 
 .admin-shell.visible{
@@ -1285,19 +696,21 @@ img{
   justify-content:
     space-between;
 
-  gap:10px;
+  gap:12px;
 
   margin-bottom:14px;
 }
 
 .admin-head h2{
   margin:0;
+
+  font-size:20px;
 }
 
 .admin-actions{
   display:flex;
 
-  gap:8px;
+  gap:7px;
 
   flex-wrap:wrap;
 }
@@ -1308,39 +721,40 @@ img{
   grid-template-columns:
     repeat(4,1fr);
 
-  gap:10px;
+  gap:9px;
 
   margin-bottom:14px;
 }
 
 .stat{
-  padding:13px;
+  padding:12px;
 
   border:
     1px solid
-    #353b5d;
+    #343b54;
+
+  border-radius:7px;
 
   background:
-    #20243a;
-
-  border-radius:8px;
+    #1e2333;
 }
 
 .stat strong{
   display:block;
 
-  font-size:22px;
+  font-size:21px;
 }
 
 .stat small{
   color:
     var(--muted);
+
+  font-size:10px;
 }
 
 .admin-list{
   display:grid;
-
-  gap:9px;
+  gap:8px;
 }
 
 .admin-row{
@@ -1351,37 +765,36 @@ img{
     minmax(0,1fr)
     auto;
 
-  gap:11px;
-
   align-items:center;
+
+  gap:10px;
 
   padding:10px;
 
   border:
     1px solid
-    #343a59;
+    #333a52;
+
+  border-radius:7px;
 
   background:
-    #20243a;
-
-  border-radius:8px;
+    #1c2131;
 }
 
 .admin-cover{
   width:58px;
-
   height:76px;
-
-  border-radius:6px;
-
-  background:
-    #111421
-    center/cover
-    no-repeat;
 
   border:
     1px solid
-    #3a4061;
+    #39405a;
+
+  border-radius:5px;
+
+  background:
+    #0f1119
+    center/cover
+    no-repeat;
 }
 
 .admin-title{
@@ -1398,8 +811,6 @@ img{
 }
 
 .readiness{
-  margin-top:7px;
-
   display:flex;
 
   align-items:center;
@@ -1407,6 +818,8 @@ img{
   gap:6px;
 
   flex-wrap:wrap;
+
+  margin-top:7px;
 }
 
 .ready-badge{
@@ -1415,7 +828,7 @@ img{
   padding:
     5px 7px;
 
-  border-radius:6px;
+  border-radius:5px;
 
   font-size:9px;
 
@@ -1423,53 +836,53 @@ img{
 }
 
 .ready-badge.ok{
-  background:
-    rgba(54,199,141,.14);
+  color:#75dfb5;
 
   border:
     1px solid
-    rgba(54,199,141,.45);
+    rgba(69,201,142,.4);
 
-  color:#7ee5ba;
+  background:
+    rgba(69,201,142,.1);
 }
 
 .ready-badge.warn{
-  background:
-    rgba(240,173,78,.12);
+  color:#ffc879;
 
   border:
     1px solid
-    rgba(240,173,78,.4);
+    rgba(237,176,92,.4);
 
-  color:#ffc66e;
+  background:
+    rgba(237,176,92,.09);
 }
 
 .ready-badge.draft{
-  background:
-    #292d43;
+  color:#bac0ce;
 
   border:
     1px solid
-    #454b6c;
+    #444b65;
 
-  color:#bdc2d2;
+  background:
+    #282d3d;
 }
 
 .ready-badge.loading{
-  background:
-    #282c44;
+  color:#aeb5c7;
 
   border:
     1px solid
-    #3b4161;
+    #3c435e;
 
-  color:#aeb3c5;
+  background:
+    #252a3b;
 }
 
 .row-actions{
   display:flex;
 
-  gap:6px;
+  gap:5px;
 
   flex-wrap:wrap;
 
@@ -1480,14 +893,14 @@ img{
   padding:
     7px 8px;
 
-  border-radius:6px;
-
   border:
     1px solid
-    #3c4264;
+    #3c435d;
+
+  border-radius:5px;
 
   background:
-    #292e47;
+    #282d40;
 
   color:#fff;
 
@@ -1495,9 +908,817 @@ img{
 }
 
 
-/* =========================
+/* ========================================
+   THREE COLUMN PORTAL
+======================================== */
+
+.portal-layout{
+  display:grid;
+
+  grid-template-columns:
+    205px
+    minmax(0,1fr)
+    235px;
+
+  gap:16px;
+
+  padding-bottom:42px;
+}
+
+.left-rail,
+.right-rail{
+  min-width:0;
+}
+
+.portal-main{
+  min-width:0;
+}
+
+
+/* ========================================
+   SIDE PANELS
+======================================== */
+
+.side-panel{
+  margin-bottom:14px;
+
+  overflow:hidden;
+
+  border:
+    1px solid
+    #30374e;
+
+  border-radius:7px;
+
+  background:
+    #171b28;
+}
+
+.side-heading{
+  padding:
+    11px 12px;
+
+  border-bottom:
+    1px solid
+    #343b54;
+
+  background:
+    linear-gradient(
+      90deg,
+      #24293b,
+      #1e2232
+    );
+
+  font-size:13px;
+
+  font-weight:900;
+}
+
+.side-content{
+  padding:10px;
+}
+
+.category-list{
+  display:grid;
+
+  gap:5px;
+}
+
+.category-btn{
+  width:100%;
+
+  padding:
+    9px 10px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:5px;
+
+  background:
+    transparent;
+
+  color:#d9dce6;
+
+  text-align:left;
+
+  font-size:11px;
+
+  transition:.15s;
+}
+
+.category-btn:hover{
+  background:
+    #22273a;
+
+  border-color:
+    #343b54;
+}
+
+.category-btn.active{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(231,76,169,.16),
+      rgba(118,87,237,.12)
+    );
+
+  border-color:
+    #514b8e;
+
+  color:#fff;
+
+  font-weight:800;
+}
+
+.tags{
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+}
+
+.tag{
+  padding:
+    6px 8px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:4px;
+
+  background:
+    #22273a;
+
+  color:#dfe2eb;
+
+  font-size:10px;
+
+  cursor:pointer;
+}
+
+.tag:hover{
+  border-color:
+    #6259a5;
+
+  background:
+    #2c2948;
+}
+
+.quick-links{
+  display:grid;
+  gap:5px;
+}
+
+.quick-link{
+  padding:
+    9px;
+
+  border-radius:5px;
+
+  background:
+    #202536;
+
+  border:
+    1px solid
+    #323950;
+
+  color:#dfe2ec;
+
+  font-size:11px;
+}
+
+.quick-link:hover{
+  background:
+    #282d41;
+}
+
+
+/* ========================================
+   SECTION HEADINGS
+======================================== */
+
+.section{
+  margin-bottom:25px;
+}
+
+.section-heading{
+  position:relative;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:
+    space-between;
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+  padding:
+    0 0 9px;
+
+  border-bottom:
+    1px solid
+    #353c56;
+}
+
+.section-heading:before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  bottom:-1px;
+
+  width:100px;
+  height:3px;
+
+  border-radius:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.section-heading h2{
+  margin:0;
+
+  font-size:21px;
+}
+
+.section-heading small{
+  color:
+    var(--muted);
+
+  font-size:10px;
+}
+
+.section-tools{
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+}
+
+.tab{
+  padding:
+    7px 10px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:5px;
+
+  background:
+    #22273a;
+
+  color:#dfe2ec;
+
+  font-size:10px;
+
+  font-weight:800;
+}
+
+.tab:hover{
+  background:
+    #292e43;
+}
+
+.tab.active{
+  border-color:
+    transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+
+  color:#fff;
+}
+
+
+/* ========================================
+   COMIC GRID
+======================================== */
+
+.comic-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
+
+  gap:11px;
+}
+
+.comic-card{
+  min-width:0;
+
+  overflow:hidden;
+
+  border:
+    1px solid
+    #343b52;
+
+  border-radius:5px;
+
+  background:
+    #1b1f2d;
+
+  cursor:pointer;
+
+  transition:
+    transform .17s,
+    border-color .17s,
+    box-shadow .17s;
+}
+
+.comic-card:hover{
+  transform:
+    translateY(-3px);
+
+  border-color:
+    #665e9e;
+
+  box-shadow:
+    var(--shadow);
+}
+
+.cover{
+  position:relative;
+
+  aspect-ratio:3/4;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #513f86,
+      #26203e 55%,
+      #11131c
+    );
+
+  background-size:cover;
+  background-position:center;
+}
+
+.cover:after{
+  content:"";
+
+  position:absolute;
+
+  inset:
+    48% 0 0;
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(5,6,10,.82)
+    );
+}
+
+.cover-placeholder{
+  position:absolute;
+
+  inset:0;
+
+  display:grid;
+
+  place-items:center;
+
+  padding:14px;
+
+  text-align:center;
+
+  color:#e2e4ed;
+
+  font-size:14px;
+
+  font-weight:900;
+}
+
+.card-badge{
+  position:absolute;
+
+  right:6px;
+  bottom:6px;
+
+  z-index:2;
+
+  padding:
+    4px 7px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12);
+
+  border-radius:4px;
+
+  background:
+    rgba(13,15,24,.9);
+
+  color:#fff;
+
+  font-size:9px;
+
+  font-weight:900;
+}
+
+.card-body{
+  padding:
+    8px 9px 9px;
+}
+
+.card-title{
+  margin:0;
+
+  min-height:34px;
+
+  overflow:hidden;
+
+  display:-webkit-box;
+
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+
+  font-size:12px;
+
+  line-height:1.35;
+}
+
+.card-meta{
+  display:flex;
+
+  justify-content:
+    space-between;
+
+  gap:5px;
+
+  margin-top:6px;
+
+  color:
+    var(--muted);
+
+  font-size:9px;
+}
+
+.card-meta span{
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+.empty{
+  grid-column:
+    1/-1;
+
+  padding:28px;
+
+  border:
+    1px dashed
+    #3b425a;
+
+  border-radius:6px;
+
+  color:
+    var(--muted);
+
+  text-align:center;
+}
+
+
+/* ========================================
+   PAGINATION
+======================================== */
+
+.pagination{
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+  margin-top:18px;
+}
+
+.page-btn{
+  min-width:36px;
+  height:36px;
+
+  padding:
+    0 10px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:6px;
+
+  background:
+    #22273a;
+
+  color:#fff;
+
+  font-size:11px;
+
+  font-weight:800;
+}
+
+.page-btn:hover{
+  background:
+    #2a3045;
+}
+
+.page-btn.active{
+  border-color:
+    transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.page-btn:disabled{
+  opacity:.35;
+
+  cursor:not-allowed;
+}
+
+
+/* ========================================
+   POPULAR LIST
+======================================== */
+
+.popular-list{
+  display:grid;
+
+  gap:6px;
+}
+
+.popular-item{
+  display:grid;
+
+  grid-template-columns:
+    28px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:7px;
+
+  padding:
+    7px;
+
+  border:
+    1px solid
+    #30374d;
+
+  border-radius:5px;
+
+  background:
+    #1e2333;
+
+  cursor:pointer;
+}
+
+.popular-item:hover{
+  border-color:
+    #545b82;
+
+  background:
+    #23283a;
+}
+
+.popular-rank{
+  width:28px;
+  height:28px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:4px;
+
+  background:
+    #2a3044;
+
+  font-size:10px;
+
+  font-weight:900;
+}
+
+.popular-copy{
+  min-width:0;
+}
+
+.popular-copy strong{
+  display:block;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+  font-size:10px;
+}
+
+.popular-copy small{
+  display:block;
+
+  margin-top:3px;
+
+  color:
+    var(--muted);
+
+  font-size:8px;
+}
+
+
+/* ========================================
+   UPDATES
+======================================== */
+
+.updates-list{
+  display:grid;
+
+  gap:7px;
+}
+
+.update-item{
+  display:grid;
+
+  grid-template-columns:
+    52px
+    minmax(0,1fr)
+    auto;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:8px;
+
+  border:
+    1px solid
+    #343b51;
+
+  border-radius:6px;
+
+  background:
+    #1c2030;
+
+  cursor:pointer;
+}
+
+.update-item:hover{
+  border-color:
+    #595f86;
+}
+
+.update-cover{
+  width:52px;
+  height:68px;
+
+  border:
+    1px solid
+    #393f59;
+
+  border-radius:4px;
+
+  background:
+    #0f1119
+    center/cover
+    no-repeat;
+}
+
+.update-main{
+  min-width:0;
+}
+
+.update-title{
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+  font-size:11px;
+
+  font-weight:900;
+}
+
+.update-meta{
+  margin-top:4px;
+
+  color:
+    var(--muted);
+
+  font-size:9px;
+}
+
+.update-part{
+  padding:
+    6px 8px;
+
+  border:
+    1px solid
+    #3a415b;
+
+  border-radius:5px;
+
+  background:
+    #252a3e;
+
+  font-size:9px;
+
+  font-weight:900;
+}
+
+
+/* ========================================
+   BUTTONS
+======================================== */
+
+.btn{
+  padding:
+    9px 12px;
+
+  border:0;
+
+  border-radius:6px;
+
+  font-weight:800;
+}
+
+.btn.primary{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.btn.secondary{
+  color:#fff;
+
+  background:
+    #252a3c;
+
+  border:
+    1px solid
+    #3a4159;
+}
+
+.btn.danger{
+  color:#ffb2c0;
+
+  background:
+    #482431;
+
+  border:
+    1px solid
+    #74364a;
+}
+
+.btn.small{
+  padding:
+    6px 8px;
+
+  font-size:10px;
+}
+
+
+/* ========================================
    MODALS
-========================= */
+======================================== */
 
 .modal{
   display:none;
@@ -1514,10 +1735,10 @@ img{
 
   padding:20px;
 
-  background:
-    rgba(5,6,12,.86);
-
   overflow:auto;
+
+  background:
+    rgba(5,6,10,.87);
 }
 
 .modal.open{
@@ -1536,14 +1757,14 @@ img{
 
   padding:20px;
 
-  border-radius:12px;
-
-  background:
-    #181c2e;
-
   border:
     1px solid
-    #3b4166;
+    #3a415b;
+
+  border-radius:9px;
+
+  background:
+    #171b28;
 }
 
 .panel.wide{
@@ -1555,7 +1776,7 @@ img{
 
 .panel h2{
   margin:
-    0 0 15px;
+    0 0 14px;
 }
 
 .modal-head{
@@ -1577,13 +1798,13 @@ img{
   grid-template-columns:
     1fr 1fr;
 
-  gap:10px;
+  gap:9px;
 }
 
 .field{
   display:grid;
 
-  gap:6px;
+  gap:5px;
 }
 
 .field.full{
@@ -1592,9 +1813,9 @@ img{
 }
 
 .field label{
-  font-size:11px;
+  color:#bfc4d2;
 
-  color:#c4c8d7;
+  font-size:10px;
 }
 
 .field input,
@@ -1604,14 +1825,14 @@ img{
 
   padding:10px;
 
-  border-radius:7px;
-
   border:
     1px solid
-    #3b4165;
+    #3a4159;
+
+  border-radius:6px;
 
   background:
-    #111421;
+    #10131d;
 
   color:#fff;
 
@@ -1619,7 +1840,7 @@ img{
 }
 
 .field textarea{
-  min-height:110px;
+  min-height:105px;
 
   resize:vertical;
 }
@@ -1639,43 +1860,42 @@ img{
 .modal-actions{
   display:flex;
 
-  justify-content:
-    flex-end;
+  justify-content:flex-end;
 
-  gap:8px;
-
-  margin-top:14px;
+  gap:7px;
 
   flex-wrap:wrap;
+
+  margin-top:13px;
 }
 
 .msg{
-  min-height:18px;
+  min-height:17px;
 
-  margin-top:8px;
+  margin-top:7px;
 
-  font-size:11px;
+  font-size:10px;
 }
 
 .error{
-  color:#ff8096;
+  color:#ff8195;
 }
 
 .success{
-  color:#70dfae;
+  color:#72e0ae;
 }
 
 
-/* =========================
+/* ========================================
    CHAPTERS
-========================= */
+======================================== */
 
 .chapter-list{
   display:grid;
 
-  gap:9px;
+  gap:8px;
 
-  margin-top:14px;
+  margin-top:13px;
 }
 
 .chapter-row{
@@ -1685,18 +1905,18 @@ img{
     minmax(0,1fr)
     auto;
 
-  gap:12px;
+  gap:10px;
 
-  padding:12px;
+  padding:11px;
 
   border:
     1px solid
-    #353b5c;
+    #343b52;
+
+  border-radius:6px;
 
   background:
-    #20243a;
-
-  border-radius:8px;
+    #1e2333;
 }
 
 .chapter-row small{
@@ -1707,25 +1927,25 @@ img{
   color:
     var(--muted);
 
-  font-size:10px;
+  font-size:9px;
 }
 
 .upload-zone{
-  margin-top:10px;
+  margin-top:9px;
 
-  padding:9px;
+  padding:8px;
 
   border:
     1px dashed
-    #50577d;
+    #4b526c;
 
-  border-radius:7px;
+  border-radius:6px;
 }
 
 
-/* =========================
-   PAGES
-========================= */
+/* ========================================
+   PAGE MANAGER
+======================================== */
 
 .pages-grid{
   display:grid;
@@ -1733,43 +1953,42 @@ img{
   grid-template-columns:
     repeat(5,1fr);
 
-  gap:11px;
+  gap:10px;
 }
 
 .page-card{
   overflow:hidden;
 
-  border-radius:8px;
-
   border:
     1px solid
-    #353b5c;
+    #343b52;
+
+  border-radius:6px;
 
   background:
-    #20243a;
+    #1d2232;
 }
 
 .page-thumb{
   aspect-ratio:3/4;
 
-  background:
-    #10131f;
-
   overflow:hidden;
+
+  background:
+    #0e1017;
 }
 
 .page-thumb img{
-  width:100%;
+  display:block;
 
+  width:100%;
   height:100%;
 
   object-fit:cover;
-
-  display:block;
 }
 
 .page-info{
-  padding:8px;
+  padding:7px;
 }
 
 .page-actions{
@@ -1778,26 +1997,26 @@ img{
   grid-template-columns:
     1fr 1fr;
 
-  gap:5px;
+  gap:4px;
 
   margin-top:6px;
 }
 
 .page-actions button{
-  padding:6px;
-
-  border-radius:5px;
+  padding:5px;
 
   border:
     1px solid
-    #3c4264;
+    #3a415a;
+
+  border-radius:4px;
 
   background:
-    #292e47;
+    #272c3f;
 
   color:#fff;
 
-  font-size:10px;
+  font-size:9px;
 }
 
 .page-actions .delete-page{
@@ -1805,21 +2024,21 @@ img{
     1/-1;
 
   background:
-    #43212d;
+    #43222e;
 
-  color:#ffb0bf;
+  color:#ffb2bf;
 }
 
 
-/* =========================
+/* ========================================
    DETAIL
-========================= */
+======================================== */
 
 .detail{
   display:grid;
 
   grid-template-columns:
-    220px
+    210px
     minmax(0,1fr);
 
   gap:18px;
@@ -1828,18 +2047,21 @@ img{
 .detail-cover{
   aspect-ratio:3/4;
 
-  border-radius:8px;
+  border:
+    1px solid
+    #393f58;
+
+  border-radius:6px;
 
   background:
     linear-gradient(
       145deg,
-      #56358b,
-      #25193e 55%,
-      #12131f
+      #513f86,
+      #26203e 55%,
+      #11131c
     );
 
   background-size:cover;
-
   background-position:center;
 }
 
@@ -1848,49 +2070,59 @@ img{
     var(--muted);
 
   line-height:1.6;
+
+  font-size:11px;
 }
 
 .detail-desc{
+  color:#e2e5ed;
+
   line-height:1.7;
 
-  color:#e5e7ef;
+  font-size:12px;
 }
 
 .parts{
   display:grid;
 
-  gap:8px;
+  gap:7px;
 
-  margin-top:14px;
+  margin-top:13px;
 }
 
 .part-btn{
   width:100%;
 
-  padding:11px;
-
-  border-radius:7px;
+  padding:10px;
 
   border:
     1px solid
-    #3a4062;
+    #3a415a;
+
+  border-radius:6px;
 
   background:
-    #24283e;
+    #22273a;
 
   color:#fff;
 
   text-align:left;
+
+  font-size:11px;
 }
 
 .part-btn:hover{
-  background:#302d55;
+  background:
+    #2b2948;
+
+  border-color:
+    #5e56a2;
 }
 
 
-/* =========================
+/* ========================================
    READER
-========================= */
+======================================== */
 
 .reader{
   display:none;
@@ -1901,9 +2133,10 @@ img{
 
   z-index:180;
 
-  background:#080a12;
-
   overflow-y:auto;
+
+  background:
+    #080a10;
 }
 
 .reader.open{
@@ -1929,14 +2162,14 @@ img{
   gap:8px;
 
   padding:
-    9px 12px;
-
-  background:
-    rgba(17,20,33,.97);
+    8px 11px;
 
   border-bottom:
     1px solid
-    #353b5c;
+    #343b52;
+
+  background:
+    rgba(17,20,30,.97);
 
   backdrop-filter:
     blur(10px);
@@ -1946,27 +2179,26 @@ img{
 .reader-right{
   display:flex;
 
-  gap:6px;
-
   align-items:center;
+
+  gap:5px;
 }
 
 .reader-title{
-  text-align:center;
+  overflow:hidden;
 
   white-space:nowrap;
 
-  overflow:hidden;
+  text-overflow:ellipsis;
 
-  text-overflow:
-    ellipsis;
+  text-align:center;
 
-  font-size:12px;
+  font-size:11px;
 }
 
 .reader-pages{
   width:min(
-    1050px,
+    1000px,
     100%
   );
 
@@ -1977,87 +2209,126 @@ img{
   display:block;
 
   width:100%;
-
   height:auto;
 
-  margin:
-    0 auto;
+  margin:auto;
 }
 
 .reader-empty{
-  min-height:72vh;
+  min-height:70vh;
 
   display:grid;
 
   place-items:center;
 
-  text-align:center;
-
   padding:40px;
 
   color:
     var(--muted);
+
+  text-align:center;
 }
 
 .reader-bottom{
   width:min(
-    1050px,
+    1000px,
     100%
   );
-
-  margin:
-    20px auto 60px;
-
-  padding:20px;
 
   display:flex;
 
   justify-content:center;
 
-  gap:8px;
+  gap:7px;
 
   flex-wrap:wrap;
+
+  margin:
+    20px auto 60px;
+
+  padding:20px;
 }
 
 
-/* =========================
+/* ========================================
    FOOTER
-========================= */
+======================================== */
 
 footer{
   padding:
-    26px 0 38px;
+    25px 0 38px;
 
   border-top:
     1px solid
-    #2b304d;
+    #292f43;
 
-  color:#8f95ad;
+  color:#81899d;
 
-  font-size:11px;
+  font-size:10px;
 }
 
 
-/* =========================
-   TABLET
-========================= */
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media(
-  max-width:1100px
+  max-width:1250px
 ){
 
-  .content-layout{
+  .portal-layout{
     grid-template-columns:
+      185px
       minmax(0,1fr)
-      260px;
+      215px;
   }
 
   .comic-grid{
     grid-template-columns:
       repeat(
-        3,
+        4,
         minmax(0,1fr)
       );
+  }
+
+}
+
+
+@media(
+  max-width:1000px
+){
+
+  .header-main{
+    grid-template-columns:
+      auto
+      minmax(250px,1fr)
+      auto;
+  }
+
+  .header-chip{
+    display:none;
+  }
+
+  .portal-layout{
+    grid-template-columns:
+      190px
+      minmax(0,1fr);
+  }
+
+  .right-rail{
+    grid-column:
+      1/-1;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:12px;
+  }
+
+  .right-rail .side-panel{
+    margin-bottom:0;
   }
 
   .pages-grid{
@@ -2068,35 +2339,56 @@ footer{
 }
 
 
-/* =========================
-   MOBILE
-========================= */
-
 @media(
-  max-width:900px
+  max-width:760px
 ){
 
-  .topbar .wrap{
+  .header-main{
     grid-template-columns:
       1fr;
+
+    gap:10px;
 
     padding:
       12px 0;
-
-    gap:10px;
   }
 
-  .header-tools{
-    justify-content:
-      flex-start;
+  .header-side{
+    justify-content:flex-start;
   }
 
-  .content-layout{
+  .intro-strip{
     grid-template-columns:
       1fr;
   }
 
-  .sidebar{
+  .intro-stat{
+    justify-content:flex-start;
+  }
+
+  .portal-layout{
+    grid-template-columns:
+      1fr;
+  }
+
+  .left-rail{
+    order:2;
+  }
+
+  .portal-main{
+    order:1;
+  }
+
+  .right-rail{
+    order:3;
+
+    grid-column:auto;
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .left-rail{
     display:grid;
 
     grid-template-columns:
@@ -2105,7 +2397,7 @@ footer{
     gap:12px;
   }
 
-  .side-card{
+  .left-rail .side-panel{
     margin-bottom:0;
   }
 
@@ -2131,35 +2423,44 @@ footer{
 
 
 @media(
-  max-width:640px
+  max-width:560px
 ){
 
-  .brand{
-    font-size:24px;
+  .wrap{
+    width:min(
+      100% - 18px,
+      1380px
+    );
   }
 
-  .navbar .wrap{
-    padding:
-      0 4px;
+  .brand{
+    font-size:23px;
   }
 
   .nav-link{
     padding:
-      13px 12px;
+      13px 11px;
 
-    font-size:12px;
+    font-size:11px;
   }
 
-  .promo{
-    min-height:90px;
+  .intro-strip{
+    padding:15px;
   }
 
-  .promo strong{
-    font-size:22px;
+  .intro-strip h1{
+    font-size:20px;
   }
 
-  .section-heading h2{
-    font-size:22px;
+  .intro-stat{
+    display:grid;
+
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .intro-stat span{
+    min-width:0;
   }
 
   .comic-grid{
@@ -2169,24 +2470,29 @@ footer{
         minmax(0,1fr)
       );
 
-    gap:10px;
+    gap:9px;
   }
 
-  .sidebar{
+  .section-heading{
+    align-items:flex-start;
+
+    flex-direction:column;
+  }
+
+  .left-rail{
     grid-template-columns:
       1fr;
   }
 
   .update-item{
     grid-template-columns:
-      50px
+      48px
       minmax(0,1fr);
   }
 
   .update-cover{
-    width:50px;
-
-    height:68px;
+    width:48px;
+    height:64px;
   }
 
   .update-part{
@@ -2196,22 +2502,20 @@ footer{
 
   .admin-row{
     grid-template-columns:
-      50px
+      48px
       minmax(0,1fr);
   }
 
   .admin-cover{
-    width:50px;
-
-    height:68px;
+    width:48px;
+    height:66px;
   }
 
   .admin-row .row-actions{
     grid-column:
       1/-1;
 
-    justify-content:
-      flex-start;
+    justify-content:flex-start;
   }
 
   .form-grid{
@@ -2239,7 +2543,7 @@ footer{
   }
 
   .detail-cover{
-    max-width:220px;
+    max-width:210px;
   }
 
   .reader-bar{
@@ -2253,20 +2557,20 @@ footer{
 
   .reader-left,
   .reader-right{
-    justify-content:
-      center;
+    justify-content:center;
   }
 
   .age-card{
     padding:
-      25px 19px;
-  }
-
-  .age-card h1{
-    font-size:25px;
+      26px 19px;
   }
 
 }
+
+
+/* ========================================
+   END CSS
+======================================== */
 
 </style>
 </head>
@@ -2275,7 +2579,9 @@ footer{
 <body>
 
 
-<!-- +18 -->
+<!-- ======================================
+     +18
+====================================== -->
 
 <div
   id="ageGate"
@@ -2300,7 +2606,7 @@ footer{
     </p>
 
     <div class="age-warning">
-      Al continuar confirmas que tienes al menos 18 años o la edad legal requerida en tu jurisdicción para acceder a contenido para adultos.
+      Al continuar confirmas que tienes al menos 18 años o la edad legal aplicable en tu jurisdicción para acceder a contenido para adultos.
     </div>
 
     <div class="age-actions">
@@ -2322,7 +2628,7 @@ footer{
     </div>
 
     <div class="age-note">
-      La confirmación se guarda únicamente en este navegador.
+      Esta confirmación se guarda únicamente en este navegador.
     </div>
 
   </div>
@@ -2331,40 +2637,47 @@ footer{
 
 
 
-<!-- HEADER -->
+<!-- ======================================
+     HEADER
+====================================== -->
 
-<div class="topbar">
+<header class="site-header">
 
-  <div class="wrap">
+  <div class="wrap header-main">
 
     <a
-      class="brand"
       href="/"
+      class="brand"
     >
 
-      <span class="brand-mark">
+      <div class="brand-icon">
         NI
-      </span>
+      </div>
 
-      <span>
+      <div class="brand-name">
+
         NightInk
-      </span>
+
+        <small>
+          COMICS +18
+        </small>
+
+      </div>
 
     </a>
 
 
-    <div class="search-wrap">
+    <div class="search-area">
 
       <input
         id="searchInput"
         class="search-input"
-        placeholder="Buscar cómics, autor..."
+        placeholder="Buscar título, autor o cómic..."
       >
 
       <button
         id="searchBtn"
         class="search-button"
-        aria-label="Buscar"
       >
         ⌕
       </button>
@@ -2372,7 +2685,11 @@ footer{
     </div>
 
 
-    <div class="header-tools">
+    <div class="header-side">
+
+      <span class="header-chip">
+        Lectura directa
+      </span>
 
       <button
         id="openAdmin"
@@ -2385,15 +2702,17 @@ footer{
 
   </div>
 
-</div>
+</header>
 
 
 
-<!-- NAV -->
+<!-- ======================================
+     NAV
+====================================== -->
 
 <nav class="navbar">
 
-  <div class="wrap">
+  <div class="wrap navbar-inner">
 
     <a
       class="nav-link active"
@@ -2436,19 +2755,47 @@ footer{
 
 
 
-<!-- PROMO -->
+<!-- ======================================
+     INTRO
+====================================== -->
 
-<div class="wrap promo">
+<div class="wrap intro-strip">
 
   <div>
 
-    <strong>
+    <h1>
       NightInk Comics
-    </strong>
+    </h1>
 
-    <small>
-      Catálogo directo, lectura vertical y actualizaciones en un solo lugar.
-    </small>
+    <p>
+      Catálogo de lectura rápida. Elige una obra y entra directamente al lector cuando tenga páginas disponibles.
+    </p>
+
+  </div>
+
+
+  <div class="intro-stat">
+
+    <span>
+      <strong>
+        +18
+      </strong>
+      Adultos
+    </span>
+
+    <span>
+      <strong>
+        ↓
+      </strong>
+      Lectura vertical
+    </span>
+
+    <span>
+      <strong>
+        ⚡
+      </strong>
+      Acceso directo
+    </span>
 
   </div>
 
@@ -2459,7 +2806,9 @@ footer{
 <main class="wrap">
 
 
-<!-- ADMIN -->
+<!-- ======================================
+     ADMIN
+====================================== -->
 
 <section
   id="adminShell"
@@ -2471,6 +2820,7 @@ footer{
     <h2>
       Panel de administración
     </h2>
+
 
     <div class="admin-actions">
 
@@ -2492,7 +2842,7 @@ footer{
         id="logoutAdminBtn"
         class="btn secondary"
       >
-        Cerrar Admin
+        Cerrar
       </button>
 
     </div>
@@ -2515,12 +2865,210 @@ footer{
 
 
 
-<div class="content-layout">
+<!-- ======================================
+     PORTAL
+====================================== -->
+
+<div class="portal-layout">
 
 
-<!-- MAIN COLUMN -->
+<!-- LEFT -->
 
-<div class="main-column">
+<aside class="left-rail">
+
+
+  <section
+    id="categorias"
+    class="side-panel"
+  >
+
+    <div class="side-heading">
+      Categorías
+    </div>
+
+
+    <div class="side-content">
+
+      <div class="category-list">
+
+        <button
+          class="category-btn active"
+          data-genre=""
+        >
+          Todos los cómics
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Romance"
+        >
+          Romance
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Fantasía"
+        >
+          Fantasía
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Drama"
+        >
+          Drama
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Misterio"
+        >
+          Misterio
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Thriller"
+        >
+          Thriller
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Acción"
+        >
+          Acción
+        </button>
+
+        <button
+          class="category-btn"
+          data-genre="Otros"
+        >
+          Otros
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <section class="side-panel">
+
+    <div class="side-heading">
+      Etiquetas
+    </div>
+
+
+    <div class="side-content">
+
+      <div class="tags">
+
+        <span
+          class="tag"
+          data-tag="Romance"
+        >
+          Romance
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Fantasía"
+        >
+          Fantasía
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Drama"
+        >
+          Drama
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Misterio"
+        >
+          Misterio
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Thriller"
+        >
+          Thriller
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Acción"
+        >
+          Acción
+        </span>
+
+        <span
+          class="tag"
+          data-tag="Otros"
+        >
+          Otros
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <section class="side-panel">
+
+    <div class="side-heading">
+      Explorar
+    </div>
+
+
+    <div class="side-content">
+
+      <div class="quick-links">
+
+        <a
+          href="#ultimos"
+          class="quick-link"
+        >
+          Últimos añadidos
+        </a>
+
+        <a
+          href="#actualizaciones"
+          class="quick-link"
+        >
+          Actualizaciones
+        </a>
+
+        <a
+          href="#azar"
+          class="quick-link"
+        >
+          Selección al azar
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+</aside>
+
+
+
+<!-- CENTER -->
+
+<div class="portal-main">
 
 
 <section
@@ -2531,8 +3079,9 @@ footer{
   <div class="section-heading">
 
     <h2>
-      🔥 Últimos cómics
+      Últimos cómics
     </h2>
+
 
     <div class="section-tools">
 
@@ -2540,14 +3089,14 @@ footer{
         class="tab active"
         data-sort="latest"
       >
-        Últimos
+        Nuevos
       </button>
 
       <button
         class="tab"
         data-sort="popular"
       >
-        Populares
+        Más vistos
       </button>
 
     </div>
@@ -2584,7 +3133,7 @@ footer{
   <div class="section-heading">
 
     <h2>
-      ⚡ Actualizaciones
+      Actualizaciones recientes
     </h2>
 
     <small>
@@ -2617,8 +3166,9 @@ footer{
   <div class="section-heading">
 
     <h2>
-      🎲 Al azar
+      Cómics al azar
     </h2>
+
 
     <button
       id="randomRefresh"
@@ -2648,161 +3198,59 @@ footer{
 
 
 
-<!-- SIDEBAR -->
+<!-- RIGHT -->
 
-<aside class="sidebar">
-
-
-<div
-  id="categorias"
-  class="side-card"
->
-
-  <div class="side-title">
-    Categorías
-  </div>
+<aside class="right-rail">
 
 
-  <div class="category-list">
+  <section class="side-panel">
 
-    <button
-      class="category-btn active"
-      data-genre=""
-    >
-      Todos
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Romance"
-    >
-      Romance
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Fantasía"
-    >
-      Fantasía
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Drama"
-    >
-      Drama
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Misterio"
-    >
-      Misterio
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Thriller"
-    >
-      Thriller
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Acción"
-    >
-      Acción
-    </button>
-
-    <button
-      class="category-btn"
-      data-genre="Otros"
-    >
-      Otros
-    </button>
-
-  </div>
-
-</div>
-
-
-
-<div class="side-card">
-
-  <div class="side-title">
-    Etiquetas
-  </div>
-
-
-  <div class="tags">
-
-    <span
-      class="tag"
-      data-tag="Romance"
-    >
-      Romance
-    </span>
-
-    <span
-      class="tag"
-      data-tag="Fantasía"
-    >
-      Fantasía
-    </span>
-
-    <span
-      class="tag"
-      data-tag="Drama"
-    >
-      Drama
-    </span>
-
-    <span
-      class="tag"
-      data-tag="Misterio"
-    >
-      Misterio
-    </span>
-
-    <span
-      class="tag"
-      data-tag="Acción"
-    >
-      Acción
-    </span>
-
-    <span
-      class="tag"
-      data-tag="Otros"
-    >
-      Otros
-    </span>
-
-  </div>
-
-</div>
-
-
-
-<div class="side-card">
-
-  <div class="side-title">
-    Más vistos
-  </div>
-
-
-  <div
-    id="popularList"
-    class="popular-list"
-  >
-
-    <div class="empty">
-      Cargando...
+    <div class="side-heading">
+      Más vistos
     </div>
 
-  </div>
 
-</div>
+    <div class="side-content">
+
+      <div
+        id="popularList"
+        class="popular-list"
+      >
+
+        <div class="empty">
+          Cargando...
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <section class="side-panel">
+
+    <div class="side-heading">
+      NightInk
+    </div>
+
+
+    <div class="side-content">
+
+      <div
+        style="
+          color:#a4aabd;
+          font-size:10px;
+          line-height:1.65
+        "
+      >
+        Las obras con contenido disponible se abren directamente en el lector. Si una obra contiene varias partes, podrás cambiar entre ellas durante la lectura.
+      </div>
+
+    </div>
+
+  </section>
 
 
 </aside>
@@ -2816,17 +3264,17 @@ footer{
 
 <footer>
 
-<div class="wrap">
-
-  NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido
-
-</div>
+  <div class="wrap">
+    NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido
+  </div>
 
 </footer>
 
 
 
-<!-- LOGIN -->
+<!-- ======================================
+     LOGIN
+====================================== -->
 
 <div
   id="loginModal"
@@ -2841,6 +3289,7 @@ footer{
     <h2>
       Administrador
     </h2>
+
 
     <div class="field">
 
@@ -2887,7 +3336,9 @@ footer{
 
 
 
-<!-- COMIC FORM -->
+<!-- ======================================
+     COMIC FORM
+====================================== -->
 
 <div
   id="comicModal"
@@ -3070,7 +3521,9 @@ footer{
 
 
 
-<!-- PARTS -->
+<!-- ======================================
+     CHAPTERS
+====================================== -->
 
 <div
   id="chaptersModal"
@@ -3173,7 +3626,9 @@ footer{
 
 
 
-<!-- EDIT PART -->
+<!-- ======================================
+     EDIT CHAPTER
+====================================== -->
 
 <div
   id="editChapterModal"
@@ -3275,7 +3730,9 @@ footer{
 
 
 
-<!-- PAGES -->
+<!-- ======================================
+     PAGES
+====================================== -->
 
 <div
   id="pagesModal"
@@ -3311,7 +3768,9 @@ footer{
 
 
 
-<!-- INFO -->
+<!-- ======================================
+     DETAIL
+====================================== -->
 
 <div
   id="detailModal"
@@ -3363,7 +3822,7 @@ footer{
         <div
           style="
             display:flex;
-            gap:8px;
+            gap:7px;
             flex-wrap:wrap;
             margin:12px 0
           "
@@ -3407,7 +3866,9 @@ footer{
 
 
 
-<!-- READER -->
+<!-- ======================================
+     READER
+====================================== -->
 
 <div
   id="reader"
@@ -3489,24 +3950,28 @@ footer{
 
 <script>
 
+/* ========================================
+   GLOBALS
+======================================== */
+
 const qs =
-  s =>
+  selector =>
     document.querySelector(
-      s
+      selector
     );
 
 
 const qsa =
-  s =>
+  selector =>
     [
       ...document.querySelectorAll(
-        s
+        selector
       )
     ];
 
 
 const AGE_KEY =
-  "nightink_age_verified_v2";
+  "nightink_age_verified_v3";
 
 
 let catalog =
@@ -3586,9 +4051,9 @@ let currentReaderIndex =
   -1;
 
 
-/* =========================
+/* ========================================
    HELPERS
-========================= */
+======================================== */
 
 function esc(
   value = ""
@@ -3597,13 +4062,14 @@ function esc(
   return String(value)
     .replace(
       /[&<>"']/g,
-      c => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[c])
+      character =>
+        ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#039;"
+        }[character])
     );
 
 }
@@ -3643,13 +4109,13 @@ qsa(
   "[data-close]"
 )
 .forEach(
-  btn => {
+  button => {
 
-    btn.addEventListener(
+    button.addEventListener(
       "click",
       () =>
         closeModal(
-          btn.dataset.close
+          button.dataset.close
         )
     );
 
@@ -3657,9 +4123,9 @@ qsa(
 );
 
 
-/* =========================
+/* ========================================
    AGE GATE
-========================= */
+======================================== */
 
 function showAgeGate(){
 
@@ -3736,9 +4202,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    API
-========================= */
+======================================== */
 
 async function api(
   url,
@@ -3805,17 +4271,16 @@ async function api(
 }
 
 
-/* =========================
+/* ========================================
    ROUTING
-========================= */
+======================================== */
 
 function getRoute(){
 
   const match =
-    location.pathname
-      .match(
-        /^\/comic\/([^/]+)\/?$/
-      );
+    location.pathname.match(
+      /^\/comic\/([^/]+)\/?$/
+    );
 
 
   if(
@@ -3897,9 +4362,9 @@ function setComicMetadata(
 }
 
 
-/* =========================
-   CARDS
-========================= */
+/* ========================================
+   CARD
+======================================== */
 
 function badgeForComic(
   comic
@@ -3958,9 +4423,11 @@ function comicCardHTML(
     `
 
       <div class="cover-placeholder">
+
         ${esc(
           comic.title
         )}
+
       </div>
 
     `;
@@ -3981,6 +4448,7 @@ function comicCardHTML(
       >
 
         ${placeholder}
+
 
         <span class="card-badge">
 
@@ -4036,9 +4504,9 @@ function comicCardHTML(
 }
 
 
-/* =========================
+/* ========================================
    CATALOG
-========================= */
+======================================== */
 
 async function loadCatalog(
   page = 1
@@ -4055,7 +4523,7 @@ async function loadCatalog(
           ),
 
         limit:
-          "12",
+          "15",
 
         sort:
           sortMode
@@ -4207,9 +4675,9 @@ function renderCatalog(){
 }
 
 
-/* =========================
+/* ========================================
    PAGINATION
-========================= */
+======================================== */
 
 function renderPagination(){
 
@@ -4358,9 +4826,7 @@ function renderPagination(){
         ""
       }
     >
-
-      Siguiente →
-
+      →
     </button>
 
   `;
@@ -4374,25 +4840,25 @@ function renderPagination(){
     "[data-page]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.addEventListener(
+      button.addEventListener(
         "click",
         () => {
 
-          const n =
+          const next =
             Number(
-              btn.dataset.page
+              button.dataset.page
             );
 
 
           if(
-            n >= 1 &&
-            n <= total
+            next >= 1 &&
+            next <= total
           ){
 
             loadCatalog(
-              n
+              next
             );
 
 
@@ -4417,9 +4883,9 @@ function renderPagination(){
 }
 
 
-/* =========================
+/* ========================================
    POPULAR
-========================= */
+======================================== */
 
 async function loadPopular(){
 
@@ -4427,7 +4893,7 @@ async function loadPopular(){
 
     const data =
       await api(
-        "/api/comics?page=1&limit=6&sort=popular"
+        "/api/comics?page=1&limit=8&sort=popular"
       );
 
 
@@ -4544,9 +5010,9 @@ async function loadPopular(){
 }
 
 
-/* =========================
+/* ========================================
    UPDATES
-========================= */
+======================================== */
 
 async function loadUpdates(){
 
@@ -4571,12 +5037,12 @@ async function loadUpdates(){
       ?
       updates
         .map(
-          u => {
+          update => {
 
             const cover =
-              u.cover_url
+              update.cover_url
               ?
-              `background-image:url('${u.cover_url}')`
+              `background-image:url('${update.cover_url}')`
               :
               "";
 
@@ -4586,9 +5052,9 @@ async function loadUpdates(){
               <div
                 class="update-item"
                 data-update-slug="${esc(
-                  u.slug
+                  update.slug
                 )}"
-                data-update-chapter="${u.chapter_id}"
+                data-update-chapter="${update.chapter_id}"
               >
 
                 <div
@@ -4602,15 +5068,16 @@ async function loadUpdates(){
                   <div class="update-title">
 
                     ${esc(
-                      u.comic_title
+                      update.comic_title
                     )}
 
                   </div>
 
+
                   <div class="update-meta">
 
                     ${Number(
-                      u.page_count ||
+                      update.page_count ||
                       0
                     )}
                     páginas
@@ -4618,7 +5085,7 @@ async function loadUpdates(){
                     ·
 
                     ${esc(
-                      u.genre ||
+                      update.genre ||
                       "Sin categoría"
                     )}
 
@@ -4629,8 +5096,8 @@ async function loadUpdates(){
 
                 <div class="update-part">
 
-                  ▶ Parte
-                  ${u.chapter_number}
+                  Parte
+                  ${update.chapter_number}
 
                 </div>
 
@@ -4702,9 +5169,9 @@ async function loadUpdates(){
 }
 
 
-/* =========================
+/* ========================================
    RANDOM
-========================= */
+======================================== */
 
 async function loadRandomPool(){
 
@@ -4758,11 +5225,11 @@ function renderRandom(){
     .sort(
       () =>
         Math.random() -
-        0.5
+        .5
     )
     .slice(
       0,
-      4
+      5
     );
 
 
@@ -4821,9 +5288,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    OPEN COMIC
-========================= */
+======================================== */
 
 async function openComicDirect(
   slug,
@@ -4924,17 +5391,16 @@ async function openComicDirect(
     ){
 
       index =
-        chapters
-          .findIndex(
-            ch =>
-              Number(
-                ch.id
-              )
-              ===
-              Number(
-                preferredChapterId
-              )
-          );
+        chapters.findIndex(
+          chapter =>
+            Number(
+              chapter.id
+            )
+            ===
+            Number(
+              preferredChapterId
+            )
+        );
 
     }
 
@@ -4950,14 +5416,13 @@ async function openComicDirect(
     ){
 
       index =
-        chapters
-          .findIndex(
-            ch =>
-              Number(
-                ch.page_count ||
-                0
-              ) > 0
-          );
+        chapters.findIndex(
+          chapter =>
+            Number(
+              chapter.page_count ||
+              0
+            ) > 0
+        );
 
     }
 
@@ -4995,9 +5460,9 @@ async function openComicDirect(
 }
 
 
-/* =========================
-   INFO
-========================= */
+/* ========================================
+   DETAIL
+======================================== */
 
 function prepareComicInfo(
   comic,
@@ -5026,9 +5491,7 @@ function prepareComicInfo(
       `${comic.views} vistas`
 
     ]
-    .filter(
-      Boolean
-    )
+    .filter(Boolean)
     .join(
       " · "
     );
@@ -5088,7 +5551,7 @@ function prepareComicInfo(
     chapters
       .map(
         (
-          ch,
+          chapter,
           index
         ) => `
 
@@ -5098,14 +5561,14 @@ function prepareComicInfo(
           >
 
             ▶ Parte
-            ${ch.chapter_number}
+            ${chapter.chapter_number}
 
             ${
-              ch.title
+              chapter.title
               ?
               " · " +
               esc(
-                ch.title
+                chapter.title
               )
               :
               ""
@@ -5114,7 +5577,7 @@ function prepareComicInfo(
             ·
 
             ${Number(
-              ch.page_count ||
+              chapter.page_count ||
               0
             )}
             páginas
@@ -5130,9 +5593,9 @@ function prepareComicInfo(
     "[data-info-part]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.addEventListener(
+      button.addEventListener(
         "click",
         async () => {
 
@@ -5143,7 +5606,7 @@ function prepareComicInfo(
 
           await openReaderByIndex(
             Number(
-              btn.dataset.infoPart
+              button.dataset.infoPart
             )
           );
 
@@ -5181,9 +5644,9 @@ function showNoPages(){
 }
 
 
-/* =========================
+/* ========================================
    READER
-========================= */
+======================================== */
 
 async function openReaderByIndex(
   index
@@ -5484,9 +5947,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    SHARE
-========================= */
+======================================== */
 
 function comicUrl(){
 
@@ -5623,9 +6086,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    EXIT
-========================= */
+======================================== */
 
 function exitComic(){
 
@@ -5745,9 +6208,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    HISTORY
-========================= */
+======================================== */
 
 window.addEventListener(
   "popstate",
@@ -5808,9 +6271,9 @@ window.addEventListener(
 );
 
 
-/* =========================
+/* ========================================
    SEARCH
-========================= */
+======================================== */
 
 function runSearch(){
 
@@ -5903,22 +6366,22 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    CATEGORIES
-========================= */
+======================================== */
 
 qsa(
   ".category-btn"
 )
 .forEach(
-  btn => {
+  button => {
 
-    btn.addEventListener(
+    button.addEventListener(
       "click",
       () => {
 
         selectedGenre =
-          btn.dataset.genre;
+          button.dataset.genre;
 
 
         qsa(
@@ -5932,7 +6395,7 @@ qsa(
               "active",
 
               item ===
-              btn
+              button
 
             );
 
@@ -6017,22 +6480,22 @@ qsa(
 );
 
 
-/* =========================
+/* ========================================
    SORT
-========================= */
+======================================== */
 
 qsa(
   ".tab[data-sort]"
 )
 .forEach(
-  btn => {
+  button => {
 
-    btn.addEventListener(
+    button.addEventListener(
       "click",
       () => {
 
         sortMode =
-          btn.dataset.sort;
+          button.dataset.sort;
 
 
         qsa(
@@ -6046,7 +6509,7 @@ qsa(
               "active",
 
               item ===
-              btn
+              button
 
             );
 
@@ -6065,9 +6528,9 @@ qsa(
 );
 
 
-/* =========================
+/* ========================================
    ADMIN LOGIN
-========================= */
+======================================== */
 
 qs(
   "#openAdmin"
@@ -6233,9 +6696,9 @@ async function loginAdmin(){
 }
 
 
-/* =========================
+/* ========================================
    ADMIN
-========================= */
+======================================== */
 
 async function showAdmin(){
 
@@ -6306,7 +6769,7 @@ async function loadStats(){
     );
 
 
-  const s =
+  const stats =
     data.stats ||
     {};
 
@@ -6320,7 +6783,7 @@ async function loadStats(){
 
       <strong>
         ${Number(
-          s.comics ||
+          stats.comics ||
           0
         )}
       </strong>
@@ -6336,7 +6799,7 @@ async function loadStats(){
 
       <strong>
         ${Number(
-          s.chapters ||
+          stats.chapters ||
           0
         )}
       </strong>
@@ -6352,7 +6815,7 @@ async function loadStats(){
 
       <strong>
         ${Number(
-          s.pages ||
+          stats.pages ||
           0
         )}
       </strong>
@@ -6368,7 +6831,7 @@ async function loadStats(){
 
       <strong>
         ${Number(
-          s.views ||
+          stats.views ||
           0
         )}
       </strong>
@@ -6384,9 +6847,9 @@ async function loadStats(){
 }
 
 
-/* =========================
+/* ========================================
    READINESS
-========================= */
+======================================== */
 
 function calculateReadiness(
   comic,
@@ -6400,18 +6863,18 @@ function calculateReadiness(
 
   const published =
     all.filter(
-      ch =>
+      chapter =>
         Boolean(
-          ch.is_published
+          chapter.is_published
         )
     );
 
 
   const readable =
     published.filter(
-      ch =>
+      chapter =>
         Number(
-          ch.page_count ||
+          chapter.page_count ||
           0
         ) > 0
     );
@@ -6422,12 +6885,12 @@ function calculateReadiness(
 
       (
         sum,
-        ch
+        chapter
       ) =>
 
         sum +
         Number(
-          ch.page_count ||
+          chapter.page_count ||
           0
         ),
 
@@ -6547,9 +7010,9 @@ function calculateReadiness(
 }
 
 
-/* =========================
+/* ========================================
    ADMIN COMICS
-========================= */
+======================================== */
 
 async function loadAdminComics(){
 
@@ -6622,6 +7085,7 @@ async function loadAdminComics(){
                   )}
 
                 </div>
+
 
                 <div class="admin-meta">
 
@@ -6702,15 +7166,15 @@ async function loadAdminComics(){
     "[data-edit]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.addEventListener(
+      button.addEventListener(
         "click",
         () =>
           editComic(
 
             Number(
-              btn.dataset.edit
+              button.dataset.edit
             ),
 
             comics
@@ -6726,15 +7190,15 @@ async function loadAdminComics(){
     "[data-parts]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.addEventListener(
+      button.addEventListener(
         "click",
         () =>
           manageParts(
 
             Number(
-              btn.dataset.parts
+              button.dataset.parts
             ),
 
             comics
@@ -6750,14 +7214,14 @@ async function loadAdminComics(){
     "[data-delete]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.addEventListener(
+      button.addEventListener(
         "click",
         () =>
           deleteComic(
             Number(
-              btn.dataset.delete
+              button.dataset.delete
             )
           )
       );
@@ -6818,22 +7282,18 @@ async function loadAdminComics(){
               <span
                 class="ready-badge ${status.badgeClass}"
               >
-
                 ${status.label}
-
               </span>
 
               <span
                 style="
-                  font-size:10px;
-                  color:#8f95ad
+                  color:#8d95a8;
+                  font-size:9px
                 "
               >
-
                 ${esc(
                   status.detail
                 )}
-
               </span>
 
             `;
@@ -6876,9 +7336,9 @@ async function loadAdminComics(){
 }
 
 
-/* =========================
-   REFRESH ADMIN
-========================= */
+/* ========================================
+   REFRESH
+======================================== */
 
 qs(
   "#refreshAdminBtn"
@@ -6909,9 +7369,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    NEW COMIC
-========================= */
+======================================== */
 
 qs(
   "#newComicBtn"
@@ -6962,9 +7422,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    EDIT COMIC
-========================= */
+======================================== */
 
 function editComic(
   id,
@@ -6973,9 +7433,9 @@ function editComic(
 
   const comic =
     comics.find(
-      c =>
+      item =>
         Number(
-          c.id
+          item.id
         ) === id
     );
 
@@ -6989,88 +7449,55 @@ function editComic(
   }
 
 
-  qs(
-    "#comicId"
-  )
-  .value =
+  qs("#comicId").value =
     comic.id;
 
 
-  qs(
-    "#comicTitle"
-  )
-  .value =
+  qs("#comicTitle").value =
     comic.title ||
     "";
 
 
-  qs(
-    "#comicSlug"
-  )
-  .value =
+  qs("#comicSlug").value =
     comic.slug ||
     "";
 
 
-  qs(
-    "#comicAuthor"
-  )
-  .value =
+  qs("#comicAuthor").value =
     comic.author ||
     "";
 
 
-  qs(
-    "#comicGenre"
-  )
-  .value =
+  qs("#comicGenre").value =
     comic.genre ||
     "";
 
 
-  qs(
-    "#comicStatus"
-  )
-  .value =
+  qs("#comicStatus").value =
     comic.status ||
     "En emisión";
 
 
-  qs(
-    "#comicDescription"
-  )
-  .value =
+  qs("#comicDescription").value =
     comic.description ||
     "";
 
 
-  qs(
-    "#comicPublished"
-  )
-  .checked =
+  qs("#comicPublished").checked =
     Boolean(
       comic.is_published
     );
 
 
-  qs(
-    "#comicCover"
-  )
-  .value =
+  qs("#comicCover").value =
     "";
 
 
-  qs(
-    "#comicFormTitle"
-  )
-  .textContent =
+  qs("#comicFormTitle").textContent =
     "Editar cómic";
 
 
-  qs(
-    "#comicMsg"
-  )
-  .textContent =
+  qs("#comicMsg").textContent =
     "";
 
 
@@ -7081,9 +7508,9 @@ function editComic(
 }
 
 
-/* =========================
+/* ========================================
    SAVE COMIC
-========================= */
+======================================== */
 
 qs(
   "#comicForm"
@@ -7303,9 +7730,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    DELETE COMIC
-========================= */
+======================================== */
 
 async function deleteComic(
   id
@@ -7368,9 +7795,9 @@ async function deleteComic(
 }
 
 
-/* =========================
+/* ========================================
    MANAGE PARTS
-========================= */
+======================================== */
 
 async function manageParts(
   id,
@@ -7383,9 +7810,9 @@ async function manageParts(
 
   const comic =
     comics.find(
-      c =>
+      item =>
         Number(
-          c.id
+          item.id
         ) === id
     );
 
@@ -7435,9 +7862,9 @@ async function manageParts(
 }
 
 
-/* =========================
+/* ========================================
    LOAD PARTS
-========================= */
+======================================== */
 
 async function loadParts(){
 
@@ -7460,7 +7887,7 @@ async function loadParts(){
     ?
     currentAdminChapters
       .map(
-        ch => `
+        chapter => `
 
           <div class="chapter-row">
 
@@ -7469,14 +7896,14 @@ async function loadParts(){
               <strong>
 
                 Parte
-                ${ch.chapter_number}
+                ${chapter.chapter_number}
 
                 ${
-                  ch.title
+                  chapter.title
                   ?
                   " · " +
                   esc(
-                    ch.title
+                    chapter.title
                   )
                   :
                   ""
@@ -7484,10 +7911,11 @@ async function loadParts(){
 
               </strong>
 
+
               <small>
 
                 ${Number(
-                  ch.page_count ||
+                  chapter.page_count ||
                   0
                 )}
                 páginas
@@ -7495,7 +7923,7 @@ async function loadParts(){
                 ·
 
                 ${
-                  ch.is_published
+                  chapter.is_published
                   ?
                   "Publicada"
                   :
@@ -7511,7 +7939,7 @@ async function loadParts(){
                   type="file"
                   multiple
                   accept="image/*"
-                  data-files="${ch.id}"
+                  data-files="${chapter.id}"
                 >
 
                 <div
@@ -7522,7 +7950,7 @@ async function loadParts(){
 
                   <button
                     class="btn secondary small"
-                    data-upload="${ch.id}"
+                    data-upload="${chapter.id}"
                   >
                     Subir páginas
                   </button>
@@ -7537,19 +7965,19 @@ async function loadParts(){
             <div class="row-actions">
 
               <button
-                data-edit-chapter="${ch.id}"
+                data-edit-chapter="${chapter.id}"
               >
                 Editar
               </button>
 
               <button
-                data-manage-pages="${ch.id}"
+                data-manage-pages="${chapter.id}"
               >
                 Páginas
               </button>
 
               <button
-                data-delchapter="${ch.id}"
+                data-delchapter="${chapter.id}"
               >
                 Eliminar
               </button>
@@ -7575,13 +8003,13 @@ async function loadParts(){
     "[data-upload]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           uploadPages(
             Number(
-              btn.dataset.upload
+              button.dataset.upload
             )
           );
 
@@ -7593,13 +8021,13 @@ async function loadParts(){
     "[data-edit-chapter]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           openEditChapter(
             Number(
-              btn.dataset.editChapter
+              button.dataset.editChapter
             )
           );
 
@@ -7611,13 +8039,13 @@ async function loadParts(){
     "[data-manage-pages]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           openPagesManager(
             Number(
-              btn.dataset.managePages
+              button.dataset.managePages
             )
           );
 
@@ -7629,13 +8057,13 @@ async function loadParts(){
     "[data-delchapter]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           deleteChapter(
             Number(
-              btn.dataset.delchapter
+              button.dataset.delchapter
             )
           );
 
@@ -7645,9 +8073,9 @@ async function loadParts(){
 }
 
 
-/* =========================
-   ADD PART
-========================= */
+/* ========================================
+   ADD CHAPTER
+======================================== */
 
 qs(
   "#addChapterBtn"
@@ -7744,26 +8172,25 @@ qs(
 );
 
 
-/* =========================
-   EDIT PART
-========================= */
+/* ========================================
+   EDIT CHAPTER
+======================================== */
 
 function openEditChapter(
   id
 ){
 
-  const ch =
-    currentAdminChapters
-      .find(
-        item =>
-          Number(
-            item.id
-          ) === id
-      );
+  const chapter =
+    currentAdminChapters.find(
+      item =>
+        Number(
+          item.id
+        ) === id
+    );
 
 
   if(
-    !ch
+    !chapter
   ){
 
     return;
@@ -7771,41 +8198,26 @@ function openEditChapter(
   }
 
 
-  qs(
-    "#editChapterId"
-  )
-  .value =
-    ch.id;
+  qs("#editChapterId").value =
+    chapter.id;
 
 
-  qs(
-    "#editChapterNumber"
-  )
-  .value =
-    ch.chapter_number;
+  qs("#editChapterNumber").value =
+    chapter.chapter_number;
 
 
-  qs(
-    "#editChapterTitle"
-  )
-  .value =
-    ch.title ||
+  qs("#editChapterTitle").value =
+    chapter.title ||
     "";
 
 
-  qs(
-    "#editChapterPublished"
-  )
-  .checked =
+  qs("#editChapterPublished").checked =
     Boolean(
-      ch.is_published
+      chapter.is_published
     );
 
 
-  qs(
-    "#editChapterMsg"
-  )
-  .textContent =
+  qs("#editChapterMsg").textContent =
     "";
 
 
@@ -7925,9 +8337,9 @@ qs(
 );
 
 
-/* =========================
+/* ========================================
    UPLOAD PAGES
-========================= */
+======================================== */
 
 async function uploadPages(
   chapterId
@@ -8053,9 +8465,9 @@ async function uploadPages(
 }
 
 
-/* =========================
-   DELETE PART
-========================= */
+/* ========================================
+   DELETE CHAPTER
+======================================== */
 
 async function deleteChapter(
   id
@@ -8118,9 +8530,9 @@ async function deleteChapter(
 }
 
 
-/* =========================
+/* ========================================
    PAGE MANAGER
-========================= */
+======================================== */
 
 async function openPagesManager(
   id
@@ -8130,23 +8542,22 @@ async function openPagesManager(
     id;
 
 
-  const ch =
-    currentAdminChapters
-      .find(
-        item =>
-          Number(
-            item.id
-          ) === id
-      );
+  const chapter =
+    currentAdminChapters.find(
+      item =>
+        Number(
+          item.id
+        ) === id
+    );
 
 
   qs(
     "#pagesTitle"
   )
   .textContent =
-    ch
+    chapter
     ?
-    `Páginas · Parte ${ch.chapter_number}`
+    `Páginas · Parte ${chapter.chapter_number}`
     :
     "Gestionar páginas";
 
@@ -8211,7 +8622,7 @@ function renderManagedPages(){
 
               <strong
                 style="
-                  font-size:11px
+                  font-size:10px
                 "
               >
                 Página
@@ -8279,14 +8690,14 @@ function renderManagedPages(){
     "[data-left]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           movePage(
 
             Number(
-              btn.dataset.left
+              button.dataset.left
             ),
 
             -1
@@ -8301,14 +8712,14 @@ function renderManagedPages(){
     "[data-right]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           movePage(
 
             Number(
-              btn.dataset.right
+              button.dataset.right
             ),
 
             1
@@ -8323,13 +8734,13 @@ function renderManagedPages(){
     "[data-delpage]"
   )
   .forEach(
-    btn => {
+    button => {
 
-      btn.onclick =
+      button.onclick =
         () =>
           deletePage(
             Number(
-              btn.dataset.delpage
+              button.dataset.delpage
             )
           );
 
@@ -8339,9 +8750,9 @@ function renderManagedPages(){
 }
 
 
-/* =========================
+/* ========================================
    MOVE PAGE
-========================= */
+======================================== */
 
 async function movePage(
   id,
@@ -8349,13 +8760,12 @@ async function movePage(
 ){
 
   const index =
-    managedPages
-      .findIndex(
-        p =>
-          Number(
-            p.id
-          ) === id
-      );
+    managedPages.findIndex(
+      page =>
+        Number(
+          page.id
+        ) === id
+    );
 
 
   const newIndex =
@@ -8417,13 +8827,12 @@ async function movePage(
           JSON.stringify({
 
             page_ids:
-              managedPages
-                .map(
-                  p =>
-                    Number(
-                      p.id
-                    )
-                )
+              managedPages.map(
+                page =>
+                  Number(
+                    page.id
+                  )
+              )
 
           })
 
@@ -8451,9 +8860,9 @@ async function movePage(
 }
 
 
-/* =========================
+/* ========================================
    DELETE PAGE
-========================= */
+======================================== */
 
 async function deletePage(
   id
@@ -8518,9 +8927,9 @@ async function deletePage(
 }
 
 
-/* =========================
+/* ========================================
    START
-========================= */
+======================================== */
 
 async function startNightInk(){
 
@@ -8604,7 +9013,6 @@ async function startNightInk(){
 startNightInk();
 
 </script>
-
 
 </body>
 </html>

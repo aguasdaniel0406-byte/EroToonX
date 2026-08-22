@@ -16,7 +16,6 @@
 
 :root{
   --bg:#0d0f18;
-  --bg-soft:#121522;
   --surface:#181c2a;
   --surface-2:#202536;
   --surface-3:#272d42;
@@ -29,7 +28,6 @@
 
   --pink:#e74ca9;
   --purple:#7657ed;
-  --violet:#4d3cb8;
   --orange:#f2a53b;
 
   --good:#45c98e;
@@ -37,8 +35,8 @@
   --danger:#ef6a80;
 
   --shadow:
-    0 14px 36px
-    rgba(0,0,0,.22);
+    0 15px 38px
+    rgba(0,0,0,.28);
 }
 
 *{
@@ -95,7 +93,7 @@ img{
 
 .wrap{
   width:min(
-    1380px,
+    1420px,
     calc(100% - 26px)
   );
 
@@ -107,9 +105,9 @@ img{
 }
 
 
-/* ========================================
+/* =========================
    AGE GATE
-======================================== */
+========================= */
 
 .age-gate{
   display:none;
@@ -190,12 +188,7 @@ img{
     );
 
   font-weight:900;
-
   font-size:22px;
-
-  box-shadow:
-    0 12px 38px
-    rgba(231,76,169,.22);
 }
 
 .age-card h1{
@@ -208,8 +201,7 @@ img{
 .age-card p{
   margin:0;
 
-  color:
-    var(--muted);
+  color:var(--muted);
 
   line-height:1.65;
 }
@@ -226,13 +218,11 @@ img{
 
   border-radius:8px;
 
-  background:
-    #202436;
+  background:#202436;
 
   color:#d9ddea;
 
   font-size:12px;
-
   line-height:1.6;
 }
 
@@ -268,8 +258,7 @@ img{
     1px solid
     #3d445e;
 
-  background:
-    #24293a;
+  background:#24293a;
 
   color:#e8eaf2;
 }
@@ -283,9 +272,9 @@ img{
 }
 
 
-/* ========================================
-   TOP HEADER
-======================================== */
+/* =========================
+   HEADER
+========================= */
 
 .site-header{
   background:#0b0d15;
@@ -301,8 +290,8 @@ img{
   display:grid;
 
   grid-template-columns:
-    250px
-    minmax(320px,620px)
+    240px
+    minmax(320px,640px)
     1fr;
 
   align-items:center;
@@ -345,14 +334,6 @@ img{
   color:#fff;
 
   font-size:13px;
-
-  box-shadow:
-    0 8px 28px
-    rgba(231,76,169,.2);
-}
-
-.brand-name{
-  position:relative;
 }
 
 .brand-name small{
@@ -397,8 +378,7 @@ img{
 }
 
 .search-input:focus{
-  border-color:
-    #6659c7;
+  border-color:#6659c7;
 
   box-shadow:
     0 0 0 3px
@@ -415,8 +395,7 @@ img{
     1px solid
     #3a415b;
 
-  background:
-    #252a3d;
+  background:#252a3d;
 
   color:#fff;
 
@@ -443,11 +422,9 @@ img{
 
   border-radius:7px;
 
-  background:
-    #181c29;
+  background:#181c29;
 
-  color:
-    #bfc4d3;
+  color:#bfc4d3;
 
   font-size:10px;
 
@@ -477,9 +454,9 @@ img{
 }
 
 
-/* ========================================
-   NAVIGATION
-======================================== */
+/* =========================
+   NAV
+========================= */
 
 .navbar{
   position:sticky;
@@ -503,8 +480,6 @@ img{
   display:flex;
 
   align-items:center;
-
-  gap:0;
 
   overflow-x:auto;
 
@@ -532,13 +507,11 @@ img{
 }
 
 .nav-link:hover{
-  background:
-    #202536;
+  background:#202536;
 }
 
 .nav-link.active{
-  background:
-    #202536;
+  background:#202536;
 
   color:#fff;
 }
@@ -554,9 +527,6 @@ img{
 
   height:3px;
 
-  border-radius:
-    4px 4px 0 0;
-
   background:
     linear-gradient(
       90deg,
@@ -566,9 +536,9 @@ img{
 }
 
 
-/* ========================================
-   INTRO STRIP
-======================================== */
+/* =========================
+   INTRO
+========================= */
 
 .intro-strip{
   margin:
@@ -615,8 +585,7 @@ img{
 .intro-strip p{
   margin:0;
 
-  color:
-    var(--muted);
+  color:var(--muted);
 
   font-size:12px;
 
@@ -641,8 +610,7 @@ img{
 
   border-radius:7px;
 
-  background:
-    #202436;
+  background:#202436;
 
   text-align:center;
 
@@ -662,9 +630,829 @@ img{
 }
 
 
-/* ========================================
+/* =========================
+   PORTAL
+========================= */
+
+.portal-layout{
+  display:grid;
+
+  grid-template-columns:
+    180px
+    minmax(0,1fr)
+    220px;
+
+  gap:15px;
+
+  padding-bottom:42px;
+}
+
+.left-rail,
+.right-rail,
+.portal-main{
+  min-width:0;
+}
+
+
+/* =========================
+   SIDE PANELS
+========================= */
+
+.side-panel{
+  margin-bottom:14px;
+
+  overflow:hidden;
+
+  border:
+    1px solid
+    #30374e;
+
+  border-radius:7px;
+
+  background:#171b28;
+}
+
+.side-heading{
+  padding:
+    11px 12px;
+
+  border-bottom:
+    1px solid
+    #343b54;
+
+  background:
+    linear-gradient(
+      90deg,
+      #24293b,
+      #1e2232
+    );
+
+  font-size:13px;
+
+  font-weight:900;
+}
+
+.side-content{
+  padding:10px;
+}
+
+.category-list{
+  display:grid;
+
+  gap:4px;
+}
+
+.category-btn{
+  width:100%;
+
+  padding:
+    9px 9px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:5px;
+
+  background:transparent;
+
+  color:#d9dce6;
+
+  text-align:left;
+
+  font-size:11px;
+
+  transition:.15s;
+}
+
+.category-btn:hover{
+  background:#22273a;
+
+  border-color:#343b54;
+}
+
+.category-btn.active{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(231,76,169,.16),
+      rgba(118,87,237,.12)
+    );
+
+  border-color:#514b8e;
+
+  color:#fff;
+
+  font-weight:800;
+}
+
+.tags{
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+}
+
+.tag{
+  padding:
+    6px 8px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:4px;
+
+  background:#22273a;
+
+  color:#dfe2eb;
+
+  font-size:10px;
+
+  cursor:pointer;
+}
+
+.tag:hover{
+  border-color:#6259a5;
+
+  background:#2c2948;
+}
+
+.quick-links{
+  display:grid;
+
+  gap:5px;
+}
+
+.quick-link{
+  padding:9px;
+
+  border-radius:5px;
+
+  background:#202536;
+
+  border:
+    1px solid
+    #323950;
+
+  color:#dfe2ec;
+
+  font-size:11px;
+}
+
+.quick-link:hover{
+  background:#282d41;
+}
+
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section{
+  margin-bottom:25px;
+}
+
+.section-heading{
+  position:relative;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+  padding:
+    0 0 9px;
+
+  border-bottom:
+    1px solid
+    #353c56;
+}
+
+.section-heading:before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  bottom:-1px;
+
+  width:100px;
+  height:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.section-heading h2{
+  margin:0;
+
+  font-size:22px;
+}
+
+.section-heading small{
+  color:var(--muted);
+
+  font-size:10px;
+}
+
+.section-tools{
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+}
+
+.tab{
+  padding:
+    7px 10px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:5px;
+
+  background:#22273a;
+
+  color:#dfe2ec;
+
+  font-size:10px;
+
+  font-weight:800;
+}
+
+.tab:hover{
+  background:#292e43;
+}
+
+.tab.active{
+  border-color:transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+
+  color:#fff;
+}
+
+
+/* =========================
+   COMIC GRID
+========================= */
+
+.comic-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
+
+  gap:11px;
+}
+
+.comic-card{
+  min-width:0;
+
+  overflow:hidden;
+
+  border:
+    1px solid
+    #343b52;
+
+  border-radius:6px;
+
+  background:#1b1f2d;
+
+  cursor:pointer;
+
+  transition:
+    transform .18s,
+    border-color .18s,
+    box-shadow .18s;
+}
+
+.comic-card:hover{
+  transform:
+    translateY(-4px);
+
+  border-color:#6a61a5;
+
+  box-shadow:var(--shadow);
+}
+
+.cover{
+  position:relative;
+
+  aspect-ratio:3/4;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #513f86,
+      #26203e 55%,
+      #11131c
+    );
+
+  background-size:cover;
+
+  background-position:center;
+}
+
+.cover:after{
+  content:"";
+
+  position:absolute;
+
+  inset:
+    70% 0 0;
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(5,6,10,.58)
+    );
+
+  pointer-events:none;
+}
+
+.cover-placeholder{
+  position:absolute;
+
+  inset:0;
+
+  display:grid;
+
+  place-items:center;
+
+  padding:14px;
+
+  text-align:center;
+
+  color:#e2e4ed;
+
+  font-size:15px;
+
+  font-weight:900;
+}
+
+.card-badge{
+  position:absolute;
+
+  right:6px;
+  bottom:6px;
+
+  z-index:2;
+
+  padding:
+    4px 7px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.14);
+
+  border-radius:4px;
+
+  background:
+    rgba(10,12,19,.9);
+
+  color:#fff;
+
+  font-size:9px;
+
+  font-weight:900;
+}
+
+.card-body{
+  padding:
+    9px 10px 10px;
+}
+
+.card-title{
+  margin:0;
+
+  min-height:36px;
+
+  overflow:hidden;
+
+  display:-webkit-box;
+
+  -webkit-line-clamp:2;
+
+  -webkit-box-orient:vertical;
+
+  font-size:13px;
+
+  font-weight:800;
+
+  line-height:1.38;
+}
+
+.card-meta{
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:6px;
+
+  margin-top:7px;
+
+  color:var(--muted);
+
+  font-size:9.5px;
+}
+
+.card-meta span{
+  min-width:0;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+.empty{
+  grid-column:
+    1/-1;
+
+  padding:28px;
+
+  border:
+    1px dashed
+    #3b425a;
+
+  border-radius:6px;
+
+  color:var(--muted);
+
+  text-align:center;
+}
+
+
+/* =========================
+   POPULAR
+========================= */
+
+.popular-list{
+  display:grid;
+
+  gap:7px;
+}
+
+.popular-item{
+  display:grid;
+
+  grid-template-columns:
+    26px
+    42px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:7px;
+
+  padding:7px;
+
+  border:
+    1px solid
+    #30374d;
+
+  border-radius:6px;
+
+  background:#1e2333;
+
+  cursor:pointer;
+
+  transition:.15s;
+}
+
+.popular-item:hover{
+  border-color:#595f87;
+
+  background:#24293b;
+
+  transform:
+    translateX(2px);
+}
+
+.popular-rank{
+  width:26px;
+  height:30px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:5px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #30364d,
+      #282d40
+    );
+
+  font-size:10px;
+
+  font-weight:900;
+}
+
+.popular-item:first-child
+.popular-rank{
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.popular-thumb{
+  width:42px;
+  height:56px;
+
+  border-radius:4px;
+
+  border:
+    1px solid
+    #3b425c;
+
+  background:
+    linear-gradient(
+      145deg,
+      #493875,
+      #171924
+    );
+
+  background-size:cover;
+
+  background-position:center;
+}
+
+.popular-copy{
+  min-width:0;
+}
+
+.popular-copy strong{
+  display:block;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+  font-size:10.5px;
+
+  line-height:1.3;
+}
+
+.popular-copy small{
+  display:block;
+
+  margin-top:4px;
+
+  color:var(--muted);
+
+  font-size:8.5px;
+}
+
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination{
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+  margin-top:18px;
+}
+
+.page-btn{
+  min-width:36px;
+  height:36px;
+
+  padding:
+    0 10px;
+
+  border:
+    1px solid
+    #3a415a;
+
+  border-radius:6px;
+
+  background:#22273a;
+
+  color:#fff;
+
+  font-size:11px;
+
+  font-weight:800;
+}
+
+.page-btn:hover{
+  background:#2a3045;
+}
+
+.page-btn.active{
+  border-color:transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.page-btn:disabled{
+  opacity:.35;
+
+  cursor:not-allowed;
+}
+
+
+/* =========================
+   UPDATES
+========================= */
+
+.updates-list{
+  display:grid;
+
+  gap:7px;
+}
+
+.update-item{
+  display:grid;
+
+  grid-template-columns:
+    52px
+    minmax(0,1fr)
+    auto;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:8px;
+
+  border:
+    1px solid
+    #343b51;
+
+  border-radius:6px;
+
+  background:#1c2030;
+
+  cursor:pointer;
+}
+
+.update-item:hover{
+  border-color:#595f86;
+}
+
+.update-cover{
+  width:52px;
+  height:68px;
+
+  border:
+    1px solid
+    #393f59;
+
+  border-radius:4px;
+
+  background:
+    #0f1119
+    center/cover
+    no-repeat;
+}
+
+.update-main{
+  min-width:0;
+}
+
+.update-title{
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+  font-size:12px;
+
+  font-weight:900;
+}
+
+.update-meta{
+  margin-top:4px;
+
+  color:var(--muted);
+
+  font-size:9px;
+}
+
+.update-part{
+  padding:
+    6px 8px;
+
+  border:
+    1px solid
+    #3a415b;
+
+  border-radius:5px;
+
+  background:#252a3e;
+
+  font-size:9px;
+
+  font-weight:900;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+  padding:
+    9px 12px;
+
+  border:0;
+
+  border-radius:6px;
+
+  font-weight:800;
+}
+
+.btn.primary{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+}
+
+.btn.secondary{
+  color:#fff;
+
+  background:#252a3c;
+
+  border:
+    1px solid
+    #3a4159;
+}
+
+.btn.danger{
+  color:#ffb2c0;
+
+  background:#482431;
+
+  border:
+    1px solid
+    #74364a;
+}
+
+.btn.small{
+  padding:
+    6px 8px;
+
+  font-size:10px;
+}
+
+
+/* =========================
    ADMIN
-======================================== */
+========================= */
 
 .admin-shell{
   display:none;
@@ -680,8 +1468,7 @@ img{
 
   border-radius:8px;
 
-  background:
-    #151925;
+  background:#151925;
 }
 
 .admin-shell.visible{
@@ -693,8 +1480,7 @@ img{
 
   align-items:center;
 
-  justify-content:
-    space-between;
+  justify-content:space-between;
 
   gap:12px;
 
@@ -735,8 +1521,7 @@ img{
 
   border-radius:7px;
 
-  background:
-    #1e2333;
+  background:#1e2333;
 }
 
 .stat strong{
@@ -746,14 +1531,14 @@ img{
 }
 
 .stat small{
-  color:
-    var(--muted);
+  color:var(--muted);
 
   font-size:10px;
 }
 
 .admin-list{
   display:grid;
+
   gap:8px;
 }
 
@@ -777,8 +1562,7 @@ img{
 
   border-radius:7px;
 
-  background:
-    #1c2131;
+  background:#1c2131;
 }
 
 .admin-cover{
@@ -804,8 +1588,7 @@ img{
 .admin-meta{
   margin-top:4px;
 
-  color:
-    var(--muted);
+  color:var(--muted);
 
   font-size:10px;
 }
@@ -864,8 +1647,7 @@ img{
     1px solid
     #444b65;
 
-  background:
-    #282d3d;
+  background:#282d3d;
 }
 
 .ready-badge.loading{
@@ -875,8 +1657,7 @@ img{
     1px solid
     #3c435e;
 
-  background:
-    #252a3b;
+  background:#252a3b;
 }
 
 .row-actions{
@@ -899,8 +1680,7 @@ img{
 
   border-radius:5px;
 
-  background:
-    #282d40;
+  background:#282d40;
 
   color:#fff;
 
@@ -908,817 +1688,9 @@ img{
 }
 
 
-/* ========================================
-   THREE COLUMN PORTAL
-======================================== */
-
-.portal-layout{
-  display:grid;
-
-  grid-template-columns:
-    205px
-    minmax(0,1fr)
-    235px;
-
-  gap:16px;
-
-  padding-bottom:42px;
-}
-
-.left-rail,
-.right-rail{
-  min-width:0;
-}
-
-.portal-main{
-  min-width:0;
-}
-
-
-/* ========================================
-   SIDE PANELS
-======================================== */
-
-.side-panel{
-  margin-bottom:14px;
-
-  overflow:hidden;
-
-  border:
-    1px solid
-    #30374e;
-
-  border-radius:7px;
-
-  background:
-    #171b28;
-}
-
-.side-heading{
-  padding:
-    11px 12px;
-
-  border-bottom:
-    1px solid
-    #343b54;
-
-  background:
-    linear-gradient(
-      90deg,
-      #24293b,
-      #1e2232
-    );
-
-  font-size:13px;
-
-  font-weight:900;
-}
-
-.side-content{
-  padding:10px;
-}
-
-.category-list{
-  display:grid;
-
-  gap:5px;
-}
-
-.category-btn{
-  width:100%;
-
-  padding:
-    9px 10px;
-
-  border:
-    1px solid
-    transparent;
-
-  border-radius:5px;
-
-  background:
-    transparent;
-
-  color:#d9dce6;
-
-  text-align:left;
-
-  font-size:11px;
-
-  transition:.15s;
-}
-
-.category-btn:hover{
-  background:
-    #22273a;
-
-  border-color:
-    #343b54;
-}
-
-.category-btn.active{
-  background:
-    linear-gradient(
-      90deg,
-      rgba(231,76,169,.16),
-      rgba(118,87,237,.12)
-    );
-
-  border-color:
-    #514b8e;
-
-  color:#fff;
-
-  font-weight:800;
-}
-
-.tags{
-  display:flex;
-
-  gap:6px;
-
-  flex-wrap:wrap;
-}
-
-.tag{
-  padding:
-    6px 8px;
-
-  border:
-    1px solid
-    #3a415a;
-
-  border-radius:4px;
-
-  background:
-    #22273a;
-
-  color:#dfe2eb;
-
-  font-size:10px;
-
-  cursor:pointer;
-}
-
-.tag:hover{
-  border-color:
-    #6259a5;
-
-  background:
-    #2c2948;
-}
-
-.quick-links{
-  display:grid;
-  gap:5px;
-}
-
-.quick-link{
-  padding:
-    9px;
-
-  border-radius:5px;
-
-  background:
-    #202536;
-
-  border:
-    1px solid
-    #323950;
-
-  color:#dfe2ec;
-
-  font-size:11px;
-}
-
-.quick-link:hover{
-  background:
-    #282d41;
-}
-
-
-/* ========================================
-   SECTION HEADINGS
-======================================== */
-
-.section{
-  margin-bottom:25px;
-}
-
-.section-heading{
-  position:relative;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:
-    space-between;
-
-  gap:10px;
-
-  margin-bottom:12px;
-
-  padding:
-    0 0 9px;
-
-  border-bottom:
-    1px solid
-    #353c56;
-}
-
-.section-heading:before{
-  content:"";
-
-  position:absolute;
-
-  left:0;
-  bottom:-1px;
-
-  width:100px;
-  height:3px;
-
-  border-radius:3px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--pink),
-      var(--purple)
-    );
-}
-
-.section-heading h2{
-  margin:0;
-
-  font-size:21px;
-}
-
-.section-heading small{
-  color:
-    var(--muted);
-
-  font-size:10px;
-}
-
-.section-tools{
-  display:flex;
-
-  gap:6px;
-
-  flex-wrap:wrap;
-}
-
-.tab{
-  padding:
-    7px 10px;
-
-  border:
-    1px solid
-    #3a415a;
-
-  border-radius:5px;
-
-  background:
-    #22273a;
-
-  color:#dfe2ec;
-
-  font-size:10px;
-
-  font-weight:800;
-}
-
-.tab:hover{
-  background:
-    #292e43;
-}
-
-.tab.active{
-  border-color:
-    transparent;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--pink),
-      var(--purple)
-    );
-
-  color:#fff;
-}
-
-
-/* ========================================
-   COMIC GRID
-======================================== */
-
-.comic-grid{
-  display:grid;
-
-  grid-template-columns:
-    repeat(
-      5,
-      minmax(0,1fr)
-    );
-
-  gap:11px;
-}
-
-.comic-card{
-  min-width:0;
-
-  overflow:hidden;
-
-  border:
-    1px solid
-    #343b52;
-
-  border-radius:5px;
-
-  background:
-    #1b1f2d;
-
-  cursor:pointer;
-
-  transition:
-    transform .17s,
-    border-color .17s,
-    box-shadow .17s;
-}
-
-.comic-card:hover{
-  transform:
-    translateY(-3px);
-
-  border-color:
-    #665e9e;
-
-  box-shadow:
-    var(--shadow);
-}
-
-.cover{
-  position:relative;
-
-  aspect-ratio:3/4;
-
-  overflow:hidden;
-
-  background:
-    linear-gradient(
-      145deg,
-      #513f86,
-      #26203e 55%,
-      #11131c
-    );
-
-  background-size:cover;
-  background-position:center;
-}
-
-.cover:after{
-  content:"";
-
-  position:absolute;
-
-  inset:
-    48% 0 0;
-
-  background:
-    linear-gradient(
-      transparent,
-      rgba(5,6,10,.82)
-    );
-}
-
-.cover-placeholder{
-  position:absolute;
-
-  inset:0;
-
-  display:grid;
-
-  place-items:center;
-
-  padding:14px;
-
-  text-align:center;
-
-  color:#e2e4ed;
-
-  font-size:14px;
-
-  font-weight:900;
-}
-
-.card-badge{
-  position:absolute;
-
-  right:6px;
-  bottom:6px;
-
-  z-index:2;
-
-  padding:
-    4px 7px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
-  border-radius:4px;
-
-  background:
-    rgba(13,15,24,.9);
-
-  color:#fff;
-
-  font-size:9px;
-
-  font-weight:900;
-}
-
-.card-body{
-  padding:
-    8px 9px 9px;
-}
-
-.card-title{
-  margin:0;
-
-  min-height:34px;
-
-  overflow:hidden;
-
-  display:-webkit-box;
-
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-
-  font-size:12px;
-
-  line-height:1.35;
-}
-
-.card-meta{
-  display:flex;
-
-  justify-content:
-    space-between;
-
-  gap:5px;
-
-  margin-top:6px;
-
-  color:
-    var(--muted);
-
-  font-size:9px;
-}
-
-.card-meta span{
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-.empty{
-  grid-column:
-    1/-1;
-
-  padding:28px;
-
-  border:
-    1px dashed
-    #3b425a;
-
-  border-radius:6px;
-
-  color:
-    var(--muted);
-
-  text-align:center;
-}
-
-
-/* ========================================
-   PAGINATION
-======================================== */
-
-.pagination{
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  gap:6px;
-
-  flex-wrap:wrap;
-
-  margin-top:18px;
-}
-
-.page-btn{
-  min-width:36px;
-  height:36px;
-
-  padding:
-    0 10px;
-
-  border:
-    1px solid
-    #3a415a;
-
-  border-radius:6px;
-
-  background:
-    #22273a;
-
-  color:#fff;
-
-  font-size:11px;
-
-  font-weight:800;
-}
-
-.page-btn:hover{
-  background:
-    #2a3045;
-}
-
-.page-btn.active{
-  border-color:
-    transparent;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--pink),
-      var(--purple)
-    );
-}
-
-.page-btn:disabled{
-  opacity:.35;
-
-  cursor:not-allowed;
-}
-
-
-/* ========================================
-   POPULAR LIST
-======================================== */
-
-.popular-list{
-  display:grid;
-
-  gap:6px;
-}
-
-.popular-item{
-  display:grid;
-
-  grid-template-columns:
-    28px
-    minmax(0,1fr);
-
-  align-items:center;
-
-  gap:7px;
-
-  padding:
-    7px;
-
-  border:
-    1px solid
-    #30374d;
-
-  border-radius:5px;
-
-  background:
-    #1e2333;
-
-  cursor:pointer;
-}
-
-.popular-item:hover{
-  border-color:
-    #545b82;
-
-  background:
-    #23283a;
-}
-
-.popular-rank{
-  width:28px;
-  height:28px;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:4px;
-
-  background:
-    #2a3044;
-
-  font-size:10px;
-
-  font-weight:900;
-}
-
-.popular-copy{
-  min-width:0;
-}
-
-.popular-copy strong{
-  display:block;
-
-  overflow:hidden;
-
-  white-space:nowrap;
-
-  text-overflow:ellipsis;
-
-  font-size:10px;
-}
-
-.popular-copy small{
-  display:block;
-
-  margin-top:3px;
-
-  color:
-    var(--muted);
-
-  font-size:8px;
-}
-
-
-/* ========================================
-   UPDATES
-======================================== */
-
-.updates-list{
-  display:grid;
-
-  gap:7px;
-}
-
-.update-item{
-  display:grid;
-
-  grid-template-columns:
-    52px
-    minmax(0,1fr)
-    auto;
-
-  align-items:center;
-
-  gap:10px;
-
-  padding:8px;
-
-  border:
-    1px solid
-    #343b51;
-
-  border-radius:6px;
-
-  background:
-    #1c2030;
-
-  cursor:pointer;
-}
-
-.update-item:hover{
-  border-color:
-    #595f86;
-}
-
-.update-cover{
-  width:52px;
-  height:68px;
-
-  border:
-    1px solid
-    #393f59;
-
-  border-radius:4px;
-
-  background:
-    #0f1119
-    center/cover
-    no-repeat;
-}
-
-.update-main{
-  min-width:0;
-}
-
-.update-title{
-  overflow:hidden;
-
-  white-space:nowrap;
-
-  text-overflow:ellipsis;
-
-  font-size:11px;
-
-  font-weight:900;
-}
-
-.update-meta{
-  margin-top:4px;
-
-  color:
-    var(--muted);
-
-  font-size:9px;
-}
-
-.update-part{
-  padding:
-    6px 8px;
-
-  border:
-    1px solid
-    #3a415b;
-
-  border-radius:5px;
-
-  background:
-    #252a3e;
-
-  font-size:9px;
-
-  font-weight:900;
-}
-
-
-/* ========================================
-   BUTTONS
-======================================== */
-
-.btn{
-  padding:
-    9px 12px;
-
-  border:0;
-
-  border-radius:6px;
-
-  font-weight:800;
-}
-
-.btn.primary{
-  color:#fff;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--pink),
-      var(--purple)
-    );
-}
-
-.btn.secondary{
-  color:#fff;
-
-  background:
-    #252a3c;
-
-  border:
-    1px solid
-    #3a4159;
-}
-
-.btn.danger{
-  color:#ffb2c0;
-
-  background:
-    #482431;
-
-  border:
-    1px solid
-    #74364a;
-}
-
-.btn.small{
-  padding:
-    6px 8px;
-
-  font-size:10px;
-}
-
-
-/* ========================================
+/* =========================
    MODALS
-======================================== */
+========================= */
 
 .modal{
   display:none;
@@ -1763,8 +1735,7 @@ img{
 
   border-radius:9px;
 
-  background:
-    #171b28;
+  background:#171b28;
 }
 
 .panel.wide{
@@ -1784,8 +1755,7 @@ img{
 
   align-items:center;
 
-  justify-content:
-    space-between;
+  justify-content:space-between;
 
   gap:10px;
 
@@ -1831,8 +1801,7 @@ img{
 
   border-radius:6px;
 
-  background:
-    #10131d;
+  background:#10131d;
 
   color:#fff;
 
@@ -1886,9 +1855,9 @@ img{
 }
 
 
-/* ========================================
+/* =========================
    CHAPTERS
-======================================== */
+========================= */
 
 .chapter-list{
   display:grid;
@@ -1915,8 +1884,7 @@ img{
 
   border-radius:6px;
 
-  background:
-    #1e2333;
+  background:#1e2333;
 }
 
 .chapter-row small{
@@ -1924,8 +1892,7 @@ img{
 
   margin-top:4px;
 
-  color:
-    var(--muted);
+  color:var(--muted);
 
   font-size:9px;
 }
@@ -1943,9 +1910,9 @@ img{
 }
 
 
-/* ========================================
-   PAGE MANAGER
-======================================== */
+/* =========================
+   PAGES
+========================= */
 
 .pages-grid{
   display:grid;
@@ -1965,8 +1932,7 @@ img{
 
   border-radius:6px;
 
-  background:
-    #1d2232;
+  background:#1d2232;
 }
 
 .page-thumb{
@@ -1974,8 +1940,7 @@ img{
 
   overflow:hidden;
 
-  background:
-    #0e1017;
+  background:#0e1017;
 }
 
 .page-thumb img{
@@ -2011,8 +1976,7 @@ img{
 
   border-radius:4px;
 
-  background:
-    #272c3f;
+  background:#272c3f;
 
   color:#fff;
 
@@ -2023,16 +1987,15 @@ img{
   grid-column:
     1/-1;
 
-  background:
-    #43222e;
+  background:#43222e;
 
   color:#ffb2bf;
 }
 
 
-/* ========================================
+/* =========================
    DETAIL
-======================================== */
+========================= */
 
 .detail{
   display:grid;
@@ -2062,12 +2025,12 @@ img{
     );
 
   background-size:cover;
+
   background-position:center;
 }
 
 .detail-meta{
-  color:
-    var(--muted);
+  color:var(--muted);
 
   line-height:1.6;
 
@@ -2101,8 +2064,7 @@ img{
 
   border-radius:6px;
 
-  background:
-    #22273a;
+  background:#22273a;
 
   color:#fff;
 
@@ -2111,18 +2073,10 @@ img{
   font-size:11px;
 }
 
-.part-btn:hover{
-  background:
-    #2b2948;
 
-  border-color:
-    #5e56a2;
-}
-
-
-/* ========================================
+/* =========================
    READER
-======================================== */
+========================= */
 
 .reader{
   display:none;
@@ -2135,8 +2089,7 @@ img{
 
   overflow-y:auto;
 
-  background:
-    #080a10;
+  background:#080a10;
 }
 
 .reader.open{
@@ -2223,8 +2176,7 @@ img{
 
   padding:40px;
 
-  color:
-    var(--muted);
+  color:var(--muted);
 
   text-align:center;
 }
@@ -2250,9 +2202,9 @@ img{
 }
 
 
-/* ========================================
+/* =========================
    FOOTER
-======================================== */
+========================= */
 
 footer{
   padding:
@@ -2268,9 +2220,9 @@ footer{
 }
 
 
-/* ========================================
+/* =========================
    RESPONSIVE
-======================================== */
+========================= */
 
 @media(
   max-width:1250px
@@ -2278,9 +2230,9 @@ footer{
 
   .portal-layout{
     grid-template-columns:
-      185px
+      175px
       minmax(0,1fr)
-      215px;
+      210px;
   }
 
   .comic-grid{
@@ -2311,7 +2263,7 @@ footer{
 
   .portal-layout{
     grid-template-columns:
-      190px
+      185px
       minmax(0,1fr);
   }
 
@@ -2362,21 +2314,24 @@ footer{
       1fr;
   }
 
-  .intro-stat{
-    justify-content:flex-start;
-  }
-
   .portal-layout{
     grid-template-columns:
       1fr;
   }
 
-  .left-rail{
-    order:2;
-  }
-
   .portal-main{
     order:1;
+  }
+
+  .left-rail{
+    order:2;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:12px;
   }
 
   .right-rail{
@@ -2386,15 +2341,6 @@ footer{
 
     grid-template-columns:
       1fr;
-  }
-
-  .left-rail{
-    display:grid;
-
-    grid-template-columns:
-      1fr 1fr;
-
-    gap:12px;
   }
 
   .left-rail .side-panel{
@@ -2429,7 +2375,7 @@ footer{
   .wrap{
     width:min(
       100% - 18px,
-      1380px
+      1420px
     );
   }
 
@@ -2484,15 +2430,22 @@ footer{
       1fr;
   }
 
+  .popular-item{
+    grid-template-columns:
+      28px
+      46px
+      minmax(0,1fr);
+  }
+
+  .popular-thumb{
+    width:46px;
+    height:62px;
+  }
+
   .update-item{
     grid-template-columns:
       48px
       minmax(0,1fr);
-  }
-
-  .update-cover{
-    width:48px;
-    height:64px;
   }
 
   .update-part{
@@ -2506,16 +2459,9 @@ footer{
       minmax(0,1fr);
   }
 
-  .admin-cover{
-    width:48px;
-    height:66px;
-  }
-
   .admin-row .row-actions{
     grid-column:
       1/-1;
-
-    justify-content:flex-start;
   }
 
   .form-grid{
@@ -2560,16 +2506,10 @@ footer{
     justify-content:center;
   }
 
-  .age-card{
-    padding:
-      26px 19px;
-  }
-
 }
 
 </style>
 </head>
-
 
 <body>
 
@@ -2577,9 +2517,6 @@ footer{
 <div
   id="ageGate"
   class="age-gate"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="ageTitle"
 >
 
   <div class="age-card">
@@ -2588,7 +2525,7 @@ footer{
       18+
     </div>
 
-    <h1 id="ageTitle">
+    <h1>
       Contenido para adultos
     </h1>
 
@@ -2629,151 +2566,130 @@ footer{
 
 <header class="site-header">
 
-  <div class="wrap header-main">
+<div class="wrap header-main">
 
-    <a
-      href="/"
-      class="brand"
-    >
+<a
+  href="/"
+  class="brand"
+>
 
-      <div class="brand-icon">
-        NI
-      </div>
+<div class="brand-icon">
+NI
+</div>
 
-      <div class="brand-name">
+<div class="brand-name">
 
-        NightInk
+NightInk
 
-        <small>
-          COMICS +18
-        </small>
+<small>
+COMICS +18
+</small>
 
-      </div>
+</div>
 
-    </a>
-
-
-    <div class="search-area">
-
-      <input
-        id="searchInput"
-        class="search-input"
-        placeholder="Buscar título, autor o cómic..."
-      >
-
-      <button
-        id="searchBtn"
-        class="search-button"
-      >
-        ⌕
-      </button>
-
-    </div>
+</a>
 
 
-    <div class="header-side">
+<div class="search-area">
 
-      <span class="header-chip">
-        Lectura directa
-      </span>
+<input
+  id="searchInput"
+  class="search-input"
+  placeholder="Buscar título, autor o cómic..."
+>
 
-      <button
-        id="openAdmin"
-        class="admin-button"
-      >
-        Admin
-      </button>
+<button
+  id="searchBtn"
+  class="search-button"
+>
+⌕
+</button>
 
-    </div>
+</div>
 
-  </div>
+
+<div class="header-side">
+
+<span class="header-chip">
+Lectura directa
+</span>
+
+<button
+  id="openAdmin"
+  class="admin-button"
+>
+Admin
+</button>
+
+</div>
+
+</div>
 
 </header>
 
 
 <nav class="navbar">
 
-  <div class="wrap navbar-inner">
+<div class="wrap navbar-inner">
 
-    <a
-      class="nav-link active"
-      href="/"
-    >
-      Inicio
-    </a>
+<a class="nav-link active" href="/">
+Inicio
+</a>
 
-    <a
-      class="nav-link"
-      href="#ultimos"
-    >
-      Últimos
-    </a>
+<a class="nav-link" href="#ultimos">
+Últimos
+</a>
 
-    <a
-      class="nav-link"
-      href="#actualizaciones"
-    >
-      Actualizaciones
-    </a>
+<a class="nav-link" href="#actualizaciones">
+Actualizaciones
+</a>
 
-    <a
-      class="nav-link"
-      href="#azar"
-    >
-      Al azar
-    </a>
+<a class="nav-link" href="#azar">
+Al azar
+</a>
 
-    <a
-      class="nav-link"
-      href="#categorias"
-    >
-      Categorías
-    </a>
+<a class="nav-link" href="#categorias">
+Categorías
+</a>
 
-  </div>
+</div>
 
 </nav>
 
 
 <div class="wrap intro-strip">
 
-  <div>
+<div>
 
-    <h1>
-      NightInk Comics
-    </h1>
+<h1>
+NightInk Comics
+</h1>
 
-    <p>
-      Catálogo de lectura rápida. Elige una obra y entra directamente al lector cuando tenga páginas disponibles.
-    </p>
+<p>
+Catálogo de lectura rápida. Elige una obra y entra directamente al lector cuando tenga páginas disponibles.
+</p>
 
-  </div>
+</div>
 
 
-  <div class="intro-stat">
+<div class="intro-stat">
 
-    <span>
-      <strong>
-        +18
-      </strong>
-      Adultos
-    </span>
+<span>
+<strong>+18</strong>
+Adultos
+</span>
 
-    <span>
-      <strong>
-        ↓
-      </strong>
-      Lectura vertical
-    </span>
+<span>
+<strong>↓</strong>
+Lectura vertical
+</span>
 
-    <span>
-      <strong>
-        ⚡
-      </strong>
-      Acceso directo
-    </span>
+<span>
+<strong>⚡</strong>
+Acceso directo
+</span>
 
-  </div>
+</div>
 
 </div>
 
@@ -2786,51 +2702,48 @@ footer{
   class="admin-shell"
 >
 
-  <div class="admin-head">
+<div class="admin-head">
 
-    <h2>
-      Panel de administración
-    </h2>
+<h2>
+Panel de administración
+</h2>
 
+<div class="admin-actions">
 
-    <div class="admin-actions">
+<button
+  id="newComicBtn"
+  class="btn primary"
+>
++ Nuevo cómic
+</button>
 
-      <button
-        id="newComicBtn"
-        class="btn primary"
-      >
-        + Nuevo cómic
-      </button>
+<button
+  id="refreshAdminBtn"
+  class="btn secondary"
+>
+Actualizar
+</button>
 
-      <button
-        id="refreshAdminBtn"
-        class="btn secondary"
-      >
-        Actualizar
-      </button>
+<button
+  id="logoutAdminBtn"
+  class="btn secondary"
+>
+Cerrar
+</button>
 
-      <button
-        id="logoutAdminBtn"
-        class="btn secondary"
-      >
-        Cerrar
-      </button>
+</div>
 
-    </div>
+</div>
 
-  </div>
+<div
+  id="stats"
+  class="stats"
+></div>
 
-
-  <div
-    id="stats"
-    class="stats"
-  ></div>
-
-
-  <div
-    id="adminList"
-    class="admin-list"
-  ></div>
+<div
+  id="adminList"
+  class="admin-list"
+></div>
 
 </section>
 
@@ -2846,180 +2759,132 @@ footer{
   class="side-panel"
 >
 
-  <div class="side-heading">
-    Categorías
-  </div>
+<div class="side-heading">
+Categorías
+</div>
 
+<div class="side-content">
 
-  <div class="side-content">
+<div class="category-list">
 
-    <div class="category-list">
+<button class="category-btn active" data-genre="">
+Todos los cómics
+</button>
 
-      <button
-        class="category-btn active"
-        data-genre=""
-      >
-        Todos los cómics
-      </button>
+<button class="category-btn" data-genre="Romance">
+Romance
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Romance"
-      >
-        Romance
-      </button>
+<button class="category-btn" data-genre="Fantasía">
+Fantasía
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Fantasía"
-      >
-        Fantasía
-      </button>
+<button class="category-btn" data-genre="Drama">
+Drama
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Drama"
-      >
-        Drama
-      </button>
+<button class="category-btn" data-genre="Misterio">
+Misterio
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Misterio"
-      >
-        Misterio
-      </button>
+<button class="category-btn" data-genre="Thriller">
+Thriller
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Thriller"
-      >
-        Thriller
-      </button>
+<button class="category-btn" data-genre="Acción">
+Acción
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Acción"
-      >
-        Acción
-      </button>
+<button class="category-btn" data-genre="Otros">
+Otros
+</button>
 
-      <button
-        class="category-btn"
-        data-genre="Otros"
-      >
-        Otros
-      </button>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
 <section class="side-panel">
 
-  <div class="side-heading">
-    Etiquetas
-  </div>
+<div class="side-heading">
+Etiquetas
+</div>
 
+<div class="side-content">
 
-  <div class="side-content">
+<div class="tags">
 
-    <div class="tags">
+<span class="tag" data-tag="Romance">
+Romance
+</span>
 
-      <span
-        class="tag"
-        data-tag="Romance"
-      >
-        Romance
-      </span>
+<span class="tag" data-tag="Fantasía">
+Fantasía
+</span>
 
-      <span
-        class="tag"
-        data-tag="Fantasía"
-      >
-        Fantasía
-      </span>
+<span class="tag" data-tag="Drama">
+Drama
+</span>
 
-      <span
-        class="tag"
-        data-tag="Drama"
-      >
-        Drama
-      </span>
+<span class="tag" data-tag="Misterio">
+Misterio
+</span>
 
-      <span
-        class="tag"
-        data-tag="Misterio"
-      >
-        Misterio
-      </span>
+<span class="tag" data-tag="Thriller">
+Thriller
+</span>
 
-      <span
-        class="tag"
-        data-tag="Thriller"
-      >
-        Thriller
-      </span>
+<span class="tag" data-tag="Acción">
+Acción
+</span>
 
-      <span
-        class="tag"
-        data-tag="Acción"
-      >
-        Acción
-      </span>
+<span class="tag" data-tag="Otros">
+Otros
+</span>
 
-      <span
-        class="tag"
-        data-tag="Otros"
-      >
-        Otros
-      </span>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
 <section class="side-panel">
 
-  <div class="side-heading">
-    Explorar
-  </div>
+<div class="side-heading">
+Explorar
+</div>
 
+<div class="side-content">
 
-  <div class="side-content">
+<div class="quick-links">
 
-    <div class="quick-links">
+<a
+  href="#ultimos"
+  class="quick-link"
+>
+Últimos añadidos
+</a>
 
-      <a
-        href="#ultimos"
-        class="quick-link"
-      >
-        Últimos añadidos
-      </a>
+<a
+  href="#actualizaciones"
+  class="quick-link"
+>
+Actualizaciones
+</a>
 
-      <a
-        href="#actualizaciones"
-        class="quick-link"
-      >
-        Actualizaciones
-      </a>
+<a
+  href="#azar"
+  class="quick-link"
+>
+Selección al azar
+</a>
 
-      <a
-        href="#azar"
-        class="quick-link"
-      >
-        Selección al azar
-      </a>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
@@ -3035,50 +2900,49 @@ footer{
   class="section"
 >
 
-  <div class="section-heading">
+<div class="section-heading">
 
-    <h2>
-      Últimos cómics
-    </h2>
+<h2>
+Últimos cómics
+</h2>
 
+<div class="section-tools">
 
-    <div class="section-tools">
+<button
+  class="tab active"
+  data-sort="latest"
+>
+Nuevos
+</button>
 
-      <button
-        class="tab active"
-        data-sort="latest"
-      >
-        Nuevos
-      </button>
+<button
+  class="tab"
+  data-sort="popular"
+>
+Más vistos
+</button>
 
-      <button
-        class="tab"
-        data-sort="popular"
-      >
-        Más vistos
-      </button>
+</div>
 
-    </div>
-
-  </div>
-
-
-  <div
-    id="comicGrid"
-    class="comic-grid"
-  >
-
-    <div class="empty">
-      Cargando catálogo...
-    </div>
-
-  </div>
+</div>
 
 
-  <div
-    id="pagination"
-    class="pagination"
-  ></div>
+<div
+  id="comicGrid"
+  class="comic-grid"
+>
+
+<div class="empty">
+Cargando catálogo...
+</div>
+
+</div>
+
+
+<div
+  id="pagination"
+  class="pagination"
+></div>
 
 </section>
 
@@ -3088,29 +2952,29 @@ footer{
   class="section"
 >
 
-  <div class="section-heading">
+<div class="section-heading">
 
-    <h2>
-      Actualizaciones recientes
-    </h2>
+<h2>
+Actualizaciones recientes
+</h2>
 
-    <small>
-      Partes con páginas disponibles
-    </small>
+<small>
+Partes con páginas disponibles
+</small>
 
-  </div>
+</div>
 
 
-  <div
-    id="updatesList"
-    class="updates-list"
-  >
+<div
+  id="updatesList"
+  class="updates-list"
+>
 
-    <div class="empty">
-      Cargando...
-    </div>
+<div class="empty">
+Cargando...
+</div>
 
-  </div>
+</div>
 
 </section>
 
@@ -3120,33 +2984,32 @@ footer{
   class="section"
 >
 
-  <div class="section-heading">
+<div class="section-heading">
 
-    <h2>
-      Cómics al azar
-    </h2>
+<h2>
+Cómics al azar
+</h2>
+
+<button
+  id="randomRefresh"
+  class="tab"
+>
+Cambiar selección
+</button>
+
+</div>
 
 
-    <button
-      id="randomRefresh"
-      class="tab"
-    >
-      Cambiar selección
-    </button>
+<div
+  id="randomGrid"
+  class="comic-grid"
+>
 
-  </div>
+<div class="empty">
+Cargando...
+</div>
 
-
-  <div
-    id="randomGrid"
-    class="comic-grid"
-  >
-
-    <div class="empty">
-      Cargando...
-    </div>
-
-  </div>
+</div>
 
 </section>
 
@@ -3159,49 +3022,49 @@ footer{
 
 <section class="side-panel">
 
-  <div class="side-heading">
-    Más vistos
-  </div>
+<div class="side-heading">
+Más vistos
+</div>
 
+<div class="side-content">
 
-  <div class="side-content">
+<div
+  id="popularList"
+  class="popular-list"
+>
 
-    <div
-      id="popularList"
-      class="popular-list"
-    >
+<div class="empty">
+Cargando...
+</div>
 
-      <div class="empty">
-        Cargando...
-      </div>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
 <section class="side-panel">
 
-  <div class="side-heading">
-    NightInk
-  </div>
+<div class="side-heading">
+NightInk
+</div>
 
+<div class="side-content">
 
-  <div class="side-content">
+<div
+  style="
+    color:#a4aabd;
+    font-size:10px;
+    line-height:1.65
+  "
+>
 
-    <div
-      style="
-        color:#a4aabd;
-        font-size:10px;
-        line-height:1.65
-      "
-    >
-      Las obras con contenido disponible se abren directamente en el lector. Si una obra contiene varias partes, podrás cambiar entre ellas durante la lectura.
-    </div>
+Las obras con contenido disponible se abren directamente en el lector. Si una obra contiene varias partes, podrás cambiar entre ellas durante la lectura.
 
-  </div>
+</div>
+
+</div>
 
 </section>
 
@@ -3216,650 +3079,608 @@ footer{
 
 <footer>
 
-  <div class="wrap">
-    NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido
-  </div>
+<div class="wrap">
+NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido
+</div>
 
 </footer>
 
+
+<!-- LOGIN -->
 
 <div
   id="loginModal"
   class="modal"
 >
 
-  <div
-    class="panel"
-    style="width:min(410px,100%)"
-  >
+<div
+  class="panel"
+  style="width:min(410px,100%)"
+>
 
-    <h2>
-      Administrador
-    </h2>
+<h2>
+Administrador
+</h2>
 
+<div class="field">
 
-    <div class="field">
+<label>
+Contraseña
+</label>
 
-      <label>
-        Contraseña
-      </label>
-
-      <input
-        id="adminPassword"
-        type="password"
-        autocomplete="current-password"
-      >
-
-    </div>
-
-
-    <div
-      id="loginMsg"
-      class="msg"
-    ></div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn secondary"
-        data-close="loginModal"
-      >
-        Cancelar
-      </button>
-
-      <button
-        id="loginBtn"
-        class="btn primary"
-      >
-        Entrar
-      </button>
-
-    </div>
-
-  </div>
+<input
+  id="adminPassword"
+  type="password"
+>
 
 </div>
 
+<div
+  id="loginMsg"
+  class="msg"
+></div>
+
+<div class="modal-actions">
+
+<button
+  class="btn secondary"
+  data-close="loginModal"
+>
+Cancelar
+</button>
+
+<button
+  id="loginBtn"
+  class="btn primary"
+>
+Entrar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- COMIC -->
 
 <div
   id="comicModal"
   class="modal"
 >
 
-  <div class="panel">
+<div class="panel">
 
-    <h2 id="comicFormTitle">
-      Nuevo cómic
-    </h2>
+<h2 id="comicFormTitle">
+Nuevo cómic
+</h2>
 
+<form id="comicForm">
 
-    <form id="comicForm">
+<input
+  id="comicId"
+  type="hidden"
+>
 
-      <input
-        id="comicId"
-        type="hidden"
-      >
+<div class="form-grid">
 
+<div class="field">
 
-      <div class="form-grid">
+<label>Título</label>
 
-
-        <div class="field">
-
-          <label>
-            Título
-          </label>
-
-          <input
-            id="comicTitle"
-            required
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Slug
-          </label>
-
-          <input
-            id="comicSlug"
-            placeholder="Opcional"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Autor
-          </label>
-
-          <input
-            id="comicAuthor"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Género
-          </label>
-
-          <input
-            id="comicGenre"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Estado
-          </label>
-
-          <select id="comicStatus">
-
-            <option>
-              En emisión
-            </option>
-
-            <option>
-              Completo
-            </option>
-
-            <option>
-              Pausado
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Portada
-          </label>
-
-          <input
-            id="comicCover"
-            type="file"
-            accept="image/*"
-          >
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            Descripción
-          </label>
-
-          <textarea
-            id="comicDescription"
-          ></textarea>
-
-        </div>
-
-
-        <div class="field full">
-
-          <label class="check">
-
-            <input
-              id="comicPublished"
-              type="checkbox"
-            >
-
-            Publicado
-
-          </label>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="comicMsg"
-        class="msg"
-      ></div>
-
-
-      <div class="modal-actions">
-
-        <button
-          type="button"
-          class="btn secondary"
-          data-close="comicModal"
-        >
-          Cancelar
-        </button>
-
-        <button
-          type="submit"
-          class="btn primary"
-        >
-          Guardar
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
+<input
+  id="comicTitle"
+  required
+>
 
 </div>
 
+<div class="field">
+
+<label>Slug</label>
+
+<input
+  id="comicSlug"
+>
+
+</div>
+
+<div class="field">
+
+<label>Autor</label>
+
+<input
+  id="comicAuthor"
+>
+
+</div>
+
+<div class="field">
+
+<label>Género</label>
+
+<input
+  id="comicGenre"
+>
+
+</div>
+
+<div class="field">
+
+<label>Estado</label>
+
+<select id="comicStatus">
+
+<option>
+En emisión
+</option>
+
+<option>
+Completo
+</option>
+
+<option>
+Pausado
+</option>
+
+</select>
+
+</div>
+
+<div class="field">
+
+<label>Portada</label>
+
+<input
+  id="comicCover"
+  type="file"
+  accept="image/*"
+>
+
+</div>
+
+<div class="field full">
+
+<label>Descripción</label>
+
+<textarea
+  id="comicDescription"
+></textarea>
+
+</div>
+
+<div class="field full">
+
+<label class="check">
+
+<input
+  id="comicPublished"
+  type="checkbox"
+>
+
+Publicado
+
+</label>
+
+</div>
+
+</div>
+
+
+<div
+  id="comicMsg"
+  class="msg"
+></div>
+
+
+<div class="modal-actions">
+
+<button
+  type="button"
+  class="btn secondary"
+  data-close="comicModal"
+>
+Cancelar
+</button>
+
+<button
+  type="submit"
+  class="btn primary"
+>
+Guardar
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+
+<!-- CHAPTERS -->
 
 <div
   id="chaptersModal"
   class="modal"
 >
 
-  <div class="panel wide">
+<div class="panel wide">
 
-    <div class="modal-head">
+<div class="modal-head">
 
-      <h2 id="chaptersTitle">
-        Partes
-      </h2>
+<h2 id="chaptersTitle">
+Partes
+</h2>
 
-      <button
-        class="btn secondary"
-        data-close="chaptersModal"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div class="form-grid">
-
-
-      <div class="field">
-
-        <label>
-          Número
-        </label>
-
-        <input
-          id="chapterNumber"
-          type="number"
-          step="0.1"
-          value="1"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Título
-        </label>
-
-        <input
-          id="chapterTitle"
-          placeholder="Opcional"
-        >
-
-      </div>
-
-
-      <div class="field full">
-
-        <label class="check">
-
-          <input
-            id="chapterPublished"
-            type="checkbox"
-            checked
-          >
-
-          Publicada
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <button
-      id="addChapterBtn"
-      class="btn primary"
-      style="margin-top:10px"
-    >
-      + Añadir parte
-    </button>
-
-
-    <div
-      id="chapterMsg"
-      class="msg"
-    ></div>
-
-
-    <div
-      id="chaptersList"
-      class="chapter-list"
-    ></div>
-
-  </div>
+<button
+  class="btn secondary"
+  data-close="chaptersModal"
+>
+Cerrar
+</button>
 
 </div>
 
+
+<div class="form-grid">
+
+<div class="field">
+
+<label>Número</label>
+
+<input
+  id="chapterNumber"
+  type="number"
+  step="0.1"
+  value="1"
+>
+
+</div>
+
+<div class="field">
+
+<label>Título</label>
+
+<input
+  id="chapterTitle"
+>
+
+</div>
+
+<div class="field full">
+
+<label class="check">
+
+<input
+  id="chapterPublished"
+  type="checkbox"
+  checked
+>
+
+Publicada
+
+</label>
+
+</div>
+
+</div>
+
+
+<button
+  id="addChapterBtn"
+  class="btn primary"
+  style="margin-top:10px"
+>
++ Añadir parte
+</button>
+
+<div
+  id="chapterMsg"
+  class="msg"
+></div>
+
+<div
+  id="chaptersList"
+  class="chapter-list"
+></div>
+
+</div>
+
+</div>
+
+
+<!-- EDIT CHAPTER -->
 
 <div
   id="editChapterModal"
   class="modal"
 >
 
-  <div
-    class="panel"
-    style="width:min(520px,100%)"
-  >
+<div
+  class="panel"
+  style="width:min(520px,100%)"
+>
 
-    <h2>
-      Editar parte
-    </h2>
+<h2>
+Editar parte
+</h2>
 
+<input
+  id="editChapterId"
+  type="hidden"
+>
 
-    <input
-      id="editChapterId"
-      type="hidden"
-    >
+<div class="form-grid">
 
+<div class="field">
 
-    <div class="form-grid">
+<label>Número</label>
 
-
-      <div class="field">
-
-        <label>
-          Número
-        </label>
-
-        <input
-          id="editChapterNumber"
-          type="number"
-          step="0.1"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Título
-        </label>
-
-        <input
-          id="editChapterTitle"
-        >
-
-      </div>
-
-
-      <div class="field full">
-
-        <label class="check">
-
-          <input
-            id="editChapterPublished"
-            type="checkbox"
-          >
-
-          Publicada
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="editChapterMsg"
-      class="msg"
-    ></div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn secondary"
-        data-close="editChapterModal"
-      >
-        Cancelar
-      </button>
-
-      <button
-        id="saveChapterBtn"
-        class="btn primary"
-      >
-        Guardar
-      </button>
-
-    </div>
-
-  </div>
+<input
+  id="editChapterNumber"
+  type="number"
+  step="0.1"
+>
 
 </div>
 
+<div class="field">
+
+<label>Título</label>
+
+<input
+  id="editChapterTitle"
+>
+
+</div>
+
+<div class="field full">
+
+<label class="check">
+
+<input
+  id="editChapterPublished"
+  type="checkbox"
+>
+
+Publicada
+
+</label>
+
+</div>
+
+</div>
+
+<div
+  id="editChapterMsg"
+  class="msg"
+></div>
+
+<div class="modal-actions">
+
+<button
+  class="btn secondary"
+  data-close="editChapterModal"
+>
+Cancelar
+</button>
+
+<button
+  id="saveChapterBtn"
+  class="btn primary"
+>
+Guardar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- PAGES -->
 
 <div
   id="pagesModal"
   class="modal"
 >
 
-  <div class="panel wide">
+<div class="panel wide">
 
-    <div class="modal-head">
+<div class="modal-head">
 
-      <h2 id="pagesTitle">
-        Gestionar páginas
-      </h2>
+<h2 id="pagesTitle">
+Gestionar páginas
+</h2>
 
-      <button
-        class="btn secondary"
-        data-close="pagesModal"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div
-      id="pagesGrid"
-      class="pages-grid"
-    ></div>
-
-  </div>
+<button
+  class="btn secondary"
+  data-close="pagesModal"
+>
+Cerrar
+</button>
 
 </div>
 
+<div
+  id="pagesGrid"
+  class="pages-grid"
+></div>
+
+</div>
+
+</div>
+
+
+<!-- DETAIL -->
 
 <div
   id="detailModal"
   class="modal"
 >
 
-  <div
-    class="panel"
-    style="width:min(900px,100%)"
-  >
+<div
+  class="panel"
+  style="width:min(900px,100%)"
+>
 
-    <div class="modal-head">
+<div class="modal-head">
 
-      <h2 id="detailTitle"></h2>
+<h2 id="detailTitle"></h2>
 
-      <button
-        id="closeDetailBtn"
-        class="btn secondary"
-      >
-        Cerrar
-      </button>
-
-    </div>
-
-
-    <div class="detail">
-
-
-      <div
-        id="detailCover"
-        class="detail-cover"
-      ></div>
-
-
-      <div>
-
-        <div
-          id="detailMeta"
-          class="detail-meta"
-        ></div>
-
-
-        <p
-          id="detailDescription"
-          class="detail-desc"
-        ></p>
-
-
-        <div
-          style="
-            display:flex;
-            gap:7px;
-            flex-wrap:wrap;
-            margin:12px 0
-          "
-        >
-
-          <button
-            id="shareComicBtn"
-            class="btn primary"
-          >
-            Compartir
-          </button>
-
-          <button
-            id="copyComicBtn"
-            class="btn secondary"
-          >
-            Copiar enlace
-          </button>
-
-        </div>
-
-
-        <div
-          id="shareMessage"
-          class="msg success"
-        ></div>
-
-
-        <div
-          id="detailParts"
-          class="parts"
-        ></div>
-
-      </div>
-
-    </div>
-
-  </div>
+<button
+  id="closeDetailBtn"
+  class="btn secondary"
+>
+Cerrar
+</button>
 
 </div>
 
+
+<div class="detail">
+
+<div
+  id="detailCover"
+  class="detail-cover"
+></div>
+
+
+<div>
+
+<div
+  id="detailMeta"
+  class="detail-meta"
+></div>
+
+<p
+  id="detailDescription"
+  class="detail-desc"
+></p>
+
+
+<div
+  style="
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin:12px 0
+  "
+>
+
+<button
+  id="shareComicBtn"
+  class="btn primary"
+>
+Compartir
+</button>
+
+<button
+  id="copyComicBtn"
+  class="btn secondary"
+>
+Copiar enlace
+</button>
+
+</div>
+
+
+<div
+  id="shareMessage"
+  class="msg success"
+></div>
+
+<div
+  id="detailParts"
+  class="parts"
+></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- READER -->
 
 <div
   id="reader"
   class="reader"
 >
 
-  <div class="reader-bar">
+<div class="reader-bar">
+
+<div class="reader-left">
+
+<button
+  id="closeReader"
+  class="btn secondary small"
+>
+← Salir
+</button>
+
+<button
+  id="readerPrev"
+  class="btn secondary small"
+>
+← Parte anterior
+</button>
+
+</div>
 
 
-    <div class="reader-left">
-
-      <button
-        id="closeReader"
-        class="btn secondary small"
-      >
-        ← Salir
-      </button>
-
-      <button
-        id="readerPrev"
-        class="btn secondary small"
-      >
-        ← Parte anterior
-      </button>
-
-    </div>
+<strong
+  id="readerTitle"
+  class="reader-title"
+>
+NightInk
+</strong>
 
 
-    <strong
-      id="readerTitle"
-      class="reader-title"
-    >
-      NightInk
-    </strong>
+<div class="reader-right">
+
+<button
+  id="readerInfo"
+  class="btn secondary small"
+>
+Información
+</button>
+
+<button
+  id="readerShare"
+  class="btn secondary small"
+>
+Compartir
+</button>
+
+<button
+  id="readerNext"
+  class="btn primary small"
+>
+Parte siguiente →
+</button>
+
+</div>
+
+</div>
 
 
-    <div class="reader-right">
+<div
+  id="readerPages"
+  class="reader-pages"
+></div>
 
-      <button
-        id="readerInfo"
-        class="btn secondary small"
-      >
-        Información
-      </button>
-
-      <button
-        id="readerShare"
-        class="btn secondary small"
-      >
-        Compartir
-      </button>
-
-      <button
-        id="readerNext"
-        class="btn primary small"
-      >
-        Parte siguiente →
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="readerPages"
-    class="reader-pages"
-  ></div>
-
-
-  <div
-    id="readerBottom"
-    class="reader-bottom"
-  ></div>
+<div
+  id="readerBottom"
+  class="reader-bottom"
+></div>
 
 </div>
 
@@ -3868,200 +3689,132 @@ footer{
 
 const qs =
   selector =>
-    document.querySelector(
-      selector
-    );
-
+    document.querySelector(selector);
 
 const qsa =
   selector =>
-    [
-      ...document.querySelectorAll(
-        selector
-      )
-    ];
-
+    [...document.querySelectorAll(selector)];
 
 const AGE_KEY =
   "nightink_age_verified_v3";
 
-
-let catalog =
-  [];
-
+let catalog = [];
 
 let pagination = {
-
   page:1,
-
   total_pages:1,
-
   total:0
-
 };
 
+let currentPage = 1;
 
-let currentPage =
-  1;
+let selectedGenre = "";
 
+let sortMode = "latest";
 
-let selectedGenre =
-  "";
+let searchQuery = "";
 
+let searchTimer = null;
 
-let sortMode =
-  "latest";
-
-
-let searchQuery =
-  "";
-
-
-let searchTimer =
-  null;
-
-
-let randomPool =
-  [];
-
+let randomPool = [];
 
 let adminToken =
   sessionStorage.getItem(
     "nightink_admin_token"
   ) || "";
 
+let currentComicForChapters = null;
 
-let currentComicForChapters =
-  null;
+let currentAdminChapters = [];
 
+let currentManagedChapter = null;
 
-let currentAdminChapters =
-  [];
+let managedPages = [];
 
+let currentPublicComic = null;
 
-let currentManagedChapter =
-  null;
+let currentPublicSlug = null;
 
+let readerParts = [];
 
-let managedPages =
-  [];
-
-
-let currentPublicComic =
-  null;
+let currentReaderIndex = -1;
 
 
-let currentPublicSlug =
-  null;
+/* HELPERS */
 
-
-let readerParts =
-  [];
-
-
-let currentReaderIndex =
-  -1;
-
-
-function esc(
-  value = ""
-){
+function esc(value = ""){
 
   return String(value)
     .replace(
       /[&<>"']/g,
-      character =>
-        ({
-          "&":"&amp;",
-          "<":"&lt;",
-          ">":"&gt;",
-          '"':"&quot;",
-          "'":"&#039;"
-        }[character])
+      character => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[character])
     );
 
 }
 
 
-function openModal(
-  id
-){
+function openModal(id){
 
-  qs(
-    "#" + id
-  )
-  ?.classList
-  .add(
-    "open"
-  );
+  qs("#" + id)
+    ?.classList
+    .add("open");
 
 }
 
 
-function closeModal(
-  id
-){
+function closeModal(id){
 
-  qs(
-    "#" + id
-  )
-  ?.classList
-  .remove(
-    "open"
-  );
+  qs("#" + id)
+    ?.classList
+    .remove("open");
 
 }
 
 
-qsa(
-  "[data-close]"
-)
-.forEach(
-  button => {
+qsa("[data-close]")
+.forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () =>
-        closeModal(
-          button.dataset.close
-        )
-    );
+  button.addEventListener(
+    "click",
+    () =>
+      closeModal(
+        button.dataset.close
+      )
+  );
 
-  }
-);
+});
 
+
+/* AGE */
 
 function showAgeGate(){
 
   if(
-    localStorage.getItem(
-      AGE_KEY
-    ) !== "yes"
+    localStorage.getItem(AGE_KEY)
+    !==
+    "yes"
   ){
 
-    qs(
-      "#ageGate"
-    )
-    .classList
-    .add(
-      "open"
-    );
-
+    qs("#ageGate")
+      .classList
+      .add("open");
 
     document.body
       .classList
-      .add(
-        "age-locked"
-      );
+      .add("age-locked");
 
   }
 
 }
 
 
-qs(
-  "#ageEnter"
-)
+qs("#ageEnter")
 .addEventListener(
   "click",
   () => {
@@ -4071,29 +3824,19 @@ qs(
       "yes"
     );
 
-
-    qs(
-      "#ageGate"
-    )
-    .classList
-    .remove(
-      "open"
-    );
-
+    qs("#ageGate")
+      .classList
+      .remove("open");
 
     document.body
       .classList
-      .remove(
-        "age-locked"
-      );
+      .remove("age-locked");
 
   }
 );
 
 
-qs(
-  "#ageExit"
-)
+qs("#ageExit")
 .addEventListener(
   "click",
   () => {
@@ -4106,6 +3849,8 @@ qs(
 );
 
 
+/* API */
+
 async function api(
   url,
   options = {}
@@ -4113,14 +3858,11 @@ async function api(
 
   const headers =
     new Headers(
-      options.headers ||
-      {}
+      options.headers || {}
     );
 
 
-  if(
-    adminToken
-  ){
+  if(adminToken){
 
     headers.set(
       "X-Admin-Token",
@@ -4140,8 +3882,7 @@ async function api(
     );
 
 
-  let data =
-    {};
+  let data = {};
 
 
   try{
@@ -4150,13 +3891,10 @@ async function api(
       await response.json();
 
   }
-
   catch{}
 
 
-  if(
-    !response.ok
-  ){
+  if(!response.ok){
 
     throw new Error(
       data.error ||
@@ -4171,6 +3909,8 @@ async function api(
 }
 
 
+/* ROUTES */
+
 function getRoute(){
 
   const match =
@@ -4179,14 +3919,11 @@ function getRoute(){
     );
 
 
-  if(
-    match
-  ){
+  if(match){
 
     return {
 
-      type:
-        "comic",
+      type:"comic",
 
       slug:
         decodeURIComponent(
@@ -4205,15 +3942,11 @@ function getRoute(){
 }
 
 
-function comicPath(
-  slug
-){
+function comicPath(slug){
 
   return (
     "/comic/" +
-    encodeURIComponent(
-      slug
-    )
+    encodeURIComponent(slug)
   );
 
 }
@@ -4224,28 +3957,21 @@ function setHomeMetadata(){
   document.title =
     "NightInk Comics";
 
-
-  qs(
-    "#metaDescription"
-  )
-  .content =
+  qs("#metaDescription")
+    .content =
     "NightInk Comics";
 
 }
 
 
-function setComicMetadata(
-  comic
-){
+function setComicMetadata(comic){
 
   document.title =
     `${comic.title} | NightInk Comics`;
 
 
-  qs(
-    "#metaDescription"
-  )
-  .content =
+  qs("#metaDescription")
+    .content =
     comic.description
     ?
     comic.description.slice(
@@ -4258,38 +3984,31 @@ function setComicMetadata(
 }
 
 
-function badgeForComic(
-  comic
-){
+/* COMIC CARDS */
+
+function badgeForComic(comic){
 
   const parts =
     Number(
-      comic.part_count ||
-      0
+      comic.part_count || 0
     );
 
 
-  if(
-    parts === 0
-  ){
+  if(parts === 0){
 
     return "Sin partes";
 
   }
 
 
-  if(
-    parts === 1
-  ){
+  if(parts === 1){
 
     return "▶ Leer";
 
   }
 
 
-  return (
-    `▶ ${parts} partes`
-  );
+  return `▶ ${parts} partes`;
 
 }
 
@@ -4315,11 +4034,7 @@ function comicCardHTML(
     `
 
       <div class="cover-placeholder">
-
-        ${esc(
-          comic.title
-        )}
-
+        ${esc(comic.title)}
       </div>
 
     `;
@@ -4329,9 +4044,7 @@ function comicCardHTML(
 
     <article
       class="comic-card"
-      ${dataAttr}="${esc(
-        comic.slug
-      )}"
+      ${dataAttr}="${esc(comic.slug)}"
     >
 
       <div
@@ -4341,13 +4054,8 @@ function comicCardHTML(
 
         ${placeholder}
 
-
         <span class="card-badge">
-
-          ${badgeForComic(
-            comic
-          )}
-
+          ${badgeForComic(comic)}
         </span>
 
       </div>
@@ -4356,33 +4064,22 @@ function comicCardHTML(
       <div class="card-body">
 
         <h3 class="card-title">
-
-          ${esc(
-            comic.title
-          )}
-
+          ${esc(comic.title)}
         </h3>
-
 
         <div class="card-meta">
 
           <span>
-
             ${esc(
               comic.genre ||
               "Sin categoría"
             )}
-
           </span>
 
           <span>
-
             ${Number(
-              comic.views ||
-              0
-            )}
-            vistas
-
+              comic.views || 0
+            )} vistas
           </span>
 
         </div>
@@ -4396,6 +4093,8 @@ function comicCardHTML(
 }
 
 
+/* CATALOG */
+
 async function loadCatalog(
   page = 1
 ){
@@ -4405,23 +4104,16 @@ async function loadCatalog(
     const params =
       new URLSearchParams({
 
-        page:
-          String(
-            page
-          ),
+        page:String(page),
 
-        limit:
-          "15",
+        limit:"15",
 
-        sort:
-          sortMode
+        sort:sortMode
 
       });
 
 
-    if(
-      searchQuery
-    ){
+    if(searchQuery){
 
       params.set(
         "q",
@@ -4431,9 +4123,7 @@ async function loadCatalog(
     }
 
 
-    if(
-      selectedGenre
-    ){
+    if(selectedGenre){
 
       params.set(
         "genre",
@@ -4451,28 +4141,21 @@ async function loadCatalog(
 
 
     catalog =
-      data.comics ||
-      [];
+      data.comics || [];
 
 
     pagination =
       data.pagination ||
       {
-
         page:1,
-
         total_pages:1,
-
-        total:
-          catalog.length
-
+        total:catalog.length
       };
 
 
     currentPage =
       Number(
-        pagination.page ||
-        1
+        pagination.page || 1
       );
 
 
@@ -4481,25 +4164,16 @@ async function loadCatalog(
     renderPagination();
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
+    qs("#comicGrid")
+      .innerHTML = `
 
-    qs(
-      "#comicGrid"
-    )
-    .innerHTML = `
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-      <div class="empty">
-
-        ${esc(
-          error.message
-        )}
-
-      </div>
-
-    `;
+      `;
 
   }
 
@@ -4509,14 +4183,10 @@ async function loadCatalog(
 function renderCatalog(){
 
   const grid =
-    qs(
-      "#comicGrid"
-    );
+    qs("#comicGrid");
 
 
-  if(
-    !catalog.length
-  ){
+  if(!catalog.length){
 
     grid.innerHTML = `
 
@@ -4535,62 +4205,51 @@ function renderCatalog(){
     catalog
       .map(
         comic =>
-          comicCardHTML(
-            comic
-          )
+          comicCardHTML(comic)
       )
       .join("");
 
 
-  qsa(
-    "[data-comic]"
-  )
-  .forEach(
-    card => {
+  qsa("[data-comic]")
+  .forEach(card => {
 
-      card.addEventListener(
-        "click",
-        () =>
-          openComicDirect(
-            card.dataset.comic,
-            true
-          )
-      );
+    card.addEventListener(
+      "click",
+      () =>
+        openComicDirect(
+          card.dataset.comic,
+          true
+        )
+    );
 
-    }
-  );
+  });
 
 }
 
 
+/* PAGINATION */
+
 function renderPagination(){
 
   const box =
-    qs(
-      "#pagination"
-    );
+    qs("#pagination");
 
 
   const total =
     Number(
-      pagination.total_pages ||
-      1
+      pagination.total_pages || 1
     );
 
 
   const page =
     Number(
-      pagination.page ||
-      1
+      pagination.page || 1
     );
 
 
-  if(
-    total <= 1
-  ){
+  if(total <= 1){
 
-    box.innerHTML =
-      "";
+    box.innerHTML = "";
 
     return;
 
@@ -4616,8 +4275,7 @@ function renderPagination(){
   `;
 
 
-  const pages =
-    [];
+  const pages = [];
 
 
   for(
@@ -4630,27 +4288,20 @@ function renderPagination(){
       total <= 7 ||
       i === 1 ||
       i === total ||
-      Math.abs(
-        i - page
-      ) <= 2
+      Math.abs(i - page) <= 2
     ){
 
-      pages.push(
-        i
-      );
+      pages.push(i);
 
     }
 
   }
 
 
-  let last =
-    0;
+  let last = 0;
 
 
-  for(
-    const i of pages
-  ){
+  for(const i of pages){
 
     if(
       last &&
@@ -4683,16 +4334,13 @@ function renderPagination(){
         }"
         data-page="${i}"
       >
-
         ${i}
-
       </button>
 
     `;
 
 
-    last =
-      i;
+    last = i;
 
   }
 
@@ -4716,56 +4364,45 @@ function renderPagination(){
   `;
 
 
-  box.innerHTML =
-    html;
+  box.innerHTML = html;
 
 
-  qsa(
-    "[data-page]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-page]")
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-          const next =
-            Number(
-              button.dataset.page
-            );
+        const next =
+          Number(
+            button.dataset.page
+          );
 
 
-          if(
-            next >= 1 &&
-            next <= total
-          ){
+        if(
+          next >= 1 &&
+          next <= total
+        ){
 
-            loadCatalog(
-              next
-            );
+          loadCatalog(next);
 
-
-            qs(
-              "#ultimos"
-            )
+          qs("#ultimos")
             .scrollIntoView({
-
-              behavior:
-                "smooth"
-
+              behavior:"smooth"
             });
 
-          }
-
         }
-      );
 
-    }
-  );
+      }
+    );
+
+  });
 
 }
 
+
+/* POPULAR */
 
 async function loadPopular(){
 
@@ -4778,14 +4415,11 @@ async function loadPopular(){
 
 
     const items =
-      data.comics ||
-      [];
+      data.comics || [];
 
 
-    qs(
-      "#popularList"
-    )
-    .innerHTML =
+    qs("#popularList")
+      .innerHTML =
       items.length
       ?
       items
@@ -4793,187 +4427,44 @@ async function loadPopular(){
           (
             comic,
             index
-          ) => `
-
-            <div
-              class="popular-item"
-              data-popular="${esc(
-                comic.slug
-              )}"
-            >
-
-              <div class="popular-rank">
-
-                ${index + 1}
-
-              </div>
-
-
-              <div class="popular-copy">
-
-                <strong>
-
-                  ${esc(
-                    comic.title
-                  )}
-
-                </strong>
-
-                <small>
-
-                  ${Number(
-                    comic.views ||
-                    0
-                  )}
-                  vistas
-
-                </small>
-
-              </div>
-
-            </div>
-
-          `
-        )
-        .join("")
-      :
-      `
-
-        <div class="empty">
-          Sin datos.
-        </div>
-
-      `;
-
-
-    qsa(
-      "[data-popular]"
-    )
-    .forEach(
-      item => {
-
-        item.addEventListener(
-          "click",
-          () =>
-            openComicDirect(
-              item.dataset.popular,
-              true
-            )
-        );
-
-      }
-    );
-
-  }
-
-  catch(
-    error
-  ){
-
-    qs(
-      "#popularList"
-    )
-    .innerHTML = `
-
-      <div class="empty">
-
-        ${esc(
-          error.message
-        )}
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-async function loadUpdates(){
-
-  try{
-
-    const data =
-      await api(
-        "/api/updates?limit=8"
-      );
-
-
-    const updates =
-      data.updates ||
-      [];
-
-
-    qs(
-      "#updatesList"
-    )
-    .innerHTML =
-      updates.length
-      ?
-      updates
-        .map(
-          update => {
+          ) => {
 
             const cover =
-              update.cover_url
+              comic.cover_url
               ?
-              `background-image:url('${update.cover_url}')`
+              `background-image:url('${comic.cover_url}')`
               :
               "";
-
 
             return `
 
               <div
-                class="update-item"
-                data-update-slug="${esc(
-                  update.slug
-                )}"
-                data-update-chapter="${update.chapter_id}"
+                class="popular-item"
+                data-popular="${esc(comic.slug)}"
               >
 
+                <div class="popular-rank">
+                  ${index + 1}
+                </div>
+
+
                 <div
-                  class="update-cover"
+                  class="popular-thumb"
                   style="${cover}"
                 ></div>
 
 
-                <div class="update-main">
+                <div class="popular-copy">
 
-                  <div class="update-title">
+                  <strong>
+                    ${esc(comic.title)}
+                  </strong>
 
-                    ${esc(
-                      update.comic_title
-                    )}
-
-                  </div>
-
-
-                  <div class="update-meta">
-
+                  <small>
                     ${Number(
-                      update.page_count ||
-                      0
-                    )}
-                    páginas
-
-                    ·
-
-                    ${esc(
-                      update.genre ||
-                      "Sin categoría"
-                    )}
-
-                  </div>
-
-                </div>
-
-
-                <div class="update-part">
-
-                  Parte
-                  ${update.chapter_number}
+                      comic.views || 0
+                    )} vistas
+                  </small>
 
                 </div>
 
@@ -4988,62 +4479,171 @@ async function loadUpdates(){
       `
 
         <div class="empty">
+          Sin datos.
+        </div>
+
+      `;
+
+
+    qsa("[data-popular]")
+    .forEach(item => {
+
+      item.addEventListener(
+        "click",
+        () =>
+          openComicDirect(
+            item.dataset.popular,
+            true
+          )
+      );
+
+    });
+
+  }
+  catch(error){
+
+    qs("#popularList")
+      .innerHTML = `
+
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
+
+      `;
+
+  }
+
+}
+
+
+/* UPDATES */
+
+async function loadUpdates(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/updates?limit=8"
+      );
+
+
+    const updates =
+      data.updates || [];
+
+
+    qs("#updatesList")
+      .innerHTML =
+      updates.length
+      ?
+      updates
+        .map(update => {
+
+          const cover =
+            update.cover_url
+            ?
+            `background-image:url('${update.cover_url}')`
+            :
+            "";
+
+
+          return `
+
+            <div
+              class="update-item"
+              data-update-slug="${esc(update.slug)}"
+              data-update-chapter="${update.chapter_id}"
+            >
+
+              <div
+                class="update-cover"
+                style="${cover}"
+              ></div>
+
+
+              <div class="update-main">
+
+                <div class="update-title">
+                  ${esc(update.comic_title)}
+                </div>
+
+                <div class="update-meta">
+
+                  ${Number(
+                    update.page_count || 0
+                  )}
+                  páginas
+
+                  ·
+
+                  ${esc(
+                    update.genre ||
+                    "Sin categoría"
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div class="update-part">
+
+                Parte
+                ${update.chapter_number}
+
+              </div>
+
+            </div>
+
+          `;
+
+        })
+        .join("")
+      :
+      `
+
+        <div class="empty">
           Todavía no hay actualizaciones con páginas.
         </div>
 
       `;
 
 
-    qsa(
-      "[data-update-slug]"
-    )
-    .forEach(
-      item => {
+    qsa("[data-update-slug]")
+    .forEach(item => {
 
-        item.addEventListener(
-          "click",
-          () =>
-            openComicDirect(
-
-              item.dataset.updateSlug,
-
-              true,
-
-              Number(
-                item.dataset.updateChapter
-              )
-
+      item.addEventListener(
+        "click",
+        () =>
+          openComicDirect(
+            item.dataset.updateSlug,
+            true,
+            Number(
+              item.dataset.updateChapter
             )
-        );
+          )
+      );
 
-      }
-    );
+    });
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
+    qs("#updatesList")
+      .innerHTML = `
 
-    qs(
-      "#updatesList"
-    )
-    .innerHTML = `
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-      <div class="empty">
-
-        ${esc(
-          error.message
-        )}
-
-      </div>
-
-    `;
+      `;
 
   }
 
 }
 
+
+/* RANDOM */
 
 async function loadRandomPool(){
 
@@ -5056,32 +4656,22 @@ async function loadRandomPool(){
 
 
     randomPool =
-      data.comics ||
-      [];
+      data.comics || [];
 
 
     renderRandom();
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
+    qs("#randomGrid")
+      .innerHTML = `
 
-    qs(
-      "#randomGrid"
-    )
-    .innerHTML = `
+        <div class="empty">
+          ${esc(error.message)}
+        </div>
 
-      <div class="empty">
-
-        ${esc(
-          error.message
-        )}
-
-      </div>
-
-    `;
+      `;
 
   }
 
@@ -5091,24 +4681,16 @@ async function loadRandomPool(){
 function renderRandom(){
 
   const shuffled =
-    [
-      ...randomPool
-    ]
-    .sort(
-      () =>
-        Math.random() -
-        .5
-    )
-    .slice(
-      0,
-      5
-    );
+    [...randomPool]
+      .sort(
+        () =>
+          Math.random() - .5
+      )
+      .slice(0,5);
 
 
-  qs(
-    "#randomGrid"
-  )
-  .innerHTML =
+  qs("#randomGrid")
+    .innerHTML =
     shuffled.length
     ?
     shuffled
@@ -5130,35 +4712,31 @@ function renderRandom(){
     `;
 
 
-  qsa(
-    "[data-random]"
-  )
-  .forEach(
-    card => {
+  qsa("[data-random]")
+  .forEach(card => {
 
-      card.addEventListener(
-        "click",
-        () =>
-          openComicDirect(
-            card.dataset.random,
-            true
-          )
-      );
+    card.addEventListener(
+      "click",
+      () =>
+        openComicDirect(
+          card.dataset.random,
+          true
+        )
+    );
 
-    }
-  );
+  });
 
 }
 
 
-qs(
-  "#randomRefresh"
-)
+qs("#randomRefresh")
 .addEventListener(
   "click",
   renderRandom
 );
 
+
+/* OPEN COMIC */
 
 async function openComicDirect(
   slug,
@@ -5171,9 +4749,7 @@ async function openComicDirect(
     const data =
       await api(
         "/api/comics/" +
-        encodeURIComponent(
-          slug
-        )
+        encodeURIComponent(slug)
       );
 
 
@@ -5182,52 +4758,31 @@ async function openComicDirect(
 
 
     const chapters =
-      data.chapters ||
-      [];
+      data.chapters || [];
 
 
-    currentPublicComic =
-      comic;
-
+    currentPublicComic = comic;
 
     currentPublicSlug =
       comic.slug;
-
 
     readerParts =
       chapters;
 
 
-    setComicMetadata(
-      comic
-    );
+    setComicMetadata(comic);
 
 
-    if(
-      pushRoute
-    ){
+    if(pushRoute){
 
       history.pushState(
-
         {
-
-          type:
-            "comic",
-
-          slug:
-            comic.slug,
-
-          fromSite:
-            true
-
+          type:"comic",
+          slug:comic.slug,
+          fromSite:true
         },
-
         "",
-
-        comicPath(
-          comic.slug
-        )
-
+        comicPath(comic.slug)
       );
 
     }
@@ -5239,9 +4794,7 @@ async function openComicDirect(
     );
 
 
-    if(
-      !chapters.length
-    ){
+    if(!chapters.length){
 
       showNoPages();
 
@@ -5250,24 +4803,17 @@ async function openComicDirect(
     }
 
 
-    let index =
-      -1;
+    let index = -1;
 
 
-    if(
-      preferredChapterId
-    ){
+    if(preferredChapterId){
 
       index =
         chapters.findIndex(
           chapter =>
-            Number(
-              chapter.id
-            )
+            Number(chapter.id)
             ===
-            Number(
-              preferredChapterId
-            )
+            Number(preferredChapterId)
         );
 
     }
@@ -5276,10 +4822,8 @@ async function openComicDirect(
     if(
       index === -1 ||
       Number(
-        chapters[
-          index
-        ]?.page_count ||
-        0
+        chapters[index]
+          ?.page_count || 0
       ) === 0
     ){
 
@@ -5287,17 +4831,14 @@ async function openComicDirect(
         chapters.findIndex(
           chapter =>
             Number(
-              chapter.page_count ||
-              0
+              chapter.page_count || 0
             ) > 0
         );
 
     }
 
 
-    if(
-      index === -1
-    ){
+    if(index === -1){
 
       showNoPages();
 
@@ -5306,74 +4847,52 @@ async function openComicDirect(
     }
 
 
-    await openReaderByIndex(
-      index
-    );
-
+    await openReaderByIndex(index);
 
     loadPopular();
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
 }
 
 
+/* INFO */
+
 function prepareComicInfo(
   comic,
   chapters
 ){
 
-  qs(
-    "#detailTitle"
-  )
-  .textContent =
+  qs("#detailTitle")
+    .textContent =
     comic.title;
 
 
-  qs(
-    "#detailMeta"
-  )
-  .textContent =
+  qs("#detailMeta")
+    .textContent =
     [
-
       comic.author,
-
       comic.genre,
-
       comic.status,
-
       `${comic.views} vistas`
-
     ]
     .filter(Boolean)
-    .join(
-      " · "
-    );
+    .join(" · ");
 
 
-  qs(
-    "#detailDescription"
-  )
-  .textContent =
-    comic.description ||
-    "";
+  qs("#detailDescription")
+    .textContent =
+    comic.description || "";
 
 
-  qs(
-    "#detailCover"
-  )
-  .style
-  .backgroundImage =
+  qs("#detailCover")
+    .style
+    .backgroundImage =
     comic.cover_url
     ?
     `url("${comic.cover_url}")`
@@ -5381,22 +4900,15 @@ function prepareComicInfo(
     "";
 
 
-  qs(
-    "#shareMessage"
-  )
-  .textContent =
-    "";
+  qs("#shareMessage")
+    .textContent = "";
 
 
   const box =
-    qs(
-      "#detailParts"
-    );
+    qs("#detailParts");
 
 
-  if(
-    !chapters.length
-  ){
+  if(!chapters.length){
 
     box.innerHTML = `
 
@@ -5431,9 +4943,7 @@ function prepareComicInfo(
               chapter.title
               ?
               " · " +
-              esc(
-                chapter.title
-              )
+              esc(chapter.title)
               :
               ""
             }
@@ -5441,8 +4951,7 @@ function prepareComicInfo(
             ·
 
             ${Number(
-              chapter.page_count ||
-              0
+              chapter.page_count || 0
             )}
             páginas
 
@@ -5453,53 +4962,40 @@ function prepareComicInfo(
       .join("");
 
 
-  qsa(
-    "[data-info-part]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-info-part]")
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        async () => {
+    button.addEventListener(
+      "click",
+      async () => {
 
-          closeModal(
-            "detailModal"
-          );
+        closeModal(
+          "detailModal"
+        );
 
+        await openReaderByIndex(
+          Number(
+            button.dataset.infoPart
+          )
+        );
 
-          await openReaderByIndex(
-            Number(
-              button.dataset.infoPart
-            )
-          );
+      }
+    );
 
-        }
-      );
-
-    }
-  );
+  });
 
 }
 
 
 function showNoPages(){
 
-  qs(
-    "#reader"
-  )
-  .classList
-  .remove(
-    "open"
-  );
-
+  qs("#reader")
+    .classList
+    .remove("open");
 
   document.body
     .classList
-    .remove(
-      "reader-locked"
-    );
-
+    .remove("reader-locked");
 
   openModal(
     "detailModal"
@@ -5508,14 +5004,13 @@ function showNoPages(){
 }
 
 
-async function openReaderByIndex(
-  index
-){
+/* READER */
+
+async function openReaderByIndex(index){
 
   if(
     index < 0 ||
-    index >=
-    readerParts.length
+    index >= readerParts.length
   ){
 
     return;
@@ -5523,14 +5018,11 @@ async function openReaderByIndex(
   }
 
 
-  currentReaderIndex =
-    index;
+  currentReaderIndex = index;
 
 
   const selected =
-    readerParts[
-      index
-    ];
+    readerParts[index];
 
 
   try{
@@ -5542,30 +5034,24 @@ async function openReaderByIndex(
 
 
     const pages =
-      data.pages ||
-      [];
+      data.pages || [];
 
 
     const chapter =
       data.chapter;
 
 
-    qs(
-      "#readerTitle"
-    )
-    .textContent =
-      readerParts.length ===
-      1
+    qs("#readerTitle")
+      .textContent =
+      readerParts.length === 1
       ?
       chapter.comic_title
       :
       `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
 
 
-    qs(
-      "#readerPages"
-    )
-    .innerHTML =
+    qs("#readerPages")
+      .innerHTML =
       pages.length
       ?
       pages
@@ -5611,37 +5097,23 @@ async function openReaderByIndex(
     );
 
 
-    qs(
-      "#reader"
-    )
-    .classList
-    .add(
-      "open"
-    );
+    qs("#reader")
+      .classList
+      .add("open");
 
 
     document.body
       .classList
-      .add(
-        "reader-locked"
-      );
+      .add("reader-locked");
 
 
-    qs(
-      "#reader"
-    )
-    .scrollTop =
-      0;
+    qs("#reader")
+      .scrollTop = 0;
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
@@ -5651,28 +5123,20 @@ async function openReaderByIndex(
 function updateReaderNavigation(){
 
   const previous =
-    currentReaderIndex -
-    1;
-
+    currentReaderIndex - 1;
 
   const next =
-    currentReaderIndex +
-    1;
+    currentReaderIndex + 1;
 
 
-  qs(
-    "#readerPrev"
-  )
-  .disabled =
+  qs("#readerPrev")
+    .disabled =
     previous < 0;
 
 
-  qs(
-    "#readerNext"
-  )
-  .disabled =
-    next >=
-    readerParts.length;
+  qs("#readerNext")
+    .disabled =
+    next >= readerParts.length;
 
 
   let html = `
@@ -5687,9 +5151,7 @@ function updateReaderNavigation(){
   `;
 
 
-  if(
-    previous >= 0
-  ){
+  if(previous >= 0){
 
     html += `
 
@@ -5705,10 +5167,7 @@ function updateReaderNavigation(){
   }
 
 
-  if(
-    next <
-    readerParts.length
-  ){
+  if(next < readerParts.length){
 
     html += `
 
@@ -5724,80 +5183,63 @@ function updateReaderNavigation(){
   }
 
 
-  qs(
-    "#readerBottom"
-  )
-  .innerHTML =
-    html;
+  qs("#readerBottom")
+    .innerHTML = html;
 
 
-  qs(
-    "#bottomInfo"
-  )
-  ?.addEventListener(
-    "click",
-    () =>
-      openModal(
-        "detailModal"
-      )
-  );
+  qs("#bottomInfo")
+    ?.addEventListener(
+      "click",
+      () =>
+        openModal(
+          "detailModal"
+        )
+    );
 
 
-  qs(
-    "#bottomPrev"
-  )
-  ?.addEventListener(
-    "click",
-    () =>
-      openReaderByIndex(
-        previous
-      )
-  );
+  qs("#bottomPrev")
+    ?.addEventListener(
+      "click",
+      () =>
+        openReaderByIndex(
+          previous
+        )
+    );
 
 
-  qs(
-    "#bottomNext"
-  )
-  ?.addEventListener(
-    "click",
-    () =>
-      openReaderByIndex(
-        next
-      )
-  );
+  qs("#bottomNext")
+    ?.addEventListener(
+      "click",
+      () =>
+        openReaderByIndex(
+          next
+        )
+    );
 
 }
 
 
-qs(
-  "#readerPrev"
-)
+qs("#readerPrev")
 .addEventListener(
   "click",
   () =>
     openReaderByIndex(
-      currentReaderIndex -
-      1
+      currentReaderIndex - 1
     )
 );
 
 
-qs(
-  "#readerNext"
-)
+qs("#readerNext")
 .addEventListener(
   "click",
   () =>
     openReaderByIndex(
-      currentReaderIndex +
-      1
+      currentReaderIndex + 1
     )
 );
 
 
-qs(
-  "#readerInfo"
-)
+qs("#readerInfo")
 .addEventListener(
   "click",
   () =>
@@ -5806,6 +5248,8 @@ qs(
     )
 );
 
+
+/* SHARE */
 
 function comicUrl(){
 
@@ -5821,12 +5265,8 @@ function comicUrl(){
 
 async function shareCurrentComic(){
 
-  if(
-    !currentPublicComic
-  ){
-
+  if(!currentPublicComic){
     return;
-
   }
 
 
@@ -5836,19 +5276,13 @@ async function shareCurrentComic(){
 
   try{
 
-    if(
-      navigator.share
-    ){
+    if(navigator.share){
 
       await navigator.share({
-
         title:
           currentPublicComic.title,
-
         url
-
       });
-
 
       return;
 
@@ -5856,9 +5290,7 @@ async function shareCurrentComic(){
 
 
     await navigator.clipboard
-      .writeText(
-        url
-      );
+      .writeText(url);
 
 
     alert(
@@ -5866,10 +5298,7 @@ async function shareCurrentComic(){
     );
 
   }
-
-  catch(
-    error
-  ){
+  catch(error){
 
     if(
       error?.name !==
@@ -5887,27 +5316,21 @@ async function shareCurrentComic(){
 }
 
 
-qs(
-  "#readerShare"
-)
+qs("#readerShare")
 .addEventListener(
   "click",
   shareCurrentComic
 );
 
 
-qs(
-  "#shareComicBtn"
-)
+qs("#shareComicBtn")
 .addEventListener(
   "click",
   shareCurrentComic
 );
 
 
-qs(
-  "#copyComicBtn"
-)
+qs("#copyComicBtn")
 .addEventListener(
   "click",
   async () => {
@@ -5919,21 +5342,15 @@ qs(
           comicUrl()
         );
 
-
-      qs(
-        "#shareMessage"
-      )
-      .textContent =
+      qs("#shareMessage")
+        .textContent =
         "Enlace copiado.";
 
     }
-
     catch{
 
-      qs(
-        "#shareMessage"
-      )
-      .textContent =
+      qs("#shareMessage")
+        .textContent =
         comicUrl();
 
     }
@@ -5942,15 +5359,13 @@ qs(
 );
 
 
+/* EXIT */
+
 function exitComic(){
 
-  qs(
-    "#reader"
-  )
-  .classList
-  .remove(
-    "open"
-  );
+  qs("#reader")
+    .classList
+    .remove("open");
 
 
   closeModal(
@@ -5960,13 +5375,10 @@ function exitComic(){
 
   document.body
     .classList
-    .remove(
-      "reader-locked"
-    );
+    .remove("reader-locked");
 
 
-  currentReaderIndex =
-    -1;
+  currentReaderIndex = -1;
 
 
   const state =
@@ -5974,8 +5386,7 @@ function exitComic(){
 
 
   if(
-    state?.type ===
-    "comic" &&
+    state?.type === "comic" &&
     state?.fromSite
   ){
 
@@ -5987,49 +5398,33 @@ function exitComic(){
 
 
   history.replaceState(
-
     {
       type:"home"
     },
-
     "",
-
     "/"
-
   );
 
 
-  currentPublicComic =
-    null;
+  currentPublicComic = null;
 
-
-  currentPublicSlug =
-    null;
-
+  currentPublicSlug = null;
 
   setHomeMetadata();
 
-
-  window.scrollTo(
-    0,
-    0
-  );
+  window.scrollTo(0,0);
 
 }
 
 
-qs(
-  "#closeReader"
-)
+qs("#closeReader")
 .addEventListener(
   "click",
   exitComic
 );
 
 
-qs(
-  "#closeDetailBtn"
-)
+qs("#closeDetailBtn")
 .addEventListener(
   "click",
   () => {
@@ -6040,13 +5435,9 @@ qs(
 
 
     if(
-      qs(
-        "#reader"
-      )
-      .classList
-      .contains(
-        "open"
-      )
+      qs("#reader")
+        .classList
+        .contains("open")
     ){
 
       return;
@@ -6060,6 +5451,8 @@ qs(
 );
 
 
+/* HISTORY */
+
 window.addEventListener(
   "popstate",
   async () => {
@@ -6068,13 +5461,9 @@ window.addEventListener(
       getRoute();
 
 
-    qs(
-      "#reader"
-    )
-    .classList
-    .remove(
-      "open"
-    );
+    qs("#reader")
+      .classList
+      .remove("open");
 
 
     closeModal(
@@ -6084,15 +5473,10 @@ window.addEventListener(
 
     document.body
       .classList
-      .remove(
-        "reader-locked"
-      );
+      .remove("reader-locked");
 
 
-    if(
-      route.type ===
-      "comic"
-    ){
+    if(route.type === "comic"){
 
       await openComicDirect(
         route.slug,
@@ -6100,16 +5484,11 @@ window.addEventListener(
       );
 
     }
-
     else{
 
-      currentPublicComic =
-        null;
+      currentPublicComic = null;
 
-
-      currentPublicSlug =
-        null;
-
+      currentPublicSlug = null;
 
       setHomeMetadata();
 
@@ -6119,54 +5498,40 @@ window.addEventListener(
 );
 
 
+/* SEARCH */
+
 function runSearch(){
 
   searchQuery =
-    qs(
-      "#searchInput"
-    )
-    .value
-    .trim();
+    qs("#searchInput")
+      .value
+      .trim();
 
 
-  loadCatalog(
-    1
-  );
+  loadCatalog(1);
 
 
-  qs(
-    "#ultimos"
-  )
-  .scrollIntoView({
-
-    behavior:
-      "smooth"
-
-  });
+  qs("#ultimos")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
 
 }
 
 
-qs(
-  "#searchBtn"
-)
+qs("#searchBtn")
 .addEventListener(
   "click",
   runSearch
 );
 
 
-qs(
-  "#searchInput"
-)
+qs("#searchInput")
 .addEventListener(
   "keydown",
   event => {
 
-    if(
-      event.key ===
-      "Enter"
-    ){
+    if(event.key === "Enter"){
 
       runSearch();
 
@@ -6176,9 +5541,7 @@ qs(
 );
 
 
-qs(
-  "#searchInput"
-)
+qs("#searchInput")
 .addEventListener(
   "input",
   event => {
@@ -6197,10 +5560,7 @@ qs(
               .value
               .trim();
 
-
-          loadCatalog(
-            1
-          );
+          loadCatalog(1);
 
         },
         350
@@ -6210,170 +5570,122 @@ qs(
 );
 
 
-qsa(
-  ".category-btn"
-)
-.forEach(
-  button => {
+/* CATEGORIES */
 
-    button.addEventListener(
-      "click",
-      () => {
+qsa(".category-btn")
+.forEach(button => {
 
-        selectedGenre =
-          button.dataset.genre;
+  button.addEventListener(
+    "click",
+    () => {
+
+      selectedGenre =
+        button.dataset.genre;
 
 
-        qsa(
-          ".category-btn"
-        )
-        .forEach(
-          item => {
+      qsa(".category-btn")
+      .forEach(item => {
 
-            item.classList.toggle(
-
-              "active",
-
-              item ===
-              button
-
-            );
-
-          }
+        item.classList.toggle(
+          "active",
+          item === button
         );
 
-
-        loadCatalog(
-          1
-        );
+      });
 
 
-        qs(
-          "#ultimos"
-        )
+      loadCatalog(1);
+
+
+      qs("#ultimos")
         .scrollIntoView({
-
-          behavior:
-            "smooth"
-
+          behavior:"smooth"
         });
 
-      }
-    );
+    }
+  );
 
-  }
-);
-
-
-qsa(
-  ".tag"
-)
-.forEach(
-  tag => {
-
-    tag.addEventListener(
-      "click",
-      () => {
-
-        selectedGenre =
-          tag.dataset.tag;
+});
 
 
-        qsa(
-          ".category-btn"
-        )
-        .forEach(
-          item => {
+qsa(".tag")
+.forEach(tag => {
 
-            item.classList.toggle(
+  tag.addEventListener(
+    "click",
+    () => {
 
-              "active",
+      selectedGenre =
+        tag.dataset.tag;
 
-              item.dataset.genre ===
-              selectedGenre
 
-            );
+      qsa(".category-btn")
+      .forEach(item => {
 
-          }
+        item.classList.toggle(
+          "active",
+          item.dataset.genre
+          ===
+          selectedGenre
         );
 
-
-        loadCatalog(
-          1
-        );
+      });
 
 
-        qs(
-          "#ultimos"
-        )
+      loadCatalog(1);
+
+
+      qs("#ultimos")
         .scrollIntoView({
-
-          behavior:
-            "smooth"
-
+          behavior:"smooth"
         });
 
-      }
-    );
+    }
+  );
 
-  }
-);
-
-
-qsa(
-  ".tab[data-sort]"
-)
-.forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        sortMode =
-          button.dataset.sort;
+});
 
 
-        qsa(
-          ".tab[data-sort]"
-        )
-        .forEach(
-          item => {
+/* SORT */
 
-            item.classList.toggle(
+qsa(".tab[data-sort]")
+.forEach(button => {
 
-              "active",
+  button.addEventListener(
+    "click",
+    () => {
 
-              item ===
-              button
+      sortMode =
+        button.dataset.sort;
 
-            );
 
-          }
+      qsa(".tab[data-sort]")
+      .forEach(item => {
+
+        item.classList.toggle(
+          "active",
+          item === button
         );
 
-
-        loadCatalog(
-          1
-        );
-
-      }
-    );
-
-  }
-);
+      });
 
 
-qs(
-  "#openAdmin"
-)
+      loadCatalog(1);
+
+    }
+  );
+
+});
+
+
+/* ADMIN LOGIN */
+
+qs("#openAdmin")
 .addEventListener(
   "click",
   async () => {
 
-    if(
-      adminToken
-    ){
+    if(adminToken){
 
       try{
 
@@ -6382,27 +5694,22 @@ qs(
         return;
 
       }
-
       catch{
 
-        adminToken =
-          "";
+        adminToken = "";
 
-
-        sessionStorage.removeItem(
-          "nightink_admin_token"
-        );
+        sessionStorage
+          .removeItem(
+            "nightink_admin_token"
+          );
 
       }
 
     }
 
 
-    qs(
-      "#loginMsg"
-    )
-    .textContent =
-      "";
+    qs("#loginMsg")
+      .textContent = "";
 
 
     openModal(
@@ -6410,35 +5717,26 @@ qs(
     );
 
 
-    qs(
-      "#adminPassword"
-    )
-    .focus();
+    qs("#adminPassword")
+      .focus();
 
   }
 );
 
 
-qs(
-  "#loginBtn"
-)
+qs("#loginBtn")
 .addEventListener(
   "click",
   loginAdmin
 );
 
 
-qs(
-  "#adminPassword"
-)
+qs("#adminPassword")
 .addEventListener(
   "keydown",
   event => {
 
-    if(
-      event.key ===
-      "Enter"
-    ){
+    if(event.key === "Enter"){
 
       loginAdmin();
 
@@ -6451,10 +5749,8 @@ qs(
 async function loginAdmin(){
 
   const password =
-    qs(
-      "#adminPassword"
-    )
-    .value;
+    qs("#adminPassword")
+      .value;
 
 
   try{
@@ -6462,24 +5758,17 @@ async function loginAdmin(){
     await api(
       "/api/admin/login",
       {
-
-        method:
-          "POST",
+        method:"POST",
 
         headers:{
-
           "Content-Type":
             "application/json"
-
         },
 
         body:
           JSON.stringify({
-
             password
-
           })
-
       }
     );
 
@@ -6489,11 +5778,8 @@ async function loginAdmin(){
 
 
     sessionStorage.setItem(
-
       "nightink_admin_token",
-
       password
-
     );
 
 
@@ -6505,22 +5791,15 @@ async function loginAdmin(){
     await showAdmin();
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    qs(
-      "#loginMsg"
-    )
-    .className =
+    qs("#loginMsg")
+      .className =
       "msg error";
 
 
-    qs(
-      "#loginMsg"
-    )
-    .textContent =
+    qs("#loginMsg")
+      .textContent =
       error.message;
 
   }
@@ -6528,62 +5807,46 @@ async function loginAdmin(){
 }
 
 
+/* ADMIN */
+
 async function showAdmin(){
 
-  qs(
-    "#adminShell"
-  )
-  .classList
-  .add(
-    "visible"
-  );
+  qs("#adminShell")
+    .classList
+    .add("visible");
 
 
   await Promise.all([
-
     loadStats(),
-
     loadAdminComics()
-
   ]);
 
 
-  qs(
-    "#adminShell"
-  )
-  .scrollIntoView({
-
-    behavior:
-      "smooth"
-
-  });
+  qs("#adminShell")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
 
 }
 
 
-qs(
-  "#logoutAdminBtn"
-)
+qs("#logoutAdminBtn")
 .addEventListener(
   "click",
   () => {
 
-    adminToken =
-      "";
+    adminToken = "";
 
 
-    sessionStorage.removeItem(
-      "nightink_admin_token"
-    );
+    sessionStorage
+      .removeItem(
+        "nightink_admin_token"
+      );
 
 
-    qs(
-      "#adminShell"
-    )
-    .classList
-    .remove(
-      "visible"
-    );
+    qs("#adminShell")
+      .classList
+      .remove("visible");
 
   }
 );
@@ -6598,82 +5861,77 @@ async function loadStats(){
 
 
   const stats =
-    data.stats ||
-    {};
+    data.stats || {};
 
 
-  qs(
-    "#stats"
-  )
-  .innerHTML = `
+  qs("#stats")
+    .innerHTML = `
 
-    <div class="stat">
+      <div class="stat">
 
-      <strong>
-        ${Number(
-          stats.comics ||
-          0
-        )}
-      </strong>
+        <strong>
+          ${Number(
+            stats.comics || 0
+          )}
+        </strong>
 
-      <small>
-        Cómics
-      </small>
+        <small>
+          Cómics
+        </small>
 
-    </div>
+      </div>
 
 
-    <div class="stat">
+      <div class="stat">
 
-      <strong>
-        ${Number(
-          stats.chapters ||
-          0
-        )}
-      </strong>
+        <strong>
+          ${Number(
+            stats.chapters || 0
+          )}
+        </strong>
 
-      <small>
-        Partes
-      </small>
+        <small>
+          Partes
+        </small>
 
-    </div>
-
-
-    <div class="stat">
-
-      <strong>
-        ${Number(
-          stats.pages ||
-          0
-        )}
-      </strong>
-
-      <small>
-        Páginas
-      </small>
-
-    </div>
+      </div>
 
 
-    <div class="stat">
+      <div class="stat">
 
-      <strong>
-        ${Number(
-          stats.views ||
-          0
-        )}
-      </strong>
+        <strong>
+          ${Number(
+            stats.pages || 0
+          )}
+        </strong>
 
-      <small>
-        Vistas
-      </small>
+        <small>
+          Páginas
+        </small>
 
-    </div>
+      </div>
 
-  `;
+
+      <div class="stat">
+
+        <strong>
+          ${Number(
+            stats.views || 0
+          )}
+        </strong>
+
+        <small>
+          Vistas
+        </small>
+
+      </div>
+
+    `;
 
 }
 
+
+/* READINESS */
 
 function calculateReadiness(
   comic,
@@ -6681,8 +5939,7 @@ function calculateReadiness(
 ){
 
   const all =
-    chapters ||
-    [];
+    chapters || [];
 
 
   const published =
@@ -6698,141 +5955,89 @@ function calculateReadiness(
     published.filter(
       chapter =>
         Number(
-          chapter.page_count ||
-          0
+          chapter.page_count || 0
         ) > 0
     );
 
 
   const totalPages =
     readable.reduce(
-
       (
         sum,
         chapter
       ) =>
-
         sum +
         Number(
-          chapter.page_count ||
-          0
+          chapter.page_count || 0
         ),
-
       0
-
     );
 
 
-  if(
-    !comic.is_published
-  ){
+  if(!comic.is_published){
 
     return {
-
-      rowClass:
-        "draft",
-
-      badgeClass:
-        "draft",
-
-      label:
-        "BORRADOR",
-
+      rowClass:"draft",
+      badgeClass:"draft",
+      label:"BORRADOR",
       detail:
         "No visible para lectores."
-
     };
 
   }
 
 
-  if(
-    !all.length
-  ){
+  if(!all.length){
 
     return {
-
-      rowClass:
-        "warning",
-
-      badgeClass:
-        "warn",
-
-      label:
-        "FALTA PARTE",
-
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"FALTA PARTE",
       detail:
         "Crea la Parte 1."
-
     };
 
   }
 
 
-  if(
-    !published.length
-  ){
+  if(!published.length){
 
     return {
-
-      rowClass:
-        "warning",
-
-      badgeClass:
-        "warn",
-
-      label:
-        "FALTA PUBLICAR",
-
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"FALTA PUBLICAR",
       detail:
         "Ninguna parte está publicada."
-
     };
 
   }
 
 
-  if(
-    !readable.length
-  ){
+  if(!readable.length){
 
     return {
-
-      rowClass:
-        "warning",
-
-      badgeClass:
-        "warn",
-
-      label:
-        "FALTAN PÁGINAS",
-
+      rowClass:"warning",
+      badgeClass:"warn",
+      label:"FALTAN PÁGINAS",
       detail:
         "No hay imágenes para leer."
-
     };
 
   }
 
 
   return {
-
-    rowClass:
-      "ready",
-
-    badgeClass:
-      "ok",
-
-    label:
-      "LISTO PARA LEER",
-
+    rowClass:"ready",
+    badgeClass:"ok",
+    label:"LISTO PARA LEER",
     detail:
       `${readable.length} parte(s) · ${totalPages} páginas`
-
   };
 
 }
 
+
+/* ADMIN COMICS */
 
 async function loadAdminComics(){
 
@@ -6843,19 +6048,14 @@ async function loadAdminComics(){
 
 
   const comics =
-    data.comics ||
-    [];
+    data.comics || [];
 
 
   const box =
-    qs(
-      "#adminList"
-    );
+    qs("#adminList");
 
 
-  if(
-    !comics.length
-  ){
+  if(!comics.length){
 
     box.innerHTML = `
 
@@ -6872,186 +6072,158 @@ async function loadAdminComics(){
 
   box.innerHTML =
     comics
-      .map(
-        comic => {
+      .map(comic => {
 
-          const cover =
-            comic.cover_url
-            ?
-            `background-image:url('${comic.cover_url}')`
-            :
-            "";
+        const cover =
+          comic.cover_url
+          ?
+          `background-image:url('${comic.cover_url}')`
+          :
+          "";
 
 
-          return `
+        return `
+
+          <div
+            class="admin-row"
+            id="adminComic-${comic.id}"
+          >
 
             <div
-              class="admin-row"
-              id="adminComic-${comic.id}"
-            >
-
-              <div
-                class="admin-cover"
-                style="${cover}"
-              ></div>
+              class="admin-cover"
+              style="${cover}"
+            ></div>
 
 
-              <div>
+            <div>
 
-                <div class="admin-title">
+              <div class="admin-title">
+                ${esc(comic.title)}
+              </div>
 
-                  ${esc(
-                    comic.title
-                  )}
+              <div class="admin-meta">
 
-                </div>
+                ${esc(
+                  comic.genre ||
+                  "Sin género"
+                )}
 
+                ·
 
-                <div class="admin-meta">
+                ${Number(
+                  comic.part_count || 0
+                )}
+                parte(s)
 
-                  ${esc(
-                    comic.genre ||
-                    "Sin género"
-                  )}
+                ·
 
-                  ·
-
-                  ${Number(
-                    comic.part_count ||
-                    0
-                  )}
-                  parte(s)
-
-                  ·
-
-                  ${
-                    comic.is_published
-                    ?
-                    "Publicado"
-                    :
-                    "Borrador"
-                  }
-
-                </div>
-
-
-                <div
-                  class="readiness"
-                  id="readiness-${comic.id}"
-                >
-
-                  <span
-                    class="ready-badge loading"
-                  >
-                    Comprobando...
-                  </span>
-
-                </div>
+                ${
+                  comic.is_published
+                  ?
+                  "Publicado"
+                  :
+                  "Borrador"
+                }
 
               </div>
 
+              <div
+                class="readiness"
+                id="readiness-${comic.id}"
+              >
 
-              <div class="row-actions">
-
-                <button
-                  data-edit="${comic.id}"
+                <span
+                  class="ready-badge loading"
                 >
-                  Editar
-                </button>
-
-                <button
-                  data-parts="${comic.id}"
-                >
-                  Partes
-                </button>
-
-                <button
-                  data-delete="${comic.id}"
-                >
-                  Eliminar
-                </button>
+                  Comprobando...
+                </span>
 
               </div>
 
             </div>
 
-          `;
 
-        }
-      )
+            <div class="row-actions">
+
+              <button
+                data-edit="${comic.id}"
+              >
+                Editar
+              </button>
+
+              <button
+                data-parts="${comic.id}"
+              >
+                Partes
+              </button>
+
+              <button
+                data-delete="${comic.id}"
+              >
+                Eliminar
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      })
       .join("");
 
 
-  qsa(
-    "[data-edit]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-edit]")
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        () =>
-          editComic(
+    button.addEventListener(
+      "click",
+      () =>
+        editComic(
+          Number(
+            button.dataset.edit
+          ),
+          comics
+        )
+    );
 
-            Number(
-              button.dataset.edit
-            ),
+  });
 
-            comics
 
+  qsa("[data-parts]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () =>
+        manageParts(
+          Number(
+            button.dataset.parts
+          ),
+          comics
+        )
+    );
+
+  });
+
+
+  qsa("[data-delete]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () =>
+        deleteComic(
+          Number(
+            button.dataset.delete
           )
-      );
+        )
+    );
 
-    }
-  );
-
-
-  qsa(
-    "[data-parts]"
-  )
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () =>
-          manageParts(
-
-            Number(
-              button.dataset.parts
-            ),
-
-            comics
-
-          )
-      );
-
-    }
-  );
-
-
-  qsa(
-    "[data-delete]"
-  )
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () =>
-          deleteComic(
-            Number(
-              button.dataset.delete
-            )
-          )
-      );
-
-    }
-  );
+  });
 
 
   await Promise.all(
-
     comics.map(
       async comic => {
 
@@ -7065,12 +6237,8 @@ async function loadAdminComics(){
 
           const status =
             calculateReadiness(
-
               comic,
-
-              result.chapters ||
-              []
-
+              result.chapters || []
             );
 
 
@@ -7093,9 +6261,7 @@ async function loadAdminComics(){
             );
 
 
-          if(
-            indicator
-          ){
+          if(indicator){
 
             indicator.innerHTML = `
 
@@ -7111,9 +6277,7 @@ async function loadAdminComics(){
                   font-size:9px
                 "
               >
-                ${esc(
-                  status.detail
-                )}
+                ${esc(status.detail)}
               </span>
 
             `;
@@ -7121,7 +6285,6 @@ async function loadAdminComics(){
           }
 
         }
-
         catch{
 
           const indicator =
@@ -7130,9 +6293,7 @@ async function loadAdminComics(){
             );
 
 
-          if(
-            indicator
-          ){
+          if(indicator){
 
             indicator.innerHTML = `
 
@@ -7150,80 +6311,55 @@ async function loadAdminComics(){
 
       }
     )
-
   );
 
 }
 
 
-qs(
-  "#refreshAdminBtn"
-)
+qs("#refreshAdminBtn")
 .addEventListener(
   "click",
   async () => {
 
     await Promise.all([
-
       loadStats(),
-
       loadAdminComics(),
-
-      loadCatalog(
-        currentPage
-      ),
-
+      loadCatalog(currentPage),
       loadPopular(),
-
       loadUpdates(),
-
       loadRandomPool()
-
     ]);
 
   }
 );
 
 
-qs(
-  "#newComicBtn"
-)
+/* NEW COMIC */
+
+qs("#newComicBtn")
 .addEventListener(
   "click",
   () => {
 
-    qs(
-      "#comicForm"
-    )
-    .reset();
+    qs("#comicForm")
+      .reset();
 
 
-    qs(
-      "#comicId"
-    )
-    .value =
-      "";
+    qs("#comicId")
+      .value = "";
 
 
-    qs(
-      "#comicPublished"
-    )
-    .checked =
-      true;
+    qs("#comicPublished")
+      .checked = true;
 
 
-    qs(
-      "#comicFormTitle"
-    )
-    .textContent =
+    qs("#comicFormTitle")
+      .textContent =
       "Nuevo cómic";
 
 
-    qs(
-      "#comicMsg"
-    )
-    .textContent =
-      "";
+    qs("#comicMsg")
+      .textContent = "";
 
 
     openModal(
@@ -7234,6 +6370,8 @@ qs(
 );
 
 
+/* EDIT COMIC */
+
 function editComic(
   id,
   comics
@@ -7242,71 +6380,52 @@ function editComic(
   const comic =
     comics.find(
       item =>
-        Number(
-          item.id
-        ) === id
+        Number(item.id)
+        ===
+        id
     );
 
 
-  if(
-    !comic
-  ){
-
+  if(!comic){
     return;
-
   }
 
 
   qs("#comicId").value =
     comic.id;
 
-
   qs("#comicTitle").value =
-    comic.title ||
-    "";
-
+    comic.title || "";
 
   qs("#comicSlug").value =
-    comic.slug ||
-    "";
-
+    comic.slug || "";
 
   qs("#comicAuthor").value =
-    comic.author ||
-    "";
-
+    comic.author || "";
 
   qs("#comicGenre").value =
-    comic.genre ||
-    "";
-
+    comic.genre || "";
 
   qs("#comicStatus").value =
     comic.status ||
     "En emisión";
 
-
   qs("#comicDescription").value =
-    comic.description ||
-    "";
-
+    comic.description || "";
 
   qs("#comicPublished").checked =
     Boolean(
       comic.is_published
     );
 
+  qs("#comicCover").value = "";
 
-  qs("#comicCover").value =
-    "";
-
-
-  qs("#comicFormTitle").textContent =
+  qs("#comicFormTitle")
+    .textContent =
     "Editar cómic";
 
-
-  qs("#comicMsg").textContent =
-    "";
+  qs("#comicMsg")
+    .textContent = "";
 
 
   openModal(
@@ -7316,9 +6435,9 @@ function editComic(
 }
 
 
-qs(
-  "#comicForm"
-)
+/* SAVE COMIC */
+
+qs("#comicForm")
 .addEventListener(
   "submit",
   async event => {
@@ -7328,117 +6447,86 @@ qs(
 
     const id =
       Number(
-        qs(
-          "#comicId"
-        )
-        .value ||
-        0
+        qs("#comicId")
+          .value || 0
       );
 
 
     const payload = {
 
       title:
-        qs(
-          "#comicTitle"
-        )
-        .value,
+        qs("#comicTitle")
+          .value,
 
       slug:
-        qs(
-          "#comicSlug"
-        )
-        .value,
+        qs("#comicSlug")
+          .value,
 
       author:
-        qs(
-          "#comicAuthor"
-        )
-        .value,
+        qs("#comicAuthor")
+          .value,
 
       genre:
-        qs(
-          "#comicGenre"
-        )
-        .value,
+        qs("#comicGenre")
+          .value,
 
       status:
-        qs(
-          "#comicStatus"
-        )
-        .value,
+        qs("#comicStatus")
+          .value,
 
       description:
-        qs(
-          "#comicDescription"
-        )
-        .value,
+        qs("#comicDescription")
+          .value,
 
       is_published:
-        qs(
-          "#comicPublished"
-        )
-        .checked
+        qs("#comicPublished")
+          .checked
 
     };
 
 
     try{
 
-      let comicId =
-        id;
+      let comicId = id;
 
 
-      if(
-        id
-      ){
+      if(id){
 
         await api(
           `/api/admin/comics/${id}`,
           {
-
-            method:
-              "PUT",
+            method:"PUT",
 
             headers:{
-
               "Content-Type":
                 "application/json"
-
             },
 
             body:
               JSON.stringify(
                 payload
               )
-
           }
         );
 
       }
-
       else{
 
         const result =
           await api(
             "/api/admin/comics",
             {
-
-              method:
-                "POST",
+              method:"POST",
 
               headers:{
-
                 "Content-Type":
                   "application/json"
-
               },
 
               body:
                 JSON.stringify(
                   payload
                 )
-
             }
           );
 
@@ -7450,15 +6538,11 @@ qs(
 
 
       const cover =
-        qs(
-          "#comicCover"
-        )
-        .files[0];
+        qs("#comicCover")
+          .files[0];
 
 
-      if(
-        cover
-      ){
+      if(cover){
 
         const form =
           new FormData();
@@ -7473,13 +6557,8 @@ qs(
         await api(
           `/api/admin/comics/${comicId}/cover`,
           {
-
-            method:
-              "POST",
-
-            body:
-              form
-
+            method:"POST",
+            body:form
           }
         );
 
@@ -7487,21 +6566,12 @@ qs(
 
 
       await Promise.all([
-
         loadAdminComics(),
-
         loadStats(),
-
-        loadCatalog(
-          currentPage
-        ),
-
+        loadCatalog(currentPage),
         loadPopular(),
-
         loadUpdates(),
-
         loadRandomPool()
-
       ]);
 
 
@@ -7510,22 +6580,15 @@ qs(
       );
 
     }
+    catch(error){
 
-    catch(
-      error
-    ){
-
-      qs(
-        "#comicMsg"
-      )
-      .className =
+      qs("#comicMsg")
+        .className =
         "msg error";
 
 
-      qs(
-        "#comicMsg"
-      )
-      .textContent =
+      qs("#comicMsg")
+        .textContent =
         error.message;
 
     }
@@ -7534,9 +6597,9 @@ qs(
 );
 
 
-async function deleteComic(
-  id
-){
+/* DELETE COMIC */
+
+async function deleteComic(id){
 
   if(
     !confirm(
@@ -7554,46 +6617,31 @@ async function deleteComic(
     await api(
       `/api/admin/comics/${id}`,
       {
-
-        method:
-          "DELETE"
-
+        method:"DELETE"
       }
     );
 
 
     await Promise.all([
-
       loadAdminComics(),
-
       loadStats(),
-
-      loadCatalog(
-        1
-      ),
-
+      loadCatalog(1),
       loadPopular(),
-
       loadUpdates(),
-
       loadRandomPool()
-
     ]);
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
 }
 
+
+/* PARTS */
 
 async function manageParts(
   id,
@@ -7607,45 +6655,31 @@ async function manageParts(
   const comic =
     comics.find(
       item =>
-        Number(
-          item.id
-        ) === id
+        Number(item.id)
+        ===
+        id
     );
 
 
-  qs(
-    "#chaptersTitle"
-  )
-  .textContent =
+  qs("#chaptersTitle")
+    .textContent =
     `Partes · ${comic?.title || ""}`;
 
 
-  qs(
-    "#chapterNumber"
-  )
-  .value =
-    1;
+  qs("#chapterNumber")
+    .value = 1;
 
 
-  qs(
-    "#chapterTitle"
-  )
-  .value =
-    "";
+  qs("#chapterTitle")
+    .value = "";
 
 
-  qs(
-    "#chapterPublished"
-  )
-  .checked =
-    true;
+  qs("#chapterPublished")
+    .checked = true;
 
 
-  qs(
-    "#chapterMsg"
-  )
-  .textContent =
-    "";
+  qs("#chapterMsg")
+    .textContent = "";
 
 
   openModal(
@@ -7667,119 +6701,109 @@ async function loadParts(){
 
 
   currentAdminChapters =
-    data.chapters ||
-    [];
+    data.chapters || [];
 
 
-  qs(
-    "#chaptersList"
-  )
-  .innerHTML =
+  qs("#chaptersList")
+    .innerHTML =
     currentAdminChapters.length
     ?
     currentAdminChapters
-      .map(
-        chapter => `
+      .map(chapter => `
 
-          <div class="chapter-row">
+        <div class="chapter-row">
 
-            <div>
+          <div>
 
-              <strong>
+            <strong>
 
-                Parte
-                ${chapter.chapter_number}
+              Parte
+              ${chapter.chapter_number}
 
-                ${
-                  chapter.title
-                  ?
-                  " · " +
-                  esc(
-                    chapter.title
-                  )
-                  :
-                  ""
-                }
+              ${
+                chapter.title
+                ?
+                " · " +
+                esc(chapter.title)
+                :
+                ""
+              }
 
-              </strong>
+            </strong>
 
 
-              <small>
+            <small>
 
-                ${Number(
-                  chapter.page_count ||
-                  0
-                )}
-                páginas
+              ${Number(
+                chapter.page_count || 0
+              )}
+              páginas
 
-                ·
+              ·
 
-                ${
-                  chapter.is_published
-                  ?
-                  "Publicada"
-                  :
-                  "Borrador"
-                }
+              ${
+                chapter.is_published
+                ?
+                "Publicada"
+                :
+                "Borrador"
+              }
 
-              </small>
+            </small>
 
 
-              <div class="upload-zone">
+            <div class="upload-zone">
 
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  data-files="${chapter.id}"
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                data-files="${chapter.id}"
+              >
+
+              <div
+                style="margin-top:8px"
+              >
+
+                <button
+                  class="btn secondary small"
+                  data-upload="${chapter.id}"
                 >
-
-                <div
-                  style="
-                    margin-top:8px
-                  "
-                >
-
-                  <button
-                    class="btn secondary small"
-                    data-upload="${chapter.id}"
-                  >
-                    Subir páginas
-                  </button>
-
-                </div>
+                  Subir páginas
+                </button>
 
               </div>
 
             </div>
 
+          </div>
 
-            <div class="row-actions">
 
-              <button
-                data-edit-chapter="${chapter.id}"
-              >
-                Editar
-              </button>
+          <div class="row-actions">
 
-              <button
-                data-manage-pages="${chapter.id}"
-              >
-                Páginas
-              </button>
+            <button
+              data-edit-chapter="${chapter.id}"
+            >
+              Editar
+            </button>
 
-              <button
-                data-delchapter="${chapter.id}"
-              >
-                Eliminar
-              </button>
+            <button
+              data-manage-pages="${chapter.id}"
+            >
+              Páginas
+            </button>
 
-            </div>
+            <button
+              data-delchapter="${chapter.id}"
+            >
+              Eliminar
+            </button>
 
           </div>
 
-        `
-      )
+        </div>
+
+      `)
       .join("")
     :
     `
@@ -7791,83 +6815,65 @@ async function loadParts(){
     `;
 
 
-  qsa(
-    "[data-upload]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-upload]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          uploadPages(
-            Number(
-              button.dataset.upload
-            )
-          );
+    button.onclick =
+      () =>
+        uploadPages(
+          Number(
+            button.dataset.upload
+          )
+        );
 
-    }
-  );
+  });
 
 
-  qsa(
-    "[data-edit-chapter]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-edit-chapter]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          openEditChapter(
-            Number(
-              button.dataset.editChapter
-            )
-          );
+    button.onclick =
+      () =>
+        openEditChapter(
+          Number(
+            button.dataset.editChapter
+          )
+        );
 
-    }
-  );
+  });
 
 
-  qsa(
-    "[data-manage-pages]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-manage-pages]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          openPagesManager(
-            Number(
-              button.dataset.managePages
-            )
-          );
+    button.onclick =
+      () =>
+        openPagesManager(
+          Number(
+            button.dataset.managePages
+          )
+        );
 
-    }
-  );
+  });
 
 
-  qsa(
-    "[data-delchapter]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-delchapter]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          deleteChapter(
-            Number(
-              button.dataset.delchapter
-            )
-          );
+    button.onclick =
+      () =>
+        deleteChapter(
+          Number(
+            button.dataset.delchapter
+          )
+        );
 
-    }
-  );
+  });
 
 }
 
 
-qs(
-  "#addChapterBtn"
-)
+qs("#addChapterBtn")
 .addEventListener(
   "click",
   async () => {
@@ -7877,81 +6883,52 @@ qs(
       await api(
         `/api/admin/comics/${currentComicForChapters}/chapters`,
         {
-
-          method:
-            "POST",
+          method:"POST",
 
           headers:{
-
             "Content-Type":
               "application/json"
-
           },
 
           body:
             JSON.stringify({
-
               chapter_number:
                 Number(
-                  qs(
-                    "#chapterNumber"
-                  )
-                  .value
+                  qs("#chapterNumber")
+                    .value
                 ),
 
               title:
-                qs(
-                  "#chapterTitle"
-                )
-                .value,
+                qs("#chapterTitle")
+                  .value,
 
               is_published:
-                qs(
-                  "#chapterPublished"
-                )
-                .checked
-
+                qs("#chapterPublished")
+                  .checked
             })
-
         }
       );
 
 
       await Promise.all([
-
         loadParts(),
-
         loadAdminComics(),
-
         loadStats(),
-
-        loadCatalog(
-          currentPage
-        ),
-
+        loadCatalog(currentPage),
         loadUpdates(),
-
         loadRandomPool()
-
       ]);
 
     }
+    catch(error){
 
-    catch(
-      error
-    ){
-
-      qs(
-        "#chapterMsg"
-      )
-      .className =
+      qs("#chapterMsg")
+        .className =
         "msg error";
 
 
-      qs(
-        "#chapterMsg"
-      )
-      .textContent =
+      qs("#chapterMsg")
+        .textContent =
         error.message;
 
     }
@@ -7960,49 +6937,45 @@ qs(
 );
 
 
-function openEditChapter(
-  id
-){
+/* EDIT PART */
+
+function openEditChapter(id){
 
   const chapter =
-    currentAdminChapters.find(
-      item =>
-        Number(
-          item.id
-        ) === id
-    );
+    currentAdminChapters
+      .find(
+        item =>
+          Number(item.id)
+          ===
+          id
+      );
 
 
-  if(
-    !chapter
-  ){
-
+  if(!chapter){
     return;
-
   }
 
 
-  qs("#editChapterId").value =
+  qs("#editChapterId")
+    .value =
     chapter.id;
 
-
-  qs("#editChapterNumber").value =
+  qs("#editChapterNumber")
+    .value =
     chapter.chapter_number;
 
+  qs("#editChapterTitle")
+    .value =
+    chapter.title || "";
 
-  qs("#editChapterTitle").value =
-    chapter.title ||
-    "";
-
-
-  qs("#editChapterPublished").checked =
+  qs("#editChapterPublished")
+    .checked =
     Boolean(
       chapter.is_published
     );
 
-
-  qs("#editChapterMsg").textContent =
-    "";
+  qs("#editChapterMsg")
+    .textContent = "";
 
 
   openModal(
@@ -8012,19 +6985,15 @@ function openEditChapter(
 }
 
 
-qs(
-  "#saveChapterBtn"
-)
+qs("#saveChapterBtn")
 .addEventListener(
   "click",
   async () => {
 
     const id =
       Number(
-        qs(
-          "#editChapterId"
-        )
-        .value
+        qs("#editChapterId")
+          .value
       );
 
 
@@ -8033,62 +7002,40 @@ qs(
       await api(
         `/api/admin/chapters/${id}`,
         {
-
-          method:
-            "PUT",
+          method:"PUT",
 
           headers:{
-
             "Content-Type":
               "application/json"
-
           },
 
           body:
             JSON.stringify({
-
               chapter_number:
                 Number(
-                  qs(
-                    "#editChapterNumber"
-                  )
-                  .value
+                  qs("#editChapterNumber")
+                    .value
                 ),
 
               title:
-                qs(
-                  "#editChapterTitle"
-                )
-                .value,
+                qs("#editChapterTitle")
+                  .value,
 
               is_published:
-                qs(
-                  "#editChapterPublished"
-                )
-                .checked
-
+                qs("#editChapterPublished")
+                  .checked
             })
-
         }
       );
 
 
       await Promise.all([
-
         loadParts(),
-
         loadAdminComics(),
-
-        loadCatalog(
-          currentPage
-        ),
-
+        loadCatalog(currentPage),
         loadUpdates(),
-
         loadStats(),
-
         loadRandomPool()
-
       ]);
 
 
@@ -8097,22 +7044,15 @@ qs(
       );
 
     }
+    catch(error){
 
-    catch(
-      error
-    ){
-
-      qs(
-        "#editChapterMsg"
-      )
-      .className =
+      qs("#editChapterMsg")
+        .className =
         "msg error";
 
 
-      qs(
-        "#editChapterMsg"
-      )
-      .textContent =
+      qs("#editChapterMsg")
+        .textContent =
         error.message;
 
     }
@@ -8120,6 +7060,8 @@ qs(
   }
 );
 
+
+/* UPLOAD */
 
 async function uploadPages(
   chapterId
@@ -8146,32 +7088,21 @@ async function uploadPages(
 
 
   const files =
-    [
-      ...input.files
-    ]
-    .sort(
-      (
-        a,
-        b
-      ) =>
-        a.name.localeCompare(
-
-          b.name,
-
-          undefined,
-
-          {
-
-            numeric:
-              true,
-
-            sensitivity:
-              "base"
-
-          }
-
-        )
-    );
+    [...input.files]
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+              numeric:true,
+              sensitivity:"base"
+            }
+          )
+      );
 
 
   const form =
@@ -8192,37 +7123,22 @@ async function uploadPages(
     await api(
       `/api/admin/chapters/${chapterId}/pages`,
       {
-
-        method:
-          "POST",
-
-        body:
-          form
-
+        method:"POST",
+        body:form
       }
     );
 
 
-    input.value =
-      "";
+    input.value = "";
 
 
     await Promise.all([
-
       loadParts(),
-
       loadAdminComics(),
-
       loadStats(),
-
-      loadCatalog(
-        currentPage
-      ),
-
+      loadCatalog(currentPage),
       loadUpdates(),
-
       loadRandomPool()
-
     ]);
 
 
@@ -8231,23 +7147,18 @@ async function uploadPages(
     );
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
 }
 
 
-async function deleteChapter(
-  id
-){
+/* DELETE PART */
+
+async function deleteChapter(id){
 
   if(
     !confirm(
@@ -8265,68 +7176,50 @@ async function deleteChapter(
     await api(
       `/api/admin/chapters/${id}`,
       {
-
-        method:
-          "DELETE"
-
+        method:"DELETE"
       }
     );
 
 
     await Promise.all([
-
       loadParts(),
-
       loadAdminComics(),
-
       loadStats(),
-
-      loadCatalog(
-        currentPage
-      ),
-
+      loadCatalog(currentPage),
       loadUpdates(),
-
       loadRandomPool()
-
     ]);
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
 }
 
 
-async function openPagesManager(
-  id
-){
+/* PAGE MANAGER */
+
+async function openPagesManager(id){
 
   currentManagedChapter =
     id;
 
 
   const chapter =
-    currentAdminChapters.find(
-      item =>
-        Number(
-          item.id
-        ) === id
-    );
+    currentAdminChapters
+      .find(
+        item =>
+          Number(item.id)
+          ===
+          id
+      );
 
 
-  qs(
-    "#pagesTitle"
-  )
-  .textContent =
+  qs("#pagesTitle")
+    .textContent =
     chapter
     ?
     `Páginas · Parte ${chapter.chapter_number}`
@@ -8353,8 +7246,7 @@ async function loadManagedPages(){
 
 
   managedPages =
-    data.pages ||
-    [];
+    data.pages || [];
 
 
   renderManagedPages();
@@ -8364,10 +7256,8 @@ async function loadManagedPages(){
 
 function renderManagedPages(){
 
-  qs(
-    "#pagesGrid"
-  )
-  .innerHTML =
+  qs("#pagesGrid")
+    .innerHTML =
     managedPages.length
     ?
     managedPages
@@ -8393,9 +7283,7 @@ function renderManagedPages(){
             <div class="page-info">
 
               <strong
-                style="
-                  font-size:10px
-                "
+                style="font-size:10px"
               >
                 Página
                 ${index + 1}
@@ -8421,8 +7309,7 @@ function renderManagedPages(){
                   data-right="${page.id}"
                   ${
                     index ===
-                    managedPages.length -
-                    1
+                    managedPages.length - 1
                     ?
                     "disabled"
                     :
@@ -8458,66 +7345,48 @@ function renderManagedPages(){
     `;
 
 
-  qsa(
-    "[data-left]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-left]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          movePage(
+    button.onclick =
+      () =>
+        movePage(
+          Number(
+            button.dataset.left
+          ),
+          -1
+        );
 
-            Number(
-              button.dataset.left
-            ),
-
-            -1
-
-          );
-
-    }
-  );
+  });
 
 
-  qsa(
-    "[data-right]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-right]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          movePage(
+    button.onclick =
+      () =>
+        movePage(
+          Number(
+            button.dataset.right
+          ),
+          1
+        );
 
-            Number(
-              button.dataset.right
-            ),
-
-            1
-
-          );
-
-    }
-  );
+  });
 
 
-  qsa(
-    "[data-delpage]"
-  )
-  .forEach(
-    button => {
+  qsa("[data-delpage]")
+  .forEach(button => {
 
-      button.onclick =
-        () =>
-          deletePage(
-            Number(
-              button.dataset.delpage
-            )
-          );
+    button.onclick =
+      () =>
+        deletePage(
+          Number(
+            button.dataset.delpage
+          )
+        );
 
-    }
-  );
+  });
 
 }
 
@@ -8528,17 +7397,17 @@ async function movePage(
 ){
 
   const index =
-    managedPages.findIndex(
-      page =>
-        Number(
-          page.id
-        ) === id
-    );
+    managedPages
+      .findIndex(
+        page =>
+          Number(page.id)
+          ===
+          id
+      );
 
 
   const newIndex =
-    index +
-    direction;
+    index + direction;
 
 
   if(
@@ -8554,22 +7423,21 @@ async function movePage(
 
 
   const copy =
-    [
-      ...managedPages
-    ];
+    [...managedPages];
 
 
   [
     copy[index],
     copy[newIndex]
-  ] = [
+  ]
+  =
+  [
     copy[newIndex],
     copy[index]
   ];
 
 
-  managedPages =
-    copy;
+  managedPages = copy;
 
 
   renderManagedPages();
@@ -8580,30 +7448,21 @@ async function movePage(
     await api(
       `/api/admin/chapters/${currentManagedChapter}/pages/reorder`,
       {
-
-        method:
-          "POST",
+        method:"POST",
 
         headers:{
-
           "Content-Type":
             "application/json"
-
         },
 
         body:
           JSON.stringify({
-
             page_ids:
               managedPages.map(
                 page =>
-                  Number(
-                    page.id
-                  )
+                  Number(page.id)
               )
-
           })
-
       }
     );
 
@@ -8611,15 +7470,9 @@ async function movePage(
     await loadManagedPages();
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
-
+    alert(error.message);
 
     await loadManagedPages();
 
@@ -8628,9 +7481,7 @@ async function movePage(
 }
 
 
-async function deletePage(
-  id
-){
+async function deletePage(id){
 
   if(
     !confirm(
@@ -8648,48 +7499,32 @@ async function deletePage(
     await api(
       `/api/admin/pages/${id}`,
       {
-
-        method:
-          "DELETE"
-
+        method:"DELETE"
       }
     );
 
 
     await Promise.all([
-
       loadManagedPages(),
-
       loadParts(),
-
       loadAdminComics(),
-
       loadStats(),
-
-      loadCatalog(
-        currentPage
-      ),
-
+      loadCatalog(currentPage),
       loadUpdates(),
-
       loadRandomPool()
-
     ]);
 
   }
+  catch(error){
 
-  catch(
-    error
-  ){
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
 }
 
+
+/* START */
 
 async function startNightInk(){
 
@@ -8701,58 +7536,33 @@ async function startNightInk(){
 
 
   history.replaceState(
-
-    route.type ===
-    "comic"
+    route.type === "comic"
     ?
     {
-
-      type:
-        "comic",
-
-      slug:
-        route.slug,
-
-      fromSite:
-        false
-
+      type:"comic",
+      slug:route.slug,
+      fromSite:false
     }
     :
     {
-
-      type:
-        "home"
-
+      type:"home"
     },
-
     "",
-
     location.pathname +
     location.search +
     location.hash
-
   );
 
 
   await Promise.all([
-
-    loadCatalog(
-      1
-    ),
-
+    loadCatalog(1),
     loadPopular(),
-
     loadUpdates(),
-
     loadRandomPool()
-
   ]);
 
 
-  if(
-    route.type ===
-    "comic"
-  ){
+  if(route.type === "comic"){
 
     await openComicDirect(
       route.slug,
@@ -8760,7 +7570,6 @@ async function startNightInk(){
     );
 
   }
-
   else{
 
     setHomeMetadata();

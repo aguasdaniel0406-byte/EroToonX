@@ -13,18 +13,21 @@
 >
 
 <style>
+
 :root{
-  --bg:#0f1014;
-  --panel:#181a21;
-  --panel2:#20232c;
-  --line:#303441;
-  --text:#f4f5f7;
-  --muted:#a9afbb;
-  --accent:#7c4dff;
-  --accent2:#ef476f;
-  --danger:#d94b62;
-  --green:#2cb67d;
-  --warning:#f1ad45;
+  --bg:#101220;
+  --bg2:#15182a;
+  --panel:#1a1e33;
+  --panel2:#232842;
+  --line:#373d63;
+  --text:#f6f7fb;
+  --muted:#a9afc5;
+  --accent:#ec4bb4;
+  --accent2:#7d5cff;
+  --accent3:#ffb021;
+  --good:#36c78d;
+  --warn:#f0ad4e;
+  --danger:#ef5d77;
 }
 
 *{
@@ -42,7 +45,8 @@ body{
   font-family:Arial,Helvetica,sans-serif;
 }
 
-body.locked{
+body.age-locked,
+body.reader-locked{
   overflow:hidden;
 }
 
@@ -62,31 +66,50 @@ button{
   cursor:pointer;
 }
 
+img{
+  max-width:100%;
+}
+
 .wrap{
-  width:min(1280px,calc(100% - 24px));
+  width:min(
+    1260px,
+    calc(100% - 24px)
+  );
+
   margin:auto;
+}
+
+.hidden{
+  display:none!important;
 }
 
 
 /* =========================
-   AGE GATE
+   +18
 ========================= */
 
 .age-gate{
   display:none;
+
   position:fixed;
+
   inset:0;
+
   z-index:99999;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
   background:
     radial-gradient(
-      circle at 50% 25%,
-      rgba(124,77,255,.18),
+      circle at 50% 20%,
+      rgba(125,92,255,.24),
       transparent 35%
     ),
-    #090a0d;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
+    rgba(5,6,12,.98);
 }
 
 .age-gate.open{
@@ -94,106 +117,137 @@ button{
 }
 
 .age-card{
-  width:min(500px,100%);
-  background:#181a21;
-  border:1px solid #373b48;
-  border-radius:18px;
-  padding:34px 30px;
+  width:min(
+    500px,
+    100%
+  );
+
+  padding:32px;
+
+  border-radius:20px;
+
+  background:#171a2b;
+
+  border:
+    1px solid
+    #3e456e;
+
   text-align:center;
-  box-shadow:0 30px 100px rgba(0,0,0,.55);
+
+  box-shadow:
+    0 25px 90px
+    rgba(0,0,0,.58);
 }
 
-.age-logo{
-  width:72px;
-  height:72px;
-  margin:0 auto 20px;
+.age-badge{
+  width:76px;
+  height:76px;
+
+  margin:
+    0 auto 18px;
+
   display:grid;
+
   place-items:center;
-  border-radius:18px;
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-  );
-  font-size:22px;
+
+  border-radius:20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+
   font-weight:900;
-  box-shadow:0 14px 35px rgba(124,77,255,.24);
+
+  font-size:23px;
 }
 
 .age-card h1{
-  margin:0 0 12px;
+  margin:
+    0 0 12px;
+
   font-size:30px;
 }
 
 .age-card p{
-  color:var(--muted);
-  line-height:1.65;
-  margin:0 auto 22px;
-  max-width:410px;
+  margin:0;
+
+  color:
+    var(--muted);
+
+  line-height:1.7;
 }
 
 .age-warning{
-  margin:18px 0;
-  padding:12px;
-  border-radius:9px;
-  border:1px solid #3a3f4d;
-  background:#20232b;
-  color:#d8dbe1;
+  margin:
+    18px 0;
+
+  padding:13px;
+
+  border:
+    1px solid
+    #3d4366;
+
+  border-radius:10px;
+
+  background:
+    #20243a;
+
+  color:
+    #dce0ee;
+
   font-size:12px;
-  line-height:1.55;
+
+  line-height:1.6;
 }
 
 .age-actions{
   display:grid;
+
   gap:9px;
 }
 
-.age-enter{
+.age-enter,
+.age-exit{
   min-height:48px;
-  border:0;
+
   border-radius:10px;
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-  );
-  color:white;
+
   font-weight:800;
 }
 
+.age-enter{
+  border:0;
+
+  color:#fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+}
+
 .age-exit{
-  min-height:44px;
-  border:1px solid #3b404d;
-  border-radius:10px;
-  background:#252832;
-  color:#d9dce2;
+  border:
+    1px solid
+    #404665;
+
+  background:
+    #24283d;
+
+  color:#e4e7ef;
 }
 
 .age-note{
-  color:#737987;
+  margin-top:15px;
+
+  color:#7d849e;
+
   font-size:10px;
-  margin-top:17px;
-  line-height:1.5;
-}
-
-
-/* =========================
-   TOP
-========================= */
-
-.topline{
-  background:#090a0d;
-  border-bottom:1px solid #20232b;
-  color:#c8ccd4;
-  font-size:12px;
-}
-
-.topline .wrap{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  padding:7px 0;
-  flex-wrap:wrap;
 }
 
 
@@ -201,238 +255,277 @@ button{
    HEADER
 ========================= */
 
-header{
-  position:sticky;
-  top:0;
-  z-index:40;
-  background:rgba(17,18,23,.97);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(12px);
+.topbar{
+  background:#0b0d18;
+
+  border-bottom:
+    1px solid
+    #242945;
 }
 
-.header-inner{
-  min-height:72px;
+.topbar .wrap{
+  min-height:76px;
+
   display:grid;
-  grid-template-columns:auto 1fr auto;
+
+  grid-template-columns:
+    auto
+    minmax(260px,520px)
+    auto;
+
   align-items:center;
-  gap:18px;
+
+  gap:22px;
 }
 
-.logo{
+.brand{
   display:flex;
+
   align-items:center;
+
   gap:10px;
-  font-size:24px;
-  font-weight:800;
+
+  font-size:28px;
+
+  font-weight:900;
+
+  letter-spacing:-.04em;
 }
 
-.logo-mark{
-  width:42px;
-  height:42px;
+.brand-mark{
+  width:46px;
+  height:46px;
+
   display:grid;
+
   place-items:center;
-  border-radius:10px;
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-  );
-  font-size:14px;
+
+  border-radius:11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent3),
+      var(--accent),
+      var(--accent2)
+    );
+
+  font-size:15px;
+
+  box-shadow:
+    0 8px 30px
+    rgba(236,75,180,.2);
 }
 
-.nav{
+.brand span:last-child{
+  background:
+    linear-gradient(
+      90deg,
+      #fff,
+      #ffc2ea
+    );
+
+  -webkit-background-clip:text;
+
+  background-clip:text;
+
+  color:transparent;
+}
+
+.search-wrap{
   display:flex;
-  gap:5px;
-  flex-wrap:wrap;
+
+  gap:7px;
 }
 
-.nav a{
-  padding:10px 12px;
-  border-radius:8px;
-  color:#d5d8de;
-  font-size:14px;
-}
+.search-input{
+  flex:1;
 
-.nav a:hover,
-.nav a.active{
-  background:#242731;
-  color:white;
-}
+  height:44px;
 
-.head-actions{
-  display:flex;
-  gap:8px;
-}
+  padding:
+    0 14px;
 
-.search{
-  width:230px;
-  height:40px;
-  border:1px solid var(--line);
-  background:#1b1e26;
-  color:white;
   border-radius:9px;
-  padding:0 12px;
+
+  border:
+    1px solid
+    #343a5a;
+
+  background:
+    #202438;
+
+  color:#fff;
+
   outline:none;
 }
 
-.admin-btn{
-  height:40px;
-  border:0;
+.search-input:focus{
+  border-color:#6b6fa1;
+}
+
+.search-button{
+  height:44px;
+
+  min-width:44px;
+
   border-radius:9px;
-  padding:0 14px;
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    #5d35c8
-  );
-  color:white;
-  font-weight:700;
-}
 
+  border:
+    1px solid
+    #3b4166;
 
-/* =========================
-   MAIN
-========================= */
-
-main{
-  padding:18px 0 45px;
-}
-
-
-/* =========================
-   HERO
-========================= */
-
-.hero{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:16px;
-  margin-bottom:18px;
-}
-
-.hero-main,
-.hero-side,
-.section,
-.sidebar,
-.admin-shell{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:12px;
-}
-
-.hero-main{
-  padding:28px;
-  min-height:300px;
   background:
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(124,77,255,.24),
-      transparent 29%
-    ),
-    radial-gradient(
-      circle at 15% 85%,
-      rgba(239,71,111,.16),
-      transparent 30%
-    ),
-    #171920;
-}
+    #252a45;
 
-.hero-main h1{
-  max-width:760px;
-  margin:10px 0 15px;
-  font-size:42px;
-  line-height:1.03;
-}
+  color:#fff;
 
-.hero-main p{
-  max-width:700px;
-  color:var(--muted);
-  line-height:1.7;
-}
-
-.eyebrow{
-  color:#c8b6ff;
-  font-size:11px;
-  letter-spacing:.14em;
   font-weight:800;
 }
 
-.hero-tags{
+.header-tools{
   display:flex;
+
   gap:8px;
-  flex-wrap:wrap;
-  margin-top:20px;
+
+  justify-content:flex-end;
 }
 
-.pill{
-  display:inline-flex;
-  padding:6px 9px;
-  border-radius:999px;
-  background:#242735;
-  border:1px solid #343847;
-  color:#dfe2e8;
-  font-size:11px;
-}
+.admin-button{
+  height:44px;
 
-.hero-side{
-  padding:14px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
+  padding:
+    0 14px;
 
-.mini-cover{
-  min-height:270px;
-  border-radius:10px;
-  border:1px solid #343845;
-  padding:12px;
-  display:flex;
-  align-items:flex-end;
-  position:relative;
-  overflow:hidden;
-}
+  border:0;
 
-.mini-cover:nth-child(1){
-  background:linear-gradient(
-    150deg,
-    #4b3ca6,
-    #211a4d 60%,
-    #11101a
-  );
-}
+  border-radius:9px;
 
-.mini-cover:nth-child(2){
-  background:linear-gradient(
-    150deg,
-    #9d355e,
-    #401527 60%,
-    #160c12
-  );
-}
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
 
-.mini-cover:nth-child(3){
-  background:linear-gradient(
-    150deg,
-    #3e6175,
-    #172b37 60%,
-    #0c151b
-  );
-}
+  color:#fff;
 
-.mini-cover:after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    transparent 35%,
-    rgba(0,0,0,.88)
-  );
-}
-
-.mini-cover span{
-  position:relative;
-  z-index:1;
   font-weight:800;
+}
+
+
+/* =========================
+   NAV
+========================= */
+
+.navbar{
+  background:#171a2a;
+
+  border-bottom:
+    2px solid
+    #292e4e;
+
+  position:sticky;
+
+  top:0;
+
+  z-index:50;
+}
+
+.navbar .wrap{
+  display:flex;
+
+  align-items:center;
+
+  gap:2px;
+
+  overflow-x:auto;
+
+  scrollbar-width:none;
+}
+
+.navbar .wrap::-webkit-scrollbar{
+  display:none;
+}
+
+.nav-link{
+  flex:
+    0 0 auto;
+
+  padding:
+    16px 18px;
+
+  font-size:14px;
+
+  font-weight:800;
+
+  color:#e8eaf3;
+
+  border-bottom:
+    3px solid
+    transparent;
+}
+
+.nav-link:hover,
+.nav-link.active{
+  background:#20243a;
+
+  border-bottom-color:
+    var(--accent);
+}
+
+
+/* =========================
+   BANNER
+========================= */
+
+.promo{
+  margin:
+    16px auto 20px;
+
+  min-height:116px;
+
+  border-radius:12px;
+
+  border:
+    1px solid
+    #333958;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  text-align:center;
+
+  padding:20px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(236,75,180,.22),
+      rgba(125,92,255,.24)
+    ),
+    linear-gradient(
+      160deg,
+      #252949,
+      #171a2a
+    );
+}
+
+.promo strong{
+  font-size:28px;
+
+  letter-spacing:.02em;
+}
+
+.promo small{
+  display:block;
+
+  margin-top:7px;
+
+  color:#c0c5d8;
 }
 
 
@@ -440,142 +533,127 @@ main{
    LAYOUT
 ========================= */
 
-.layout{
+.content-layout{
   display:grid;
-  grid-template-columns:245px 1fr;
-  gap:16px;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    300px;
+
+  gap:18px;
+
+  padding-bottom:40px;
+}
+
+.main-column{
+  min-width:0;
 }
 
 .sidebar{
-  padding:14px;
-  height:max-content;
-  position:sticky;
-  top:88px;
+  min-width:0;
 }
 
-.side-title{
-  font-weight:800;
-  font-size:15px;
-  margin-bottom:10px;
+.section{
+  margin-bottom:26px;
 }
 
-.genre-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-}
+.section-heading{
+  display:flex;
 
-.genre-btn,
-.tab{
-  border:1px solid #353947;
-  background:#22252e;
-  color:#e8e9ed;
-  border-radius:8px;
-}
-
-.genre-btn{
-  padding:9px 10px;
-  font-size:12px;
-  text-align:left;
-}
-
-.genre-btn:hover,
-.genre-btn.active,
-.tab.active{
-  background:var(--accent);
-  border-color:var(--accent);
-}
-
-.side-block{
-  margin-top:18px;
-  padding-top:15px;
-  border-top:1px solid var(--line);
-}
-
-
-/* =========================
-   POPULAR
-========================= */
-
-.popular-list{
-  display:grid;
-  gap:8px;
-}
-
-.popular-item{
-  display:grid;
-  grid-template-columns:30px 1fr;
-  gap:8px;
   align-items:center;
-  padding:9px;
-  border-radius:8px;
-  background:#20232b;
-  border:1px solid transparent;
-  cursor:pointer;
+
+  justify-content:
+    space-between;
+
+  gap:12px;
+
+  margin-bottom:13px;
+
+  padding-bottom:10px;
+
+  border-bottom:
+    3px solid
+    #322f62;
+
+  position:relative;
 }
 
-.popular-item:hover{
-  border-color:#3c4250;
+.section-heading:after{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+
+  bottom:-3px;
+
+  width:120px;
+
+  height:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      var(--accent2)
+    );
 }
 
-.popular-rank{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border-radius:7px;
-  background:#2b2f3a;
-  font-weight:800;
+.section-heading h2{
+  margin:0;
+
+  font-size:26px;
+
+  letter-spacing:-.02em;
+}
+
+.section-heading small{
+  color:
+    var(--muted);
+
   font-size:11px;
 }
 
-.popular-item strong{
-  display:block;
-  font-size:12px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.popular-item small{
-  display:block;
-  margin-top:3px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-
-/* =========================
-   SECTION
-========================= */
-
-.section{
-  padding:14px;
-  margin-bottom:16px;
-}
-
-.section-head{
+.section-tools{
   display:flex;
+
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
+
+  gap:8px;
+
   flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.section-head h2{
-  margin:0;
-  font-size:21px;
-}
-
-.tabs{
-  display:flex;
-  gap:7px;
 }
 
 .tab{
-  padding:8px 11px;
+  padding:
+    8px 12px;
+
+  border-radius:8px;
+
+  border:
+    1px solid
+    #3d4366;
+
+  background:
+    #24283d;
+
+  color:#e7e9f3;
+
   font-size:12px;
+
+  font-weight:800;
+}
+
+.tab.active{
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+
+  border-color:
+    transparent;
 }
 
 
@@ -585,99 +663,183 @@ main{
 
 .comic-grid{
   display:grid;
-  grid-template-columns:repeat(
-    5,
-    minmax(0,1fr)
-  );
-  gap:12px;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+
+  gap:15px;
 }
 
 .comic-card{
-  background:#20232b;
-  border:1px solid #313644;
-  border-radius:10px;
+  min-width:0;
+
+  background:
+    #20243a;
+
+  border:
+    1px solid
+    #363c60;
+
+  border-radius:4px;
+
   overflow:hidden;
-  transition:.17s;
+
   cursor:pointer;
+
+  transition:.18s;
 }
 
 .comic-card:hover{
-  transform:translateY(-3px);
-  border-color:#565d72;
+  transform:
+    translateY(-3px);
+
+  border-color:
+    #646ca2;
+
+  box-shadow:
+    0 12px 28px
+    rgba(0,0,0,.2);
 }
 
 .cover{
-  aspect-ratio:3/4;
   position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:flex-end;
-  padding:10px;
-  background:linear-gradient(
-    150deg,
-    #4b3ca6,
-    #211a4d 60%,
-    #11101a
-  );
+
+  aspect-ratio:3/4;
+
+  background:
+    linear-gradient(
+      145deg,
+      #56358b,
+      #25193e 55%,
+      #12131f
+    );
+
   background-size:cover;
+
   background-position:center;
+
+  overflow:hidden;
 }
 
 .cover:after{
   content:"";
+
   position:absolute;
+
+  inset:
+    55% 0 0;
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(0,0,0,.82)
+    );
+}
+
+.cover-placeholder{
+  position:absolute;
+
   inset:0;
-  background:linear-gradient(
-    transparent 35%,
-    rgba(0,0,0,.9)
-  );
+
+  display:grid;
+
+  place-items:center;
+
+  color:#d8d8ec;
+
+  font-weight:900;
+
+  font-size:18px;
+
+  text-align:center;
+
+  padding:18px;
 }
 
-.cover-title{
-  position:relative;
-  z-index:1;
-  font-size:15px;
-  font-weight:800;
-}
-
-.chapter-badge{
+.card-badge{
   position:absolute;
-  top:8px;
+
   right:8px;
+
+  bottom:8px;
+
   z-index:2;
-  background:rgba(0,0,0,.8);
-  padding:5px 7px;
-  border-radius:7px;
+
+  padding:
+    5px 8px;
+
+  border-radius:999px;
+
+  background:
+    rgba(18,18,27,.9);
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
   font-size:10px;
+
+  font-weight:900;
 }
 
-.card-info{
-  padding:10px;
+.card-body{
+  padding:
+    10px 11px 12px;
 }
 
 .card-title{
-  margin:0 0 5px;
+  margin:0;
+
   font-size:14px;
-  white-space:nowrap;
+
+  line-height:1.35;
+
+  min-height:38px;
+
+  display:-webkit-box;
+
+  -webkit-line-clamp:2;
+
+  -webkit-box-orient:vertical;
+
   overflow:hidden;
-  text-overflow:ellipsis;
 }
 
 .card-meta{
   display:flex;
-  justify-content:space-between;
-  gap:5px;
-  color:var(--muted);
+
+  justify-content:
+    space-between;
+
+  gap:6px;
+
+  margin-top:8px;
+
+  color:
+    var(--muted);
+
   font-size:10px;
 }
 
 .empty{
-  grid-column:1/-1;
-  padding:28px;
+  padding:30px;
+
+  border:
+    1px dashed
+    #3b4166;
+
+  border-radius:8px;
+
+  color:
+    var(--muted);
+
   text-align:center;
-  color:var(--muted);
-  border:1px dashed #373b47;
-  border-radius:10px;
+
+  grid-column:
+    1/-1;
 }
 
 
@@ -687,31 +849,246 @@ main{
 
 .pagination{
   display:flex;
-  align-items:center;
+
   justify-content:center;
-  gap:6px;
+
+  align-items:center;
+
+  gap:7px;
+
   flex-wrap:wrap;
-  margin-top:18px;
+
+  margin:
+    22px 0 4px;
 }
 
 .page-btn{
-  min-width:36px;
-  height:36px;
-  border-radius:8px;
-  border:1px solid #373b47;
-  background:#22252d;
-  color:white;
-  padding:0 10px;
+  min-width:42px;
+
+  height:42px;
+
+  padding:
+    0 12px;
+
+  border-radius:10px;
+
+  border:
+    1px solid
+    #3d4366;
+
+  background:
+    #24283d;
+
+  color:#fff;
+
+  font-weight:800;
 }
 
 .page-btn.active{
-  background:var(--accent);
-  border-color:var(--accent);
+  border-color:
+    transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
 }
 
 .page-btn:disabled{
   opacity:.35;
+
   cursor:not-allowed;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.side-card{
+  margin-bottom:16px;
+
+  padding:14px;
+
+  background:
+    #181c2e;
+
+  border:
+    1px solid
+    #323858;
+
+  border-radius:8px;
+}
+
+.side-title{
+  margin:
+    -14px -14px 13px;
+
+  padding:
+    12px 14px;
+
+  background:
+    #20243b;
+
+  border-bottom:
+    1px solid
+    #343a5c;
+
+  font-weight:900;
+}
+
+.category-list{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:7px;
+}
+
+.category-btn{
+  padding:10px;
+
+  border-radius:7px;
+
+  border:
+    1px solid
+    #353b5f;
+
+  background:
+    #22263d;
+
+  color:#edf0f7;
+
+  text-align:left;
+
+  font-size:12px;
+}
+
+.category-btn:hover,
+.category-btn.active{
+  background:
+    #312d59;
+
+  border-color:
+    #6f63d5;
+}
+
+.tags{
+  display:flex;
+
+  gap:7px;
+
+  flex-wrap:wrap;
+}
+
+.tag{
+  padding:
+    7px 9px;
+
+  border-radius:6px;
+
+  background:
+    #24283f;
+
+  border:
+    1px solid
+    #3b4164;
+
+  color:#e6e9f2;
+
+  font-size:11px;
+
+  cursor:pointer;
+}
+
+.tag:hover{
+  background:#302d55;
+}
+
+.popular-list{
+  display:grid;
+
+  gap:8px;
+}
+
+.popular-item{
+  display:grid;
+
+  grid-template-columns:
+    30px 1fr;
+
+  gap:9px;
+
+  align-items:center;
+
+  padding:9px;
+
+  border:
+    1px solid
+    #303653;
+
+  background:
+    #20243a;
+
+  border-radius:7px;
+
+  cursor:pointer;
+}
+
+.popular-item:hover{
+  border-color:#555d91;
+}
+
+.popular-rank{
+  width:30px;
+
+  height:30px;
+
+  border-radius:7px;
+
+  display:grid;
+
+  place-items:center;
+
+  background:
+    #2d3150;
+
+  color:#fff;
+
+  font-weight:900;
+
+  font-size:12px;
+}
+
+.popular-copy{
+  min-width:0;
+}
+
+.popular-copy strong{
+  display:block;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:
+    ellipsis;
+
+  font-size:12px;
+}
+
+.popular-copy small{
+  display:block;
+
+  margin-top:3px;
+
+  color:
+    var(--muted);
+
+  font-size:10px;
 }
 
 
@@ -721,52 +1098,100 @@ main{
 
 .updates-list{
   display:grid;
-  gap:8px;
+
+  gap:9px;
 }
 
 .update-item{
   display:grid;
-  grid-template-columns:54px 1fr auto;
+
+  grid-template-columns:
+    60px
+    minmax(0,1fr)
+    auto;
+
   gap:12px;
+
   align-items:center;
+
   padding:9px;
-  background:#20232b;
-  border:1px solid #303541;
-  border-radius:9px;
+
+  border:
+    1px solid
+    #343a5c;
+
+  background:
+    #1f2338;
+
+  border-radius:8px;
+
   cursor:pointer;
 }
 
 .update-item:hover{
-  border-color:#505667;
+  border-color:
+    #59618f;
 }
 
 .update-cover{
-  width:54px;
-  height:70px;
-  border-radius:7px;
-  background:#111318;
-  background-size:cover;
-  background-position:center;
-  border:1px solid #353946;
+  width:60px;
+
+  height:78px;
+
+  border-radius:6px;
+
+  background:
+    #111421
+    center/cover
+    no-repeat;
+
+  border:
+    1px solid
+    #3b4165;
+}
+
+.update-main{
+  min-width:0;
 }
 
 .update-title{
-  font-weight:800;
+  font-weight:900;
+
   font-size:13px;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:
+    ellipsis;
 }
 
 .update-meta{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:4px;
+  margin-top:5px;
+
+  color:
+    var(--muted);
+
+  font-size:10px;
 }
 
 .update-part{
-  padding:6px 8px;
-  border-radius:7px;
-  background:#292d38;
-  border:1px solid #383d49;
+  padding:
+    7px 10px;
+
+  border-radius:8px;
+
+  background:
+    #292e4a;
+
+  border:
+    1px solid
+    #3c4266;
+
   font-size:10px;
+
+  font-weight:900;
 }
 
 
@@ -776,34 +1201,52 @@ main{
 
 .btn{
   border:0;
-  border-radius:9px;
-  padding:10px 14px;
-  font-weight:700;
+
+  border-radius:8px;
+
+  padding:
+    10px 13px;
+
+  font-weight:800;
 }
 
 .btn.primary{
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-  );
-  color:white;
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+
+  color:#fff;
 }
 
 .btn.secondary{
-  background:#292d36;
-  color:white;
-  border:1px solid #3b414d;
+  background:
+    #292e47;
+
+  border:
+    1px solid
+    #3c4264;
+
+  color:#fff;
 }
 
 .btn.danger{
-  background:#3c1d26;
-  color:#ff9cac;
-  border:1px solid #69303e;
+  background:
+    #4a2433;
+
+  border:
+    1px solid
+    #7d3850;
+
+  color:#ffb6c2;
 }
 
 .btn.small{
-  padding:7px 9px;
+  padding:
+    7px 9px;
+
   font-size:11px;
 }
 
@@ -814,160 +1257,241 @@ main{
 
 .admin-shell{
   display:none;
+
+  margin:
+    18px 0 24px;
+
   padding:16px;
-  margin-bottom:16px;
+
+  background:
+    #171b2d;
+
+  border:
+    1px solid
+    #3b4165;
+
+  border-radius:10px;
 }
 
 .admin-shell.visible{
   display:block;
 }
 
+.admin-head{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:
+    space-between;
+
+  gap:10px;
+
+  margin-bottom:14px;
+}
+
+.admin-head h2{
+  margin:0;
+}
+
+.admin-actions{
+  display:flex;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+}
+
 .stats{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+
+  grid-template-columns:
+    repeat(4,1fr);
+
   gap:10px;
+
+  margin-bottom:14px;
 }
 
 .stat{
-  padding:12px;
-  background:#22252e;
-  border:1px solid #353a47;
-  border-radius:9px;
+  padding:13px;
+
+  border:
+    1px solid
+    #353b5d;
+
+  background:
+    #20243a;
+
+  border-radius:8px;
 }
 
 .stat strong{
   display:block;
+
   font-size:22px;
 }
 
 .stat small{
-  color:var(--muted);
-}
-
-.admin-toolbar{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  margin:14px 0;
-  flex-wrap:wrap;
-}
-
-.admin-toolbar-left,
-.admin-toolbar-right{
-  display:flex;
-  gap:8px;
+  color:
+    var(--muted);
 }
 
 .admin-list{
   display:grid;
-  gap:10px;
+
+  gap:9px;
 }
 
 .admin-row{
   display:grid;
-  grid-template-columns:65px 1fr auto;
+
+  grid-template-columns:
+    58px
+    minmax(0,1fr)
+    auto;
+
+  gap:11px;
+
   align-items:center;
-  gap:12px;
-  padding:12px;
-  background:#20232b;
-  border:1px solid #323744;
-  border-radius:10px;
-}
 
-.admin-row.ready{
-  border-color:rgba(44,182,125,.5);
-}
+  padding:10px;
 
-.admin-row.warning{
-  border-color:rgba(241,173,69,.45);
-}
+  border:
+    1px solid
+    #343a59;
 
-.admin-row.draft{
-  opacity:.78;
+  background:
+    #20243a;
+
+  border-radius:8px;
 }
 
 .admin-cover{
-  width:65px;
-  height:86px;
-  border-radius:7px;
-  background:#15171c;
-  background-size:cover;
-  background-position:center;
-  border:1px solid #353a47;
+  width:58px;
+
+  height:76px;
+
+  border-radius:6px;
+
+  background:
+    #111421
+    center/cover
+    no-repeat;
+
+  border:
+    1px solid
+    #3a4061;
 }
 
-.admin-row small{
-  display:block;
-  margin-top:5px;
-  color:var(--muted);
+.admin-title{
+  font-weight:900;
 }
 
-.admin-title-line{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
+.admin-meta{
+  margin-top:4px;
+
+  color:
+    var(--muted);
+
+  font-size:10px;
 }
 
 .readiness{
-  margin-top:8px;
+  margin-top:7px;
+
   display:flex;
-  gap:6px;
+
   align-items:center;
+
+  gap:6px;
+
   flex-wrap:wrap;
 }
 
 .ready-badge{
   display:inline-flex;
-  align-items:center;
-  padding:6px 9px;
-  border-radius:7px;
-  font-size:10px;
-  font-weight:800;
+
+  padding:
+    5px 7px;
+
+  border-radius:6px;
+
+  font-size:9px;
+
+  font-weight:900;
 }
 
 .ready-badge.ok{
-  background:rgba(44,182,125,.14);
-  border:1px solid rgba(44,182,125,.45);
-  color:#78e5b4;
+  background:
+    rgba(54,199,141,.14);
+
+  border:
+    1px solid
+    rgba(54,199,141,.45);
+
+  color:#7ee5ba;
 }
 
 .ready-badge.warn{
-  background:rgba(241,173,69,.13);
-  border:1px solid rgba(241,173,69,.42);
-  color:#ffc86d;
+  background:
+    rgba(240,173,78,.12);
+
+  border:
+    1px solid
+    rgba(240,173,78,.4);
+
+  color:#ffc66e;
 }
 
 .ready-badge.draft{
-  background:#282c35;
-  border:1px solid #404552;
-  color:#b5bac5;
+  background:
+    #292d43;
+
+  border:
+    1px solid
+    #454b6c;
+
+  color:#bdc2d2;
 }
 
 .ready-badge.loading{
-  background:#242735;
-  border:1px solid #383d49;
-  color:#a9afbb;
-}
+  background:
+    #282c44;
 
-.readiness-detail{
-  color:#8f96a4;
-  font-size:10px;
+  border:
+    1px solid
+    #3b4161;
+
+  color:#aeb3c5;
 }
 
 .row-actions{
   display:flex;
+
   gap:6px;
+
   flex-wrap:wrap;
+
+  justify-content:flex-end;
 }
 
 .row-actions button{
-  border:1px solid #3a3f4c;
-  background:#292d36;
-  color:white;
-  border-radius:7px;
-  padding:7px 9px;
-  font-size:11px;
+  padding:
+    7px 8px;
+
+  border-radius:6px;
+
+  border:
+    1px solid
+    #3c4264;
+
+  background:
+    #292e47;
+
+  color:#fff;
+
+  font-size:10px;
 }
 
 
@@ -977,13 +1501,22 @@ main{
 
 .modal{
   display:none;
+
   position:fixed;
+
   inset:0;
-  z-index:210;
-  background:rgba(0,0,0,.84);
+
+  z-index:220;
+
   align-items:center;
+
   justify-content:center;
+
   padding:20px;
+
+  background:
+    rgba(5,6,12,.86);
+
   overflow:auto;
 }
 
@@ -992,62 +1525,110 @@ main{
 }
 
 .panel{
-  width:min(680px,100%);
+  width:min(
+    680px,
+    100%
+  );
+
   max-height:92vh;
+
   overflow:auto;
-  background:#1b1f27;
-  border:1px solid #343947;
-  border-radius:14px;
-  padding:22px;
+
+  padding:20px;
+
+  border-radius:12px;
+
+  background:
+    #181c2e;
+
+  border:
+    1px solid
+    #3b4166;
 }
 
 .panel.wide{
-  width:min(1050px,100%);
+  width:min(
+    1040px,
+    100%
+  );
 }
 
 .panel h2{
-  margin-top:0;
+  margin:
+    0 0 15px;
+}
+
+.modal-head{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:
+    space-between;
+
+  gap:10px;
+
+  margin-bottom:14px;
 }
 
 .form-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap:10px;
 }
 
 .field{
   display:grid;
+
   gap:6px;
 }
 
 .field.full{
-  grid-column:1/-1;
+  grid-column:
+    1/-1;
 }
 
 .field label{
-  font-size:12px;
-  color:#c8ccd4;
+  font-size:11px;
+
+  color:#c4c8d7;
 }
 
 .field input,
 .field select,
 .field textarea{
   width:100%;
-  background:#11141a;
-  border:1px solid #3a404d;
-  color:white;
-  border-radius:8px;
+
   padding:10px;
+
+  border-radius:7px;
+
+  border:
+    1px solid
+    #3b4165;
+
+  background:
+    #111421;
+
+  color:#fff;
+
   outline:none;
 }
 
 .field textarea{
-  min-height:100px;
+  min-height:110px;
+
+  resize:vertical;
 }
 
 .check{
   display:flex;
+
   align-items:center;
+
   gap:8px;
 }
 
@@ -1057,23 +1638,31 @@ main{
 
 .modal-actions{
   display:flex;
-  justify-content:flex-end;
+
+  justify-content:
+    flex-end;
+
   gap:8px;
+
   margin-top:14px;
+
+  flex-wrap:wrap;
 }
 
 .msg{
   min-height:18px;
+
   margin-top:8px;
-  font-size:12px;
+
+  font-size:11px;
 }
 
 .error{
-  color:#ff7488;
+  color:#ff8096;
 }
 
 .success{
-  color:#67d99c;
+  color:#70dfae;
 }
 
 
@@ -1081,148 +1670,221 @@ main{
    CHAPTERS
 ========================= */
 
-.chapters-list{
+.chapter-list{
   display:grid;
-  gap:8px;
+
+  gap:9px;
+
   margin-top:14px;
 }
 
 .chapter-row{
   display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+
+  gap:12px;
+
   padding:12px;
-  background:#20232b;
-  border:1px solid #323744;
-  border-radius:9px;
+
+  border:
+    1px solid
+    #353b5c;
+
+  background:
+    #20243a;
+
+  border-radius:8px;
 }
 
 .chapter-row small{
   display:block;
-  margin-top:5px;
-  color:var(--muted);
+
+  margin-top:4px;
+
+  color:
+    var(--muted);
+
+  font-size:10px;
 }
 
 .upload-zone{
   margin-top:10px;
-  padding:10px;
-  border:1px dashed #4a5060;
-  border-radius:8px;
+
+  padding:9px;
+
+  border:
+    1px dashed
+    #50577d;
+
+  border-radius:7px;
 }
 
 
 /* =========================
-   PAGE MANAGER
+   PAGES
 ========================= */
-
-.page-manager-info{
-  padding:10px 12px;
-  margin-bottom:12px;
-  border:1px solid #333846;
-  background:#20232b;
-  border-radius:9px;
-  color:var(--muted);
-  font-size:12px;
-}
 
 .pages-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
+
+  grid-template-columns:
+    repeat(5,1fr);
+
+  gap:11px;
 }
 
 .page-card{
-  border:1px solid #353a47;
-  background:#20232b;
-  border-radius:10px;
   overflow:hidden;
+
+  border-radius:8px;
+
+  border:
+    1px solid
+    #353b5c;
+
+  background:
+    #20243a;
 }
 
 .page-thumb{
   aspect-ratio:3/4;
-  background:#101116;
+
+  background:
+    #10131f;
+
   overflow:hidden;
 }
 
 .page-thumb img{
   width:100%;
+
   height:100%;
+
   object-fit:cover;
+
+  display:block;
 }
 
-.page-bottom{
+.page-info{
   padding:8px;
-}
-
-.page-number{
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:7px;
 }
 
 .page-actions{
   display:grid;
-  grid-template-columns:1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap:5px;
+
+  margin-top:6px;
 }
 
 .page-actions button{
   padding:6px;
-  font-size:11px;
-  border-radius:6px;
-  border:1px solid #3c414e;
-  background:#292d36;
-  color:white;
+
+  border-radius:5px;
+
+  border:
+    1px solid
+    #3c4264;
+
+  background:
+    #292e47;
+
+  color:#fff;
+
+  font-size:10px;
 }
 
 .page-actions .delete-page{
-  grid-column:1/-1;
-  color:#ff9aaa;
-  background:#391b23;
-}
+  grid-column:
+    1/-1;
 
-.page-actions button:disabled{
-  opacity:.3;
+  background:
+    #43212d;
+
+  color:#ffb0bf;
 }
 
 
 /* =========================
-   INFO
+   DETAIL
 ========================= */
 
 .detail{
   display:grid;
-  grid-template-columns:220px 1fr;
+
+  grid-template-columns:
+    220px
+    minmax(0,1fr);
+
   gap:18px;
 }
 
 .detail-cover{
   aspect-ratio:3/4;
-  border-radius:10px;
-  background:linear-gradient(
-    150deg,
-    #4b3ca6,
-    #211a4d,
-    #11101a
-  );
+
+  border-radius:8px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #56358b,
+      #25193e 55%,
+      #12131f
+    );
+
   background-size:cover;
+
   background-position:center;
+}
+
+.detail-meta{
+  color:
+    var(--muted);
+
+  line-height:1.6;
+}
+
+.detail-desc{
+  line-height:1.7;
+
+  color:#e5e7ef;
 }
 
 .parts{
   display:grid;
+
   gap:8px;
-  margin-top:15px;
+
+  margin-top:14px;
 }
 
 .part-btn{
   width:100%;
-  text-align:left;
-  background:#22252e;
-  border:1px solid #353a47;
-  color:white;
-  border-radius:8px;
+
   padding:11px;
+
+  border-radius:7px;
+
+  border:
+    1px solid
+    #3a4062;
+
+  background:
+    #24283e;
+
+  color:#fff;
+
+  text-align:left;
+}
+
+.part-btn:hover{
+  background:#302d55;
 }
 
 
@@ -1232,10 +1894,15 @@ main{
 
 .reader{
   display:none;
+
   position:fixed;
+
   inset:0;
-  z-index:150;
-  background:#090a0d;
+
+  z-index:180;
+
+  background:#080a12;
+
   overflow-y:auto;
 }
 
@@ -1245,63 +1912,159 @@ main{
 
 .reader-bar{
   position:sticky;
+
   top:0;
-  z-index:5;
+
+  z-index:8;
+
   display:grid;
-  grid-template-columns:auto 1fr auto;
+
+  grid-template-columns:
+    auto
+    minmax(0,1fr)
+    auto;
+
   align-items:center;
-  gap:10px;
-  padding:9px 14px;
-  background:rgba(19,21,27,.97);
-  border-bottom:1px solid #303441;
-  backdrop-filter:blur(10px);
+
+  gap:8px;
+
+  padding:
+    9px 12px;
+
+  background:
+    rgba(17,20,33,.97);
+
+  border-bottom:
+    1px solid
+    #353b5c;
+
+  backdrop-filter:
+    blur(10px);
 }
 
 .reader-left,
 .reader-right{
   display:flex;
-  align-items:center;
+
   gap:6px;
+
+  align-items:center;
 }
 
 .reader-title{
   text-align:center;
-  overflow:hidden;
-  text-overflow:ellipsis;
+
   white-space:nowrap;
-  font-size:13px;
+
+  overflow:hidden;
+
+  text-overflow:
+    ellipsis;
+
+  font-size:12px;
 }
 
 .reader-pages{
-  width:min(1050px,100%);
+  width:min(
+    1050px,
+    100%
+  );
+
   margin:auto;
-  padding-bottom:50px;
 }
 
 .reader-pages img{
-  width:100%;
-  height:auto;
   display:block;
-  margin:0 auto;
+
+  width:100%;
+
+  height:auto;
+
+  margin:
+    0 auto;
 }
 
 .reader-empty{
-  min-height:70vh;
+  min-height:72vh;
+
   display:grid;
+
   place-items:center;
+
   text-align:center;
-  color:var(--muted);
+
   padding:40px;
+
+  color:
+    var(--muted);
 }
 
-.reader-bottom-nav{
-  width:min(1050px,100%);
-  margin:25px auto 60px;
+.reader-bottom{
+  width:min(
+    1050px,
+    100%
+  );
+
+  margin:
+    20px auto 60px;
+
   padding:20px;
+
   display:flex;
+
   justify-content:center;
+
   gap:8px;
+
   flex-wrap:wrap;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  padding:
+    26px 0 38px;
+
+  border-top:
+    1px solid
+    #2b304d;
+
+  color:#8f95ad;
+
+  font-size:11px;
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media(
+  max-width:1100px
+){
+
+  .content-layout{
+    grid-template-columns:
+      minmax(0,1fr)
+      260px;
+  }
+
+  .comic-grid{
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
+  }
+
+  .pages-grid{
+    grid-template-columns:
+      repeat(4,1fr);
+  }
+
 }
 
 
@@ -1309,117 +2072,170 @@ main{
    MOBILE
 ========================= */
 
-@media(max-width:1100px){
+@media(
+  max-width:900px
+){
 
-  .comic-grid{
-    grid-template-columns:repeat(4,1fr);
+  .topbar .wrap{
+    grid-template-columns:
+      1fr;
+
+    padding:
+      12px 0;
+
+    gap:10px;
   }
 
-  .pages-grid{
-    grid-template-columns:repeat(4,1fr);
+  .header-tools{
+    justify-content:
+      flex-start;
   }
 
-  .hero{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:900px){
-
-  .header-inner{
-    grid-template-columns:1fr;
-    padding:12px 0;
-  }
-
-  .head-actions{
-    width:100%;
-  }
-
-  .search{
-    flex:1;
-    width:auto;
-  }
-
-  .layout{
-    grid-template-columns:1fr;
+  .content-layout{
+    grid-template-columns:
+      1fr;
   }
 
   .sidebar{
-    position:static;
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:12px;
+  }
+
+  .side-card{
+    margin-bottom:0;
   }
 
   .comic-grid{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .pages-grid{
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
   }
 
   .stats{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .pages-grid{
+    grid-template-columns:
+      repeat(3,1fr);
   }
 
 }
 
-@media(max-width:640px){
 
-  .nav{
-    display:none;
+@media(
+  max-width:640px
+){
+
+  .brand{
+    font-size:24px;
+  }
+
+  .navbar .wrap{
+    padding:
+      0 4px;
+  }
+
+  .nav-link{
+    padding:
+      13px 12px;
+
+    font-size:12px;
+  }
+
+  .promo{
+    min-height:90px;
+  }
+
+  .promo strong{
+    font-size:22px;
+  }
+
+  .section-heading h2{
+    font-size:22px;
   }
 
   .comic-grid{
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+    gap:10px;
   }
 
-  .pages-grid{
-    grid-template-columns:repeat(2,1fr);
+  .sidebar{
+    grid-template-columns:
+      1fr;
   }
 
-  .hero-side{
-    grid-template-columns:repeat(3,1fr);
+  .update-item{
+    grid-template-columns:
+      50px
+      minmax(0,1fr);
   }
 
-  .mini-cover{
-    min-height:180px;
+  .update-cover{
+    width:50px;
+
+    height:68px;
+  }
+
+  .update-part{
+    grid-column:
+      1/-1;
+  }
+
+  .admin-row{
+    grid-template-columns:
+      50px
+      minmax(0,1fr);
+  }
+
+  .admin-cover{
+    width:50px;
+
+    height:68px;
+  }
+
+  .admin-row .row-actions{
+    grid-column:
+      1/-1;
+
+    justify-content:
+      flex-start;
   }
 
   .form-grid{
-    grid-template-columns:1fr;
+    grid-template-columns:
+      1fr;
   }
 
   .field.full{
     grid-column:auto;
   }
 
-  .admin-row{
-    grid-template-columns:52px 1fr;
-  }
-
-  .admin-cover{
-    width:52px;
-    height:70px;
-  }
-
-  .admin-row .row-actions{
-    grid-column:1/-1;
-  }
-
   .chapter-row{
-    grid-template-columns:1fr;
+    grid-template-columns:
+      1fr;
   }
 
-  .update-item{
-    grid-template-columns:48px 1fr;
-  }
-
-  .update-part{
-    grid-column:1/-1;
+  .pages-grid{
+    grid-template-columns:
+      repeat(2,1fr);
   }
 
   .detail{
-    grid-template-columns:1fr;
+    grid-template-columns:
+      1fr;
   }
 
   .detail-cover{
@@ -1427,20 +2243,23 @@ main{
   }
 
   .reader-bar{
-    grid-template-columns:1fr;
-  }
-
-  .reader-left,
-  .reader-right{
-    justify-content:center;
+    grid-template-columns:
+      1fr;
   }
 
   .reader-title{
     order:-1;
   }
 
+  .reader-left,
+  .reader-right{
+    justify-content:
+      center;
+  }
+
   .age-card{
-    padding:28px 20px;
+    padding:
+      25px 19px;
   }
 
   .age-card h1{
@@ -1448,40 +2267,40 @@ main{
   }
 
 }
+
 </style>
 </head>
+
 
 <body>
 
 
-<!-- =========================
-     +18 AGE GATE
-========================= -->
+<!-- +18 -->
 
 <div
   id="ageGate"
   class="age-gate"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="ageTitle"
 >
 
   <div class="age-card">
 
-    <div class="age-logo">
+    <div class="age-badge">
       18+
     </div>
 
-    <h1>
+    <h1 id="ageTitle">
       Contenido para adultos
     </h1>
 
     <p>
-      NightInk contiene material destinado únicamente
-      a personas mayores de edad.
+      NightInk está destinado únicamente a personas mayores de edad.
     </p>
 
     <div class="age-warning">
-      Al continuar confirmas que tienes al menos
-      18 años o la edad legal requerida en tu ubicación
-      para acceder a contenido para adultos.
+      Al continuar confirmas que tienes al menos 18 años o la edad legal requerida en tu jurisdicción para acceder a contenido para adultos.
     </div>
 
     <div class="age-actions">
@@ -1490,7 +2309,7 @@ main{
         id="ageEnter"
         class="age-enter"
       >
-        Tengo 18 años o más
+        Tengo 18 años o más — Entrar
       </button>
 
       <button
@@ -1503,8 +2322,7 @@ main{
     </div>
 
     <div class="age-note">
-      NightInk recuerda esta confirmación únicamente
-      en este navegador.
+      La confirmación se guarda únicamente en este navegador.
     </div>
 
   </div>
@@ -1513,16 +2331,56 @@ main{
 
 
 
-<div class="topline">
+<!-- HEADER -->
+
+<div class="topbar">
 
   <div class="wrap">
 
-    <div>
-      NightInk Comics · +18
+    <a
+      class="brand"
+      href="/"
+    >
+
+      <span class="brand-mark">
+        NI
+      </span>
+
+      <span>
+        NightInk
+      </span>
+
+    </a>
+
+
+    <div class="search-wrap">
+
+      <input
+        id="searchInput"
+        class="search-input"
+        placeholder="Buscar cómics, autor..."
+      >
+
+      <button
+        id="searchBtn"
+        class="search-button"
+        aria-label="Buscar"
+      >
+        ⌕
+      </button>
+
     </div>
 
-    <div>
-      Cómics · Series · Actualizaciones
+
+    <div class="header-tools">
+
+      <button
+        id="openAdmin"
+        class="admin-button"
+      >
+        Admin
+      </button>
+
     </div>
 
   </div>
@@ -1531,172 +2389,90 @@ main{
 
 
 
-<header>
+<!-- NAV -->
 
-<div class="wrap header-inner">
+<nav class="navbar">
 
-  <a
-    class="logo"
-    href="/"
-    id="homeLogo"
-  >
+  <div class="wrap">
 
-    <span class="logo-mark">
-      NI
-    </span>
-
-    <span>
-      NightInk
-    </span>
-
-  </a>
-
-
-  <nav class="nav">
-
-    <a href="/" class="active">
+    <a
+      class="nav-link active"
+      href="/"
+    >
       Inicio
     </a>
 
-    <a href="/#catalogo">
+    <a
+      class="nav-link"
+      href="#ultimos"
+    >
       Últimos
     </a>
 
-    <a href="/#actualizaciones">
+    <a
+      class="nav-link"
+      href="#actualizaciones"
+    >
       Actualizaciones
     </a>
 
-    <a href="/#categorias">
+    <a
+      class="nav-link"
+      href="#azar"
+    >
+      Al azar
+    </a>
+
+    <a
+      class="nav-link"
+      href="#categorias"
+    >
       Categorías
     </a>
 
-  </nav>
+  </div>
+
+</nav>
 
 
-  <div class="head-actions">
 
-    <input
-      id="searchInput"
-      class="search"
-      placeholder="Buscar cómic..."
-    >
+<!-- PROMO -->
 
-    <button
-      id="openAdmin"
-      class="admin-btn"
-    >
-      ⚙ Admin
-    </button>
+<div class="wrap promo">
+
+  <div>
+
+    <strong>
+      NightInk Comics
+    </strong>
+
+    <small>
+      Catálogo directo, lectura vertical y actualizaciones en un solo lugar.
+    </small>
 
   </div>
 
 </div>
-
-</header>
 
 
 
 <main class="wrap">
 
 
-<section class="hero">
-
-  <div class="hero-main">
-
-    <span class="eyebrow">
-      NIGHTINK COMICS
-    </span>
-
-    <h1>
-      Lee directamente. Sin pasos innecesarios.
-    </h1>
-
-    <p>
-      Abre cualquier obra y comienza a leer inmediatamente.
-      Si tiene varias partes podrás moverte entre ellas desde
-      el propio lector.
-    </p>
-
-    <div class="hero-tags">
-
-      <span class="pill">
-        +18
-      </span>
-
-      <span class="pill">
-        One-shots
-      </span>
-
-      <span class="pill">
-        Series
-      </span>
-
-      <span class="pill">
-        Actualizaciones
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <div class="hero-side">
-
-    <div class="mini-cover">
-      <span>
-        NightInk
-      </span>
-    </div>
-
-    <div class="mini-cover">
-      <span>
-        Leer ahora
-      </span>
-    </div>
-
-    <div class="mini-cover">
-      <span>
-        Nuevas partes
-      </span>
-    </div>
-
-  </div>
-
-</section>
-
-
-
-<!-- =========================
-     ADMIN
-========================= -->
+<!-- ADMIN -->
 
 <section
   id="adminShell"
   class="admin-shell"
 >
 
-  <div class="section-head">
+  <div class="admin-head">
 
     <h2>
       Panel de administración
     </h2>
 
-    <span class="pill">
-      D1 + R2
-    </span>
-
-  </div>
-
-
-  <div
-    id="stats"
-    class="stats"
-  ></div>
-
-
-  <div class="admin-toolbar">
-
-    <div class="admin-toolbar-left">
+    <div class="admin-actions">
 
       <button
         id="newComicBtn"
@@ -1712,11 +2488,6 @@ main{
         Actualizar
       </button>
 
-    </div>
-
-
-    <div class="admin-toolbar-right">
-
       <button
         id="logoutAdminBtn"
         class="btn secondary"
@@ -1730,6 +2501,12 @@ main{
 
 
   <div
+    id="stats"
+    class="stats"
+  ></div>
+
+
+  <div
     id="adminList"
     class="admin-list"
   ></div>
@@ -1738,119 +2515,26 @@ main{
 
 
 
-<div class="layout">
+<div class="content-layout">
 
 
-<aside
-  id="categorias"
-  class="sidebar"
->
+<!-- MAIN COLUMN -->
 
-  <div class="side-title">
-    Categorías
-  </div>
-
-
-  <div class="genre-grid">
-
-    <button
-      class="genre-btn active"
-      data-genre=""
-    >
-      Todos
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Romance"
-    >
-      Romance
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Fantasía"
-    >
-      Fantasía
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Drama"
-    >
-      Drama
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Misterio"
-    >
-      Misterio
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Thriller"
-    >
-      Thriller
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Acción"
-    >
-      Acción
-    </button>
-
-    <button
-      class="genre-btn"
-      data-genre="Otros"
-    >
-      Otros
-    </button>
-
-  </div>
-
-
-  <div class="side-block">
-
-    <div class="side-title">
-      Más vistos
-    </div>
-
-    <div
-      id="popularList"
-      class="popular-list"
-    >
-
-      <div class="empty">
-        Cargando...
-      </div>
-
-    </div>
-
-  </div>
-
-</aside>
-
-
-
-<div class="content">
+<div class="main-column">
 
 
 <section
-  id="catalogo"
+  id="ultimos"
   class="section"
 >
 
-  <div class="section-head">
+  <div class="section-heading">
 
-    <h2 id="catalogTitle">
-      Últimos cómics
+    <h2>
+      🔥 Últimos cómics
     </h2>
 
-
-    <div class="tabs">
+    <div class="section-tools">
 
       <button
         class="tab active"
@@ -1897,15 +2581,15 @@ main{
   class="section"
 >
 
-  <div class="section-head">
+  <div class="section-heading">
 
     <h2>
-      Últimas actualizaciones
+      ⚡ Actualizaciones
     </h2>
 
-    <span class="pill">
-      Leer directamente
-    </span>
+    <small>
+      Partes con páginas disponibles
+    </small>
 
   </div>
 
@@ -1924,7 +2608,205 @@ main{
 </section>
 
 
+
+<section
+  id="azar"
+  class="section"
+>
+
+  <div class="section-heading">
+
+    <h2>
+      🎲 Al azar
+    </h2>
+
+    <button
+      id="randomRefresh"
+      class="tab"
+    >
+      Cambiar selección
+    </button>
+
+  </div>
+
+
+  <div
+    id="randomGrid"
+    class="comic-grid"
+  >
+
+    <div class="empty">
+      Cargando...
+    </div>
+
+  </div>
+
+</section>
+
+
 </div>
+
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+
+<div
+  id="categorias"
+  class="side-card"
+>
+
+  <div class="side-title">
+    Categorías
+  </div>
+
+
+  <div class="category-list">
+
+    <button
+      class="category-btn active"
+      data-genre=""
+    >
+      Todos
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Romance"
+    >
+      Romance
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Fantasía"
+    >
+      Fantasía
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Drama"
+    >
+      Drama
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Misterio"
+    >
+      Misterio
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Thriller"
+    >
+      Thriller
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Acción"
+    >
+      Acción
+    </button>
+
+    <button
+      class="category-btn"
+      data-genre="Otros"
+    >
+      Otros
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<div class="side-card">
+
+  <div class="side-title">
+    Etiquetas
+  </div>
+
+
+  <div class="tags">
+
+    <span
+      class="tag"
+      data-tag="Romance"
+    >
+      Romance
+    </span>
+
+    <span
+      class="tag"
+      data-tag="Fantasía"
+    >
+      Fantasía
+    </span>
+
+    <span
+      class="tag"
+      data-tag="Drama"
+    >
+      Drama
+    </span>
+
+    <span
+      class="tag"
+      data-tag="Misterio"
+    >
+      Misterio
+    </span>
+
+    <span
+      class="tag"
+      data-tag="Acción"
+    >
+      Acción
+    </span>
+
+    <span
+      class="tag"
+      data-tag="Otros"
+    >
+      Otros
+    </span>
+
+  </div>
+
+</div>
+
+
+
+<div class="side-card">
+
+  <div class="side-title">
+    Más vistos
+  </div>
+
+
+  <div
+    id="popularList"
+    class="popular-list"
+  >
+
+    <div class="empty">
+      Cargando...
+    </div>
+
+  </div>
+
+</div>
+
+
+</aside>
+
 
 </div>
 
@@ -1935,16 +2817,16 @@ main{
 <footer>
 
 <div class="wrap">
-  NightInk Comics · Privacidad · Términos · DMCA · Reportar contenido
+
+  NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido
+
 </div>
 
 </footer>
 
 
 
-<!-- =========================
-     LOGIN
-========================= -->
+<!-- LOGIN -->
 
 <div
   id="loginModal"
@@ -1962,10 +2844,14 @@ main{
 
     <div class="field">
 
+      <label>
+        Contraseña
+      </label>
+
       <input
         id="adminPassword"
         type="password"
-        placeholder="Contraseña"
+        autocomplete="current-password"
       >
 
     </div>
@@ -2001,9 +2887,7 @@ main{
 
 
 
-<!-- =========================
-     COMIC FORM
-========================= -->
+<!-- COMIC FORM -->
 
 <div
   id="comicModal"
@@ -2186,9 +3070,7 @@ main{
 
 
 
-<!-- =========================
-     PARTS
-========================= -->
+<!-- PARTS -->
 
 <div
   id="chaptersModal"
@@ -2197,7 +3079,7 @@ main{
 
   <div class="panel wide">
 
-    <div class="section-head">
+    <div class="modal-head">
 
       <h2 id="chaptersTitle">
         Partes
@@ -2214,6 +3096,7 @@ main{
 
 
     <div class="form-grid">
+
 
       <div class="field">
 
@@ -2281,7 +3164,7 @@ main{
 
     <div
       id="chaptersList"
-      class="chapters-list"
+      class="chapter-list"
     ></div>
 
   </div>
@@ -2290,9 +3173,7 @@ main{
 
 
 
-<!-- =========================
-     EDIT PART
-========================= -->
+<!-- EDIT PART -->
 
 <div
   id="editChapterModal"
@@ -2301,7 +3182,7 @@ main{
 
   <div
     class="panel"
-    style="width:min(500px,100%)"
+    style="width:min(520px,100%)"
   >
 
     <h2>
@@ -2316,6 +3197,7 @@ main{
 
 
     <div class="form-grid">
+
 
       <div class="field">
 
@@ -2393,9 +3275,7 @@ main{
 
 
 
-<!-- =========================
-     PAGE MANAGER
-========================= -->
+<!-- PAGES -->
 
 <div
   id="pagesModal"
@@ -2404,7 +3284,7 @@ main{
 
   <div class="panel wide">
 
-    <div class="section-head">
+    <div class="modal-head">
 
       <h2 id="pagesTitle">
         Gestionar páginas
@@ -2420,14 +3300,6 @@ main{
     </div>
 
 
-    <div class="page-manager-info">
-
-      Usa ← y → para mover las páginas
-      o elimina solamente la página que quieras.
-
-    </div>
-
-
     <div
       id="pagesGrid"
       class="pages-grid"
@@ -2439,9 +3311,7 @@ main{
 
 
 
-<!-- =========================
-     INFO
-========================= -->
+<!-- INFO -->
 
 <div
   id="detailModal"
@@ -2453,7 +3323,7 @@ main{
     style="width:min(900px,100%)"
   >
 
-    <div class="section-head">
+    <div class="modal-head">
 
       <h2 id="detailTitle"></h2>
 
@@ -2469,6 +3339,7 @@ main{
 
     <div class="detail">
 
+
       <div
         id="detailCover"
         class="detail-cover"
@@ -2477,15 +3348,15 @@ main{
 
       <div>
 
-        <p
+        <div
           id="detailMeta"
-          style="color:var(--muted)"
-        ></p>
+          class="detail-meta"
+        ></div>
 
 
         <p
           id="detailDescription"
-          style="line-height:1.7"
+          class="detail-desc"
         ></p>
 
 
@@ -2494,7 +3365,7 @@ main{
             display:flex;
             gap:8px;
             flex-wrap:wrap;
-            margin:12px 0;
+            margin:12px 0
           "
         >
 
@@ -2536,9 +3407,7 @@ main{
 
 
 
-<!-- =========================
-     READER
-========================= -->
+<!-- READER -->
 
 <div
   id="reader"
@@ -2546,6 +3415,7 @@ main{
 >
 
   <div class="reader-bar">
+
 
     <div class="reader-left">
 
@@ -2609,8 +3479,8 @@ main{
 
 
   <div
-    id="readerBottomNav"
-    class="reader-bottom-nav"
+    id="readerBottom"
+    class="reader-bottom"
   ></div>
 
 </div>
@@ -2619,125 +3489,63 @@ main{
 
 <script>
 
-/* =========================
-   AGE GATE
-========================= */
-
-const AGE_STORAGE_KEY =
-  "nightink_age_verified";
-
-
-function showAgeGate(){
-
-  const verified =
-    localStorage.getItem(
-      AGE_STORAGE_KEY
+const qs =
+  s =>
+    document.querySelector(
+      s
     );
 
 
-  if(
-    verified !== "yes"
-  ){
-
-    document
-      .querySelector("#ageGate")
-      .classList
-      .add("open");
-
-
-    document.body
-      .classList
-      .add("locked");
-
-  }
-
-}
+const qsa =
+  s =>
+    [
+      ...document.querySelectorAll(
+        s
+      )
+    ];
 
 
-document
-  .querySelector("#ageEnter")
-  .addEventListener(
-    "click",
-    () => {
-
-      localStorage.setItem(
-        AGE_STORAGE_KEY,
-        "yes"
-      );
+const AGE_KEY =
+  "nightink_age_verified_v2";
 
 
-      document
-        .querySelector("#ageGate")
-        .classList
-        .remove("open");
+let catalog =
+  [];
 
-
-      document.body
-        .classList
-        .remove("locked");
-
-    }
-  );
-
-
-document
-  .querySelector("#ageExit")
-  .addEventListener(
-    "click",
-    () => {
-
-      if(
-        window.history.length > 1
-      ){
-
-        window.history.back();
-
-      }
-
-      else{
-
-        window.location.replace(
-          "https://www.google.com/"
-        );
-
-      }
-
-    }
-  );
-
-
-showAgeGate();
-
-
-
-/* =========================
-   GLOBAL
-========================= */
-
-const qs = s =>
-  document.querySelector(s);
-
-const qsa = s =>
-  [...document.querySelectorAll(s)];
-
-
-let catalog = [];
 
 let pagination = {
+
   page:1,
+
   total_pages:1,
+
   total:0
+
 };
 
-let currentPage = 1;
 
-let selectedGenre = "";
+let currentPage =
+  1;
 
-let sortMode = "latest";
 
-let searchQuery = "";
+let selectedGenre =
+  "";
 
-let searchTimer;
+
+let sortMode =
+  "latest";
+
+
+let searchQuery =
+  "";
+
+
+let searchTimer =
+  null;
+
+
+let randomPool =
+  [];
 
 
 let adminToken =
@@ -2746,29 +3554,45 @@ let adminToken =
   ) || "";
 
 
-let currentComicForChapters = null;
-
-let currentAdminChapters = [];
-
-let currentManagedChapter = null;
-
-let managedPages = [];
+let currentComicForChapters =
+  null;
 
 
-let currentPublicComic = null;
+let currentAdminChapters =
+  [];
 
-let currentPublicSlug = null;
 
-let readerParts = [];
+let currentManagedChapter =
+  null;
 
-let currentReaderIndex = -1;
+
+let managedPages =
+  [];
+
+
+let currentPublicComic =
+  null;
+
+
+let currentPublicSlug =
+  null;
+
+
+let readerParts =
+  [];
+
+
+let currentReaderIndex =
+  -1;
 
 
 /* =========================
    HELPERS
 ========================= */
 
-function esc(value = "") {
+function esc(
+  value = ""
+){
 
   return String(value)
     .replace(
@@ -2785,50 +3609,152 @@ function esc(value = "") {
 }
 
 
-function openModal(id) {
+function openModal(
+  id
+){
 
-  qs("#" + id)
-    .classList
-    .add("open");
-
-}
-
-
-function closeModal(id) {
-
-  qs("#" + id)
-    .classList
-    .remove("open");
-
-}
-
-
-qsa("[data-close]")
-.forEach(btn => {
-
-  btn.addEventListener(
-    "click",
-    () =>
-      closeModal(
-        btn.dataset.close
-      )
+  qs(
+    "#" + id
+  )
+  ?.classList
+  .add(
+    "open"
   );
 
-});
+}
 
+
+function closeModal(
+  id
+){
+
+  qs(
+    "#" + id
+  )
+  ?.classList
+  .remove(
+    "open"
+  );
+
+}
+
+
+qsa(
+  "[data-close]"
+)
+.forEach(
+  btn => {
+
+    btn.addEventListener(
+      "click",
+      () =>
+        closeModal(
+          btn.dataset.close
+        )
+    );
+
+  }
+);
+
+
+/* =========================
+   AGE GATE
+========================= */
+
+function showAgeGate(){
+
+  if(
+    localStorage.getItem(
+      AGE_KEY
+    ) !== "yes"
+  ){
+
+    qs(
+      "#ageGate"
+    )
+    .classList
+    .add(
+      "open"
+    );
+
+
+    document.body
+      .classList
+      .add(
+        "age-locked"
+      );
+
+  }
+
+}
+
+
+qs(
+  "#ageEnter"
+)
+.addEventListener(
+  "click",
+  () => {
+
+    localStorage.setItem(
+      AGE_KEY,
+      "yes"
+    );
+
+
+    qs(
+      "#ageGate"
+    )
+    .classList
+    .remove(
+      "open"
+    );
+
+
+    document.body
+      .classList
+      .remove(
+        "age-locked"
+      );
+
+  }
+);
+
+
+qs(
+  "#ageExit"
+)
+.addEventListener(
+  "click",
+  () => {
+
+    location.replace(
+      "https://www.google.com/"
+    );
+
+  }
+);
+
+
+/* =========================
+   API
+========================= */
 
 async function api(
   url,
   options = {}
-) {
+){
 
   const headers =
     new Headers(
-      options.headers || {}
+      options.headers ||
+      {}
     );
 
 
-  if (adminToken) {
+  if(
+    adminToken
+  ){
 
     headers.set(
       "X-Admin-Token",
@@ -2848,20 +3774,23 @@ async function api(
     );
 
 
-  let data = {};
+  let data =
+    {};
 
 
-  try {
+  try{
 
     data =
       await response.json();
 
   }
 
-  catch {}
+  catch{}
 
 
-  if (!response.ok) {
+  if(
+    !response.ok
+  ){
 
     throw new Error(
       data.error ||
@@ -2877,22 +3806,26 @@ async function api(
 
 
 /* =========================
-   ROUTES
+   ROUTING
 ========================= */
 
-function getRoute() {
+function getRoute(){
 
   const match =
-    location.pathname.match(
-      /^\/comic\/([^/]+)\/?$/
-    );
+    location.pathname
+      .match(
+        /^\/comic\/([^/]+)\/?$/
+      );
 
 
-  if (match) {
+  if(
+    match
+  ){
 
     return {
 
-      type:"comic",
+      type:
+        "comic",
 
       slug:
         decodeURIComponent(
@@ -2911,46 +3844,194 @@ function getRoute() {
 }
 
 
-function comicPath(slug) {
+function comicPath(
+  slug
+){
 
   return (
     "/comic/" +
-    encodeURIComponent(slug)
+    encodeURIComponent(
+      slug
+    )
   );
 
 }
 
 
-function setHomeMetadata() {
+function setHomeMetadata(){
 
   document.title =
     "NightInk Comics";
 
 
-  qs("#metaDescription")
-    .content =
-      "NightInk Comics";
+  qs(
+    "#metaDescription"
+  )
+  .content =
+    "NightInk Comics";
 
 }
 
 
-function setComicMetadata(comic) {
+function setComicMetadata(
+  comic
+){
 
   document.title =
-    comic.title +
-    " | NightInk Comics";
+    `${comic.title} | NightInk Comics`;
 
 
-  qs("#metaDescription")
-    .content =
-      comic.description
-      ?
-      comic.description.slice(
-        0,
-        150
-      )
-      :
-      `Lee ${comic.title} en NightInk Comics`;
+  qs(
+    "#metaDescription"
+  )
+  .content =
+    comic.description
+    ?
+    comic.description.slice(
+      0,
+      150
+    )
+    :
+    `Lee ${comic.title} en NightInk Comics`;
+
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+function badgeForComic(
+  comic
+){
+
+  const parts =
+    Number(
+      comic.part_count ||
+      0
+    );
+
+
+  if(
+    parts === 0
+  ){
+
+    return "Sin partes";
+
+  }
+
+
+  if(
+    parts === 1
+  ){
+
+    return "▶ Leer";
+
+  }
+
+
+  return (
+    `▶ ${parts} partes`
+  );
+
+}
+
+
+function comicCardHTML(
+  comic,
+  dataAttr = "data-comic"
+){
+
+  const cover =
+    comic.cover_url
+    ?
+    `background-image:url('${comic.cover_url}')`
+    :
+    "";
+
+
+  const placeholder =
+    comic.cover_url
+    ?
+    ""
+    :
+    `
+
+      <div class="cover-placeholder">
+        ${esc(
+          comic.title
+        )}
+      </div>
+
+    `;
+
+
+  return `
+
+    <article
+      class="comic-card"
+      ${dataAttr}="${esc(
+        comic.slug
+      )}"
+    >
+
+      <div
+        class="cover"
+        style="${cover}"
+      >
+
+        ${placeholder}
+
+        <span class="card-badge">
+
+          ${badgeForComic(
+            comic
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div class="card-body">
+
+        <h3 class="card-title">
+
+          ${esc(
+            comic.title
+          )}
+
+        </h3>
+
+
+        <div class="card-meta">
+
+          <span>
+
+            ${esc(
+              comic.genre ||
+              "Sin categoría"
+            )}
+
+          </span>
+
+          <span>
+
+            ${Number(
+              comic.views ||
+              0
+            )}
+            vistas
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  `;
 
 }
 
@@ -2961,33 +4042,30 @@ function setComicMetadata(comic) {
 
 async function loadCatalog(
   page = 1
-) {
+){
 
-  try {
+  try{
 
     const params =
-      new URLSearchParams();
+      new URLSearchParams({
+
+        page:
+          String(
+            page
+          ),
+
+        limit:
+          "12",
+
+        sort:
+          sortMode
+
+      });
 
 
-    params.set(
-      "page",
-      page
-    );
-
-
-    params.set(
-      "limit",
-      10
-    );
-
-
-    params.set(
-      "sort",
-      sortMode
-    );
-
-
-    if (searchQuery) {
+    if(
+      searchQuery
+    ){
 
       params.set(
         "q",
@@ -2997,7 +4075,9 @@ async function loadCatalog(
     }
 
 
-    if (selectedGenre) {
+    if(
+      selectedGenre
+    ){
 
       params.set(
         "genre",
@@ -3015,20 +4095,28 @@ async function loadCatalog(
 
 
     catalog =
-      data.comics || [];
+      data.comics ||
+      [];
 
 
     pagination =
-      data.pagination || {
+      data.pagination ||
+      {
+
         page:1,
+
         total_pages:1,
-        total:catalog.length
+
+        total:
+          catalog.length
+
       };
 
 
     currentPage =
       Number(
-        pagination.page || 1
+        pagination.page ||
+        1
       );
 
 
@@ -3038,38 +4126,41 @@ async function loadCatalog(
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
-    qs("#comicGrid")
-      .innerHTML = `
+    qs(
+      "#comicGrid"
+    )
+    .innerHTML = `
 
-        <div class="empty">
-          ${esc(error.message)}
-        </div>
+      <div class="empty">
 
-      `;
+        ${esc(
+          error.message
+        )}
+
+      </div>
+
+    `;
 
   }
 
 }
 
 
-function renderCatalog() {
+function renderCatalog(){
 
   const grid =
-    qs("#comicGrid");
+    qs(
+      "#comicGrid"
+    );
 
 
-  qs("#catalogTitle")
-    .textContent =
-      sortMode === "popular"
-      ?
-      "Cómics más populares"
-      :
-      "Últimos cómics";
-
-
-  if (!catalog.length) {
+  if(
+    !catalog.length
+  ){
 
     grid.innerHTML = `
 
@@ -3085,115 +4176,33 @@ function renderCatalog() {
 
 
   grid.innerHTML =
-    catalog.map(comic => {
-
-      const parts =
-        Number(
-          comic.part_count || 0
-        );
-
-
-      let badge =
-        "Sin páginas";
+    catalog
+      .map(
+        comic =>
+          comicCardHTML(
+            comic
+          )
+      )
+      .join("");
 
 
-      if (parts === 1) {
-
-        badge =
-          "▶ Leer";
-
-      }
-
-
-      if (parts > 1) {
-
-        badge =
-          `▶ ${parts} partes`;
-
-      }
-
-
-      const cover =
-        comic.cover_url
-        ?
-        `background-image:url('${comic.cover_url}')`
-        :
-        "";
-
-
-      return `
-
-        <article
-          class="comic-card"
-          data-comic="${esc(comic.slug)}"
-        >
-
-          <div
-            class="cover"
-            style="${cover}"
-          >
-
-            <span class="chapter-badge">
-              ${badge}
-            </span>
-
-            <span class="cover-title">
-              ${esc(comic.title)}
-            </span>
-
-          </div>
-
-
-          <div class="card-info">
-
-            <h3 class="card-title">
-              ${esc(comic.title)}
-            </h3>
-
-            <div class="card-meta">
-
-              <span>
-                ${esc(
-                  comic.genre ||
-                  "Sin categoría"
-                )}
-              </span>
-
-              <span>
-                ${Number(
-                  comic.views || 0
-                )}
-                vistas
-              </span>
-
-            </div>
-
-          </div>
-
-        </article>
-
-      `;
-
-    })
-    .join("");
-
-
-  qsa("[data-comic]")
-    .forEach(card => {
+  qsa(
+    "[data-comic]"
+  )
+  .forEach(
+    card => {
 
       card.addEventListener(
         "click",
-        () => {
-
+        () =>
           openComicDirect(
             card.dataset.comic,
             true
-          );
-
-        }
+          )
       );
 
-    });
+    }
+  );
 
 }
 
@@ -3202,37 +4211,41 @@ function renderCatalog() {
    PAGINATION
 ========================= */
 
-function renderPagination() {
+function renderPagination(){
 
   const box =
-    qs("#pagination");
+    qs(
+      "#pagination"
+    );
 
 
   const total =
     Number(
-      pagination.total_pages || 1
+      pagination.total_pages ||
+      1
     );
 
 
   const page =
     Number(
-      pagination.page || 1
+      pagination.page ||
+      1
     );
 
 
-  if (total <= 1) {
+  if(
+    total <= 1
+  ){
 
-    box.innerHTML = "";
+    box.innerHTML =
+      "";
 
     return;
 
   }
 
 
-  let html = "";
-
-
-  html += `
+  let html = `
 
     <button
       class="page-btn"
@@ -3251,20 +4264,57 @@ function renderPagination() {
   `;
 
 
-  for (
+  const pages =
+    [];
+
+
+  for(
     let i = 1;
     i <= total;
     i++
-  ) {
+  ){
 
-    if (
-      total > 7 &&
-      i !== 1 &&
-      i !== total &&
-      Math.abs(i - page) > 2
-    ) {
+    if(
+      total <= 7 ||
+      i === 1 ||
+      i === total ||
+      Math.abs(
+        i - page
+      ) <= 2
+    ){
 
-      continue;
+      pages.push(
+        i
+      );
+
+    }
+
+  }
+
+
+  let last =
+    0;
+
+
+  for(
+    const i of pages
+  ){
+
+    if(
+      last &&
+      i - last > 1
+    ){
+
+      html += `
+
+        <button
+          class="page-btn"
+          disabled
+        >
+          …
+        </button>
+
+      `;
 
     }
 
@@ -3272,8 +4322,7 @@ function renderPagination() {
     html += `
 
       <button
-        class="page-btn
-        ${
+        class="page-btn ${
           i === page
           ?
           "active"
@@ -3282,10 +4331,16 @@ function renderPagination() {
         }"
         data-page="${i}"
       >
+
         ${i}
+
       </button>
 
     `;
+
+
+    last =
+      i;
 
   }
 
@@ -3303,7 +4358,9 @@ function renderPagination() {
         ""
       }
     >
-      →
+
+      Siguiente →
+
     </button>
 
   `;
@@ -3313,32 +4370,49 @@ function renderPagination() {
     html;
 
 
-  qsa("[data-page]")
-    .forEach(button => {
+  qsa(
+    "[data-page]"
+  )
+  .forEach(
+    btn => {
 
-      button.addEventListener(
+      btn.addEventListener(
         "click",
         () => {
 
           const n =
             Number(
-              button.dataset.page
+              btn.dataset.page
             );
 
 
-          if (
+          if(
             n >= 1 &&
             n <= total
-          ) {
+          ){
 
-            loadCatalog(n);
+            loadCatalog(
+              n
+            );
+
+
+            qs(
+              "#ultimos"
+            )
+            .scrollIntoView({
+
+              behavior:
+                "smooth"
+
+            });
 
           }
 
         }
       );
 
-    });
+    }
+  );
 
 }
 
@@ -3347,45 +4421,66 @@ function renderPagination() {
    POPULAR
 ========================= */
 
-async function loadPopular() {
+async function loadPopular(){
 
-  try {
+  try{
 
     const data =
       await api(
-        "/api/comics?page=1&limit=5&sort=popular"
+        "/api/comics?page=1&limit=6&sort=popular"
       );
 
 
     const items =
-      data.comics || [];
+      data.comics ||
+      [];
 
 
-    qs("#popularList")
-      .innerHTML =
-        items.length
-        ?
-        items.map(
-          (comic,index) => `
+    qs(
+      "#popularList"
+    )
+    .innerHTML =
+      items.length
+      ?
+      items
+        .map(
+          (
+            comic,
+            index
+          ) => `
 
             <div
               class="popular-item"
-              data-popular="${esc(comic.slug)}"
+              data-popular="${esc(
+                comic.slug
+              )}"
             >
 
               <div class="popular-rank">
+
                 ${index + 1}
+
               </div>
 
-              <div>
+
+              <div class="popular-copy">
 
                 <strong>
-                  ${esc(comic.title)}
+
+                  ${esc(
+                    comic.title
+                  )}
+
                 </strong>
 
                 <small>
-                  ${comic.views}
+
+                  ${Number(
+                    comic.views ||
+                    0
+                  )}
                   vistas
+
                 </small>
 
               </div>
@@ -3393,46 +4488,56 @@ async function loadPopular() {
             </div>
 
           `
-        ).join("")
-        :
-        `
-
-          <div class="empty">
-            Sin datos.
-          </div>
-
-        `;
-
-
-    qsa("[data-popular]")
-      .forEach(item => {
-
-        item.addEventListener(
-          "click",
-          () => {
-
-            openComicDirect(
-              item.dataset.popular,
-              true
-            );
-
-          }
-        );
-
-      });
-
-  }
-
-  catch(error) {
-
-    qs("#popularList")
-      .innerHTML = `
+        )
+        .join("")
+      :
+      `
 
         <div class="empty">
-          ${esc(error.message)}
+          Sin datos.
         </div>
 
       `;
+
+
+    qsa(
+      "[data-popular]"
+    )
+    .forEach(
+      item => {
+
+        item.addEventListener(
+          "click",
+          () =>
+            openComicDirect(
+              item.dataset.popular,
+              true
+            )
+        );
+
+      }
+    );
+
+  }
+
+  catch(
+    error
+  ){
+
+    qs(
+      "#popularList"
+    )
+    .innerHTML = `
+
+      <div class="empty">
+
+        ${esc(
+          error.message
+        )}
+
+      </div>
+
+    `;
 
   }
 
@@ -3443,9 +4548,9 @@ async function loadPopular() {
    UPDATES
 ========================= */
 
-async function loadUpdates() {
+async function loadUpdates(){
 
-  try {
+  try{
 
     const data =
       await api(
@@ -3454,118 +4559,143 @@ async function loadUpdates() {
 
 
     const updates =
-      data.updates || [];
+      data.updates ||
+      [];
 
 
-    qs("#updatesList")
-      .innerHTML =
-        updates.length
-        ?
-        updates.map(update => {
+    qs(
+      "#updatesList"
+    )
+    .innerHTML =
+      updates.length
+      ?
+      updates
+        .map(
+          u => {
 
-          const cover =
-            update.cover_url
-            ?
-            `background-image:url('${update.cover_url}')`
-            :
-            "";
+            const cover =
+              u.cover_url
+              ?
+              `background-image:url('${u.cover_url}')`
+              :
+              "";
 
 
-          return `
-
-            <div
-              class="update-item"
-              data-update-slug="${esc(update.slug)}"
-              data-update-chapter="${update.chapter_id}"
-            >
+            return `
 
               <div
-                class="update-cover"
-                style="${cover}"
-              ></div>
+                class="update-item"
+                data-update-slug="${esc(
+                  u.slug
+                )}"
+                data-update-chapter="${u.chapter_id}"
+              >
+
+                <div
+                  class="update-cover"
+                  style="${cover}"
+                ></div>
 
 
-              <div>
+                <div class="update-main">
 
-                <div class="update-title">
-                  ${esc(
-                    update.comic_title
-                  )}
+                  <div class="update-title">
+
+                    ${esc(
+                      u.comic_title
+                    )}
+
+                  </div>
+
+                  <div class="update-meta">
+
+                    ${Number(
+                      u.page_count ||
+                      0
+                    )}
+                    páginas
+
+                    ·
+
+                    ${esc(
+                      u.genre ||
+                      "Sin categoría"
+                    )}
+
+                  </div>
+
                 </div>
 
-                <div class="update-meta">
 
-                  ${Number(
-                    update.page_count || 0
-                  )}
-                  páginas
+                <div class="update-part">
 
-                  ·
-
-                  ${esc(
-                    update.genre ||
-                    "Sin categoría"
-                  )}
+                  ▶ Parte
+                  ${u.chapter_number}
 
                 </div>
 
               </div>
 
-
-              <div class="update-part">
-
-                ▶ Parte
-                ${update.chapter_number}
-
-              </div>
-
-            </div>
-
-          `;
-
-        }).join("")
-        :
-        `
-
-          <div class="empty">
-            Todavía no hay actualizaciones.
-          </div>
-
-        `;
-
-
-    qsa("[data-update-slug]")
-      .forEach(item => {
-
-        item.addEventListener(
-          "click",
-          () => {
-
-            openComicDirect(
-              item.dataset.updateSlug,
-              true,
-              Number(
-                item.dataset.updateChapter
-              )
-            );
+            `;
 
           }
-        );
-
-      });
-
-  }
-
-  catch(error) {
-
-    qs("#updatesList")
-      .innerHTML = `
+        )
+        .join("")
+      :
+      `
 
         <div class="empty">
-          ${esc(error.message)}
+          Todavía no hay actualizaciones con páginas.
         </div>
 
       `;
+
+
+    qsa(
+      "[data-update-slug]"
+    )
+    .forEach(
+      item => {
+
+        item.addEventListener(
+          "click",
+          () =>
+            openComicDirect(
+
+              item.dataset.updateSlug,
+
+              true,
+
+              Number(
+                item.dataset.updateChapter
+              )
+
+            )
+        );
+
+      }
+    );
+
+  }
+
+  catch(
+    error
+  ){
+
+    qs(
+      "#updatesList"
+    )
+    .innerHTML = `
+
+      <div class="empty">
+
+        ${esc(
+          error.message
+        )}
+
+      </div>
+
+    `;
 
   }
 
@@ -3573,21 +4703,142 @@ async function loadUpdates() {
 
 
 /* =========================
-   DIRECT READER
+   RANDOM
+========================= */
+
+async function loadRandomPool(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/comics?page=1&limit=30&sort=latest"
+      );
+
+
+    randomPool =
+      data.comics ||
+      [];
+
+
+    renderRandom();
+
+  }
+
+  catch(
+    error
+  ){
+
+    qs(
+      "#randomGrid"
+    )
+    .innerHTML = `
+
+      <div class="empty">
+
+        ${esc(
+          error.message
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+function renderRandom(){
+
+  const shuffled =
+    [
+      ...randomPool
+    ]
+    .sort(
+      () =>
+        Math.random() -
+        0.5
+    )
+    .slice(
+      0,
+      4
+    );
+
+
+  qs(
+    "#randomGrid"
+  )
+  .innerHTML =
+    shuffled.length
+    ?
+    shuffled
+      .map(
+        comic =>
+          comicCardHTML(
+            comic,
+            "data-random"
+          )
+      )
+      .join("")
+    :
+    `
+
+      <div class="empty">
+        Todavía no hay suficientes cómics.
+      </div>
+
+    `;
+
+
+  qsa(
+    "[data-random]"
+  )
+  .forEach(
+    card => {
+
+      card.addEventListener(
+        "click",
+        () =>
+          openComicDirect(
+            card.dataset.random,
+            true
+          )
+      );
+
+    }
+  );
+
+}
+
+
+qs(
+  "#randomRefresh"
+)
+.addEventListener(
+  "click",
+  renderRandom
+);
+
+
+/* =========================
+   OPEN COMIC
 ========================= */
 
 async function openComicDirect(
   slug,
   pushRoute = true,
   preferredChapterId = null
-) {
+){
 
-  try {
+  try{
 
     const data =
       await api(
         "/api/comics/" +
-        encodeURIComponent(slug)
+        encodeURIComponent(
+          slug
+        )
       );
 
 
@@ -3596,7 +4847,8 @@ async function openComicDirect(
 
 
     const chapters =
-      data.chapters || [];
+      data.chapters ||
+      [];
 
 
     currentPublicComic =
@@ -3616,18 +4868,31 @@ async function openComicDirect(
     );
 
 
-    if (pushRoute) {
+    if(
+      pushRoute
+    ){
 
       history.pushState(
+
         {
-          type:"comic",
-          slug:comic.slug,
-          fromSite:true
+
+          type:
+            "comic",
+
+          slug:
+            comic.slug,
+
+          fromSite:
+            true
+
         },
+
         "",
+
         comicPath(
           comic.slug
         )
+
       );
 
     }
@@ -3639,7 +4904,9 @@ async function openComicDirect(
     );
 
 
-    if (!chapters.length) {
+    if(
+      !chapters.length
+    ){
 
       showNoPages();
 
@@ -3652,39 +4919,52 @@ async function openComicDirect(
       -1;
 
 
-    if (
+    if(
       preferredChapterId
-    ) {
+    ){
 
       index =
-        chapters.findIndex(
-          chapter =>
-            Number(chapter.id) ===
-            Number(preferredChapterId)
-        );
+        chapters
+          .findIndex(
+            ch =>
+              Number(
+                ch.id
+              )
+              ===
+              Number(
+                preferredChapterId
+              )
+          );
 
     }
 
 
-    if (
+    if(
       index === -1 ||
       Number(
-        chapters[index]?.page_count || 0
+        chapters[
+          index
+        ]?.page_count ||
+        0
       ) === 0
-    ) {
+    ){
 
       index =
-        chapters.findIndex(
-          chapter =>
-            Number(
-              chapter.page_count || 0
-            ) > 0
-        );
+        chapters
+          .findIndex(
+            ch =>
+              Number(
+                ch.page_count ||
+                0
+              ) > 0
+          );
 
     }
 
 
-    if (index === -1) {
+    if(
+      index === -1
+    ){
 
       showNoPages();
 
@@ -3702,7 +4982,9 @@ async function openComicDirect(
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
     alert(
       error.message
@@ -3720,50 +5002,76 @@ async function openComicDirect(
 function prepareComicInfo(
   comic,
   chapters
-) {
+){
 
-  qs("#detailTitle")
-    .textContent =
-      comic.title;
-
-
-  qs("#detailMeta")
-    .textContent =
-      [
-        comic.author,
-        comic.genre,
-        comic.status,
-        `${comic.views} vistas`
-      ]
-      .filter(Boolean)
-      .join(" · ");
+  qs(
+    "#detailTitle"
+  )
+  .textContent =
+    comic.title;
 
 
-  qs("#detailDescription")
-    .textContent =
-      comic.description || "";
+  qs(
+    "#detailMeta"
+  )
+  .textContent =
+    [
+
+      comic.author,
+
+      comic.genre,
+
+      comic.status,
+
+      `${comic.views} vistas`
+
+    ]
+    .filter(
+      Boolean
+    )
+    .join(
+      " · "
+    );
 
 
-  qs("#detailCover")
-    .style.backgroundImage =
-      comic.cover_url
-      ?
-      `url("${comic.cover_url}")`
-      :
-      "";
+  qs(
+    "#detailDescription"
+  )
+  .textContent =
+    comic.description ||
+    "";
 
 
-  qs("#shareMessage")
-    .textContent = "";
+  qs(
+    "#detailCover"
+  )
+  .style
+  .backgroundImage =
+    comic.cover_url
+    ?
+    `url("${comic.cover_url}")`
+    :
+    "";
 
 
-  const parts =
-    qs("#detailParts");
+  qs(
+    "#shareMessage"
+  )
+  .textContent =
+    "";
 
 
-  if (!chapters.length) {
+  const box =
+    qs(
+      "#detailParts"
+    );
 
-    parts.innerHTML = `
+
+  if(
+    !chapters.length
+  ){
+
+    box.innerHTML = `
 
       <div class="empty">
         No hay partes publicadas.
@@ -3776,43 +5084,55 @@ function prepareComicInfo(
   }
 
 
-  parts.innerHTML =
-    chapters.map(
-      (chapter,index) => `
+  box.innerHTML =
+    chapters
+      .map(
+        (
+          ch,
+          index
+        ) => `
 
-        <button
-          class="part-btn"
-          data-info-part="${index}"
-        >
+          <button
+            class="part-btn"
+            data-info-part="${index}"
+          >
 
-          ▶ Parte
-          ${chapter.chapter_number}
+            ▶ Parte
+            ${ch.chapter_number}
 
-          ${
-            chapter.title
-            ?
-            " · " +
-            esc(chapter.title)
-            :
-            ""
-          }
+            ${
+              ch.title
+              ?
+              " · " +
+              esc(
+                ch.title
+              )
+              :
+              ""
+            }
 
-          ·
+            ·
 
-          ${chapter.page_count}
-          páginas
+            ${Number(
+              ch.page_count ||
+              0
+            )}
+            páginas
 
-        </button>
+          </button>
 
-      `
-    )
-    .join("");
+        `
+      )
+      .join("");
 
 
-  qsa("[data-info-part]")
-    .forEach(button => {
+  qsa(
+    "[data-info-part]"
+  )
+  .forEach(
+    btn => {
 
-      button.addEventListener(
+      btn.addEventListener(
         "click",
         async () => {
 
@@ -3823,28 +5143,35 @@ function prepareComicInfo(
 
           await openReaderByIndex(
             Number(
-              button.dataset.infoPart
+              btn.dataset.infoPart
             )
           );
 
         }
       );
 
-    });
+    }
+  );
 
 }
 
 
-function showNoPages() {
+function showNoPages(){
 
-  qs("#reader")
-    .classList
-    .remove("open");
+  qs(
+    "#reader"
+  )
+  .classList
+  .remove(
+    "open"
+  );
 
 
   document.body
     .classList
-    .remove("locked");
+    .remove(
+      "reader-locked"
+    );
 
 
   openModal(
@@ -3860,12 +5187,13 @@ function showNoPages() {
 
 async function openReaderByIndex(
   index
-) {
+){
 
-  if (
+  if(
     index < 0 ||
-    index >= readerParts.length
-  ) {
+    index >=
+    readerParts.length
+  ){
 
     return;
 
@@ -3877,10 +5205,12 @@ async function openReaderByIndex(
 
 
   const selected =
-    readerParts[index];
+    readerParts[
+      index
+    ];
 
 
-  try {
+  try{
 
     const data =
       await api(
@@ -3889,52 +5219,35 @@ async function openReaderByIndex(
 
 
     const pages =
-      data.pages || [];
+      data.pages ||
+      [];
 
 
     const chapter =
       data.chapter;
 
 
-    qs("#readerTitle")
-      .textContent =
-        readerParts.length === 1
-        ?
-        chapter.comic_title
-        :
-        `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
+    qs(
+      "#readerTitle"
+    )
+    .textContent =
+      readerParts.length ===
+      1
+      ?
+      chapter.comic_title
+      :
+      `${chapter.comic_title} · Parte ${chapter.chapter_number}`;
 
 
-    if (!pages.length) {
-
-      qs("#readerPages")
-        .innerHTML = `
-
-          <div class="reader-empty">
-
-            <div>
-
-              <h2>
-                Esta parte todavía no tiene páginas.
-              </h2>
-
-              <p>
-                Selecciona otra parte o vuelve al catálogo.
-              </p>
-
-            </div>
-
-          </div>
-
-        `;
-
-    }
-
-    else {
-
-      qs("#readerPages")
-        .innerHTML =
-          pages.map(page => `
+    qs(
+      "#readerPages"
+    )
+    .innerHTML =
+      pages.length
+      ?
+      pages
+        .map(
+          page => `
 
             <img
               src="${page.url}"
@@ -3942,10 +5255,29 @@ async function openReaderByIndex(
               loading="lazy"
             >
 
-          `)
-          .join("");
+          `
+        )
+        .join("")
+      :
+      `
 
-    }
+        <div class="reader-empty">
+
+          <div>
+
+            <h2>
+              Esta parte todavía no tiene páginas.
+            </h2>
+
+            <p>
+              Selecciona otra parte o vuelve al catálogo.
+            </p>
+
+          </div>
+
+        </div>
+
+      `;
 
 
     updateReaderNavigation();
@@ -3956,22 +5288,33 @@ async function openReaderByIndex(
     );
 
 
-    qs("#reader")
-      .classList
-      .add("open");
+    qs(
+      "#reader"
+    )
+    .classList
+    .add(
+      "open"
+    );
 
 
     document.body
       .classList
-      .add("locked");
+      .add(
+        "reader-locked"
+      );
 
 
-    qs("#reader")
-      .scrollTop = 0;
+    qs(
+      "#reader"
+    )
+    .scrollTop =
+      0;
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
     alert(
       error.message
@@ -3982,28 +5325,31 @@ async function openReaderByIndex(
 }
 
 
-function updateReaderNavigation() {
+function updateReaderNavigation(){
 
   const previous =
-    currentReaderIndex - 1;
+    currentReaderIndex -
+    1;
 
 
   const next =
-    currentReaderIndex + 1;
+    currentReaderIndex +
+    1;
 
 
-  qs("#readerPrev")
-    .disabled =
-      previous < 0;
+  qs(
+    "#readerPrev"
+  )
+  .disabled =
+    previous < 0;
 
 
-  qs("#readerNext")
-    .disabled =
-      next >= readerParts.length;
-
-
-  const bottom =
-    qs("#readerBottomNav");
+  qs(
+    "#readerNext"
+  )
+  .disabled =
+    next >=
+    readerParts.length;
 
 
   let html = `
@@ -4018,9 +5364,9 @@ function updateReaderNavigation() {
   `;
 
 
-  if (
+  if(
     previous >= 0
-  ) {
+  ){
 
     html += `
 
@@ -4036,10 +5382,10 @@ function updateReaderNavigation() {
   }
 
 
-  if (
+  if(
     next <
     readerParts.length
-  ) {
+  ){
 
     html += `
 
@@ -4055,95 +5401,94 @@ function updateReaderNavigation() {
   }
 
 
-  bottom.innerHTML =
+  qs(
+    "#readerBottom"
+  )
+  .innerHTML =
     html;
 
 
-  qs("#bottomInfo")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        openModal(
-          "detailModal"
-        );
-
-      }
-    );
-
-
-  qs("#bottomPrev")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        openReaderByIndex(
-          previous
-        );
-
-      }
-    );
+  qs(
+    "#bottomInfo"
+  )
+  ?.addEventListener(
+    "click",
+    () =>
+      openModal(
+        "detailModal"
+      )
+  );
 
 
-  qs("#bottomNext")
-    ?.addEventListener(
-      "click",
-      () => {
+  qs(
+    "#bottomPrev"
+  )
+  ?.addEventListener(
+    "click",
+    () =>
+      openReaderByIndex(
+        previous
+      )
+  );
 
-        openReaderByIndex(
-          next
-        );
 
-      }
-    );
+  qs(
+    "#bottomNext"
+  )
+  ?.addEventListener(
+    "click",
+    () =>
+      openReaderByIndex(
+        next
+      )
+  );
 
 }
 
 
-qs("#readerPrev")
-  .addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        currentReaderIndex - 1
-      );
-
-    }
-  );
-
-
-qs("#readerNext")
-  .addEventListener(
-    "click",
-    () => {
-
-      openReaderByIndex(
-        currentReaderIndex + 1
-      );
-
-    }
-  );
+qs(
+  "#readerPrev"
+)
+.addEventListener(
+  "click",
+  () =>
+    openReaderByIndex(
+      currentReaderIndex -
+      1
+    )
+);
 
 
-qs("#readerInfo")
-  .addEventListener(
-    "click",
-    () => {
+qs(
+  "#readerNext"
+)
+.addEventListener(
+  "click",
+  () =>
+    openReaderByIndex(
+      currentReaderIndex +
+      1
+    )
+);
 
-      openModal(
-        "detailModal"
-      );
 
-    }
-  );
+qs(
+  "#readerInfo"
+)
+.addEventListener(
+  "click",
+  () =>
+    openModal(
+      "detailModal"
+    )
+);
 
 
 /* =========================
    SHARE
 ========================= */
 
-function comicUrl() {
+function comicUrl(){
 
   return (
     location.origin +
@@ -4155,9 +5500,11 @@ function comicUrl() {
 }
 
 
-async function shareCurrentComic() {
+async function shareCurrentComic(){
 
-  if (!currentPublicComic) {
+  if(
+    !currentPublicComic
+  ){
 
     return;
 
@@ -4168,16 +5515,19 @@ async function shareCurrentComic() {
     comicUrl();
 
 
-  try {
+  try{
 
-    if (
+    if(
       navigator.share
-    ) {
+    ){
 
       await navigator.share({
+
         title:
           currentPublicComic.title,
+
         url
+
       });
 
 
@@ -4187,7 +5537,9 @@ async function shareCurrentComic() {
 
 
     await navigator.clipboard
-      .writeText(url);
+      .writeText(
+        url
+      );
 
 
     alert(
@@ -4196,12 +5548,14 @@ async function shareCurrentComic() {
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
-    if (
+    if(
       error?.name !==
       "AbortError"
-    ) {
+    ){
 
       alert(
         "No se pudo compartir."
@@ -4214,87 +5568,74 @@ async function shareCurrentComic() {
 }
 
 
-qs("#readerShare")
-  .addEventListener(
-    "click",
-    shareCurrentComic
-  );
+qs(
+  "#readerShare"
+)
+.addEventListener(
+  "click",
+  shareCurrentComic
+);
 
 
-qs("#shareComicBtn")
-  .addEventListener(
-    "click",
-    shareCurrentComic
-  );
+qs(
+  "#shareComicBtn"
+)
+.addEventListener(
+  "click",
+  shareCurrentComic
+);
 
 
-qs("#copyComicBtn")
-  .addEventListener(
-    "click",
-    async () => {
+qs(
+  "#copyComicBtn"
+)
+.addEventListener(
+  "click",
+  async () => {
 
-      try {
+    try{
 
-        await navigator.clipboard
-          .writeText(
-            comicUrl()
-          );
+      await navigator.clipboard
+        .writeText(
+          comicUrl()
+        );
 
 
-        qs("#shareMessage")
-          .textContent =
-            "Enlace copiado.";
-
-      }
-
-      catch {
-
-        qs("#shareMessage")
-          .textContent =
-            comicUrl();
-
-      }
+      qs(
+        "#shareMessage"
+      )
+      .textContent =
+        "Enlace copiado.";
 
     }
-  );
+
+    catch{
+
+      qs(
+        "#shareMessage"
+      )
+      .textContent =
+        comicUrl();
+
+    }
+
+  }
+);
 
 
 /* =========================
    EXIT
 ========================= */
 
-qs("#closeDetailBtn")
-  .addEventListener(
-    "click",
-    () => {
+function exitComic(){
 
-      closeModal(
-        "detailModal"
-      );
-
-
-      if (
-        qs("#reader")
-          .classList
-          .contains("open")
-      ) {
-
-        return;
-
-      }
-
-
-      exitComic();
-
-    }
+  qs(
+    "#reader"
+  )
+  .classList
+  .remove(
+    "open"
   );
-
-
-function exitComic() {
-
-  qs("#reader")
-    .classList
-    .remove("open");
 
 
   closeModal(
@@ -4304,7 +5645,9 @@ function exitComic() {
 
   document.body
     .classList
-    .remove("locked");
+    .remove(
+      "reader-locked"
+    );
 
 
   currentReaderIndex =
@@ -4315,10 +5658,11 @@ function exitComic() {
     history.state;
 
 
-  if (
-    state?.type === "comic" &&
+  if(
+    state?.type ===
+    "comic" &&
     state?.fromSite
-  ) {
+  ){
 
     history.back();
 
@@ -4328,17 +5672,24 @@ function exitComic() {
 
 
   history.replaceState(
+
     {
       type:"home"
     },
+
     "",
+
     "/"
+
   );
 
 
-  currentPublicComic = null;
+  currentPublicComic =
+    null;
 
-  currentPublicSlug = null;
+
+  currentPublicSlug =
+    null;
 
 
   setHomeMetadata();
@@ -4352,11 +5703,46 @@ function exitComic() {
 }
 
 
-qs("#closeReader")
-  .addEventListener(
-    "click",
-    exitComic
-  );
+qs(
+  "#closeReader"
+)
+.addEventListener(
+  "click",
+  exitComic
+);
+
+
+qs(
+  "#closeDetailBtn"
+)
+.addEventListener(
+  "click",
+  () => {
+
+    closeModal(
+      "detailModal"
+    );
+
+
+    if(
+      qs(
+        "#reader"
+      )
+      .classList
+      .contains(
+        "open"
+      )
+    ){
+
+      return;
+
+    }
+
+
+    exitComic();
+
+  }
+);
 
 
 /* =========================
@@ -4371,9 +5757,13 @@ window.addEventListener(
       getRoute();
 
 
-    qs("#reader")
-      .classList
-      .remove("open");
+    qs(
+      "#reader"
+    )
+    .classList
+    .remove(
+      "open"
+    );
 
 
     closeModal(
@@ -4383,12 +5773,15 @@ window.addEventListener(
 
     document.body
       .classList
-      .remove("locked");
+      .remove(
+        "reader-locked"
+      );
 
 
-    if (
-      route.type === "comic"
-    ) {
+    if(
+      route.type ===
+      "comic"
+    ){
 
       await openComicDirect(
         route.slug,
@@ -4397,11 +5790,15 @@ window.addEventListener(
 
     }
 
-    else {
+    else{
 
-      currentPublicComic = null;
+      currentPublicComic =
+        null;
 
-      currentPublicSlug = null;
+
+      currentPublicSlug =
+        null;
+
 
       setHomeMetadata();
 
@@ -4415,198 +5812,379 @@ window.addEventListener(
    SEARCH
 ========================= */
 
-qs("#searchInput")
-  .addEventListener(
-    "input",
-    event => {
+function runSearch(){
 
-      clearTimeout(
-        searchTimer
-      );
-
-
-      searchTimer =
-        setTimeout(
-          () => {
-
-            searchQuery =
-              event.target.value
-                .trim();
+  searchQuery =
+    qs(
+      "#searchInput"
+    )
+    .value
+    .trim();
 
 
-            currentPage = 1;
-
-
-            loadCatalog(1);
-
-          },
-          300
-        );
-
-    }
+  loadCatalog(
+    1
   );
 
 
+  qs(
+    "#ultimos"
+  )
+  .scrollIntoView({
+
+    behavior:
+      "smooth"
+
+  });
+
+}
+
+
+qs(
+  "#searchBtn"
+)
+.addEventListener(
+  "click",
+  runSearch
+);
+
+
+qs(
+  "#searchInput"
+)
+.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "Enter"
+    ){
+
+      runSearch();
+
+    }
+
+  }
+);
+
+
+qs(
+  "#searchInput"
+)
+.addEventListener(
+  "input",
+  event => {
+
+    clearTimeout(
+      searchTimer
+    );
+
+
+    searchTimer =
+      setTimeout(
+        () => {
+
+          searchQuery =
+            event.target
+              .value
+              .trim();
+
+
+          loadCatalog(
+            1
+          );
+
+        },
+        350
+      );
+
+  }
+);
+
+
 /* =========================
-   GENRES
+   CATEGORIES
 ========================= */
 
-qsa(".genre-btn")
-  .forEach(button => {
+qsa(
+  ".category-btn"
+)
+.forEach(
+  btn => {
 
-    button.addEventListener(
+    btn.addEventListener(
       "click",
       () => {
 
         selectedGenre =
-          button.dataset.genre;
+          btn.dataset.genre;
 
 
-        qsa(".genre-btn")
-          .forEach(item => {
+        qsa(
+          ".category-btn"
+        )
+        .forEach(
+          item => {
 
             item.classList.toggle(
+
               "active",
-              item === button
+
+              item ===
+              btn
+
             );
 
-          });
+          }
+        );
 
 
-        loadCatalog(1);
+        loadCatalog(
+          1
+        );
+
+
+        qs(
+          "#ultimos"
+        )
+        .scrollIntoView({
+
+          behavior:
+            "smooth"
+
+        });
 
       }
     );
 
-  });
+  }
+);
+
+
+qsa(
+  ".tag"
+)
+.forEach(
+  tag => {
+
+    tag.addEventListener(
+      "click",
+      () => {
+
+        selectedGenre =
+          tag.dataset.tag;
+
+
+        qsa(
+          ".category-btn"
+        )
+        .forEach(
+          item => {
+
+            item.classList.toggle(
+
+              "active",
+
+              item.dataset.genre ===
+              selectedGenre
+
+            );
+
+          }
+        );
+
+
+        loadCatalog(
+          1
+        );
+
+
+        qs(
+          "#ultimos"
+        )
+        .scrollIntoView({
+
+          behavior:
+            "smooth"
+
+        });
+
+      }
+    );
+
+  }
+);
 
 
 /* =========================
    SORT
 ========================= */
 
-qsa(".tab")
-  .forEach(button => {
+qsa(
+  ".tab[data-sort]"
+)
+.forEach(
+  btn => {
 
-    button.addEventListener(
+    btn.addEventListener(
       "click",
       () => {
 
         sortMode =
-          button.dataset.sort;
+          btn.dataset.sort;
 
 
-        qsa(".tab")
-          .forEach(item => {
+        qsa(
+          ".tab[data-sort]"
+        )
+        .forEach(
+          item => {
 
             item.classList.toggle(
+
               "active",
-              item === button
+
+              item ===
+              btn
+
             );
 
-          });
+          }
+        );
 
 
-        loadCatalog(1);
+        loadCatalog(
+          1
+        );
 
       }
     );
 
-  });
+  }
+);
 
 
 /* =========================
    ADMIN LOGIN
 ========================= */
 
-qs("#openAdmin")
-  .addEventListener(
-    "click",
-    async () => {
+qs(
+  "#openAdmin"
+)
+.addEventListener(
+  "click",
+  async () => {
 
-      if (adminToken) {
+    if(
+      adminToken
+    ){
 
-        try {
+      try{
 
-          await showAdmin();
+        await showAdmin();
 
-          return;
-
-        }
-
-        catch {
-
-          adminToken = "";
-
-
-          sessionStorage.removeItem(
-            "nightink_admin_token"
-          );
-
-        }
+        return;
 
       }
 
+      catch{
 
-      openModal(
-        "loginModal"
-      );
-
-
-      qs("#adminPassword")
-        .focus();
-
-    }
-  );
+        adminToken =
+          "";
 
 
-qs("#loginBtn")
-  .addEventListener(
-    "click",
-    loginAdmin
-  );
-
-
-qs("#adminPassword")
-  .addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key === "Enter"
-      ) {
-
-        loginAdmin();
+        sessionStorage.removeItem(
+          "nightink_admin_token"
+        );
 
       }
 
     }
-  );
 
 
-async function loginAdmin() {
+    qs(
+      "#loginMsg"
+    )
+    .textContent =
+      "";
+
+
+    openModal(
+      "loginModal"
+    );
+
+
+    qs(
+      "#adminPassword"
+    )
+    .focus();
+
+  }
+);
+
+
+qs(
+  "#loginBtn"
+)
+.addEventListener(
+  "click",
+  loginAdmin
+);
+
+
+qs(
+  "#adminPassword"
+)
+.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "Enter"
+    ){
+
+      loginAdmin();
+
+    }
+
+  }
+);
+
+
+async function loginAdmin(){
 
   const password =
-    qs("#adminPassword")
-      .value;
+    qs(
+      "#adminPassword"
+    )
+    .value;
 
 
-  try {
+  try{
 
     await api(
       "/api/admin/login",
       {
-        method:"POST",
+
+        method:
+          "POST",
 
         headers:{
+
           "Content-Type":
             "application/json"
+
         },
 
         body:
           JSON.stringify({
+
             password
+
           })
+
       }
     );
 
@@ -4616,8 +6194,11 @@ async function loginAdmin() {
 
 
     sessionStorage.setItem(
+
       "nightink_admin_token",
+
       password
+
     );
 
 
@@ -4630,16 +6211,22 @@ async function loginAdmin() {
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
-    qs("#loginMsg")
-      .className =
-        "msg error";
+    qs(
+      "#loginMsg"
+    )
+    .className =
+      "msg error";
 
 
-    qs("#loginMsg")
-      .textContent =
-        error.message;
+    qs(
+      "#loginMsg"
+    )
+    .textContent =
+      error.message;
 
   }
 
@@ -4650,49 +6237,68 @@ async function loginAdmin() {
    ADMIN
 ========================= */
 
-async function showAdmin() {
+async function showAdmin(){
 
-  qs("#adminShell")
-    .classList
-    .add("visible");
+  qs(
+    "#adminShell"
+  )
+  .classList
+  .add(
+    "visible"
+  );
 
 
   await Promise.all([
+
     loadStats(),
+
     loadAdminComics()
+
   ]);
 
 
-  qs("#adminShell")
-    .scrollIntoView({
-      behavior:"smooth"
-    });
+  qs(
+    "#adminShell"
+  )
+  .scrollIntoView({
+
+    behavior:
+      "smooth"
+
+  });
 
 }
 
 
-qs("#logoutAdminBtn")
-  .addEventListener(
-    "click",
-    () => {
+qs(
+  "#logoutAdminBtn"
+)
+.addEventListener(
+  "click",
+  () => {
 
-      adminToken = "";
-
-
-      sessionStorage.removeItem(
-        "nightink_admin_token"
-      );
+    adminToken =
+      "";
 
 
-      qs("#adminShell")
-        .classList
-        .remove("visible");
-
-    }
-  );
+    sessionStorage.removeItem(
+      "nightink_admin_token"
+    );
 
 
-async function loadStats() {
+    qs(
+      "#adminShell"
+    )
+    .classList
+    .remove(
+      "visible"
+    );
+
+  }
+);
+
+
+async function loadStats(){
 
   const data =
     await api(
@@ -4701,64 +6307,79 @@ async function loadStats() {
 
 
   const s =
-    data.stats;
+    data.stats ||
+    {};
 
 
-  qs("#stats")
-    .innerHTML = `
+  qs(
+    "#stats"
+  )
+  .innerHTML = `
 
-      <div class="stat">
+    <div class="stat">
 
-        <strong>
-          ${s.comics}
-        </strong>
+      <strong>
+        ${Number(
+          s.comics ||
+          0
+        )}
+      </strong>
 
-        <small>
-          Cómics
-        </small>
+      <small>
+        Cómics
+      </small>
 
-      </div>
-
-
-      <div class="stat">
-
-        <strong>
-          ${s.chapters}
-        </strong>
-
-        <small>
-          Partes
-        </small>
-
-      </div>
+    </div>
 
 
-      <div class="stat">
+    <div class="stat">
 
-        <strong>
-          ${s.pages}
-        </strong>
+      <strong>
+        ${Number(
+          s.chapters ||
+          0
+        )}
+      </strong>
 
-        <small>
-          Páginas
-        </small>
+      <small>
+        Partes
+      </small>
 
-      </div>
+    </div>
 
 
-      <div class="stat">
+    <div class="stat">
 
-        <strong>
-          ${s.views}
-        </strong>
+      <strong>
+        ${Number(
+          s.pages ||
+          0
+        )}
+      </strong>
 
-        <small>
-          Vistas
-        </small>
+      <small>
+        Páginas
+      </small>
 
-      </div>
+    </div>
 
-    `;
+
+    <div class="stat">
+
+      <strong>
+        ${Number(
+          s.views ||
+          0
+        )}
+      </strong>
+
+      <small>
+        Vistas
+      </small>
+
+    </div>
+
+  `;
 
 }
 
@@ -4770,107 +6391,157 @@ async function loadStats() {
 function calculateReadiness(
   comic,
   chapters
-) {
+){
 
   const all =
-    chapters || [];
+    chapters ||
+    [];
 
 
   const published =
     all.filter(
-      chapter =>
+      ch =>
         Boolean(
-          chapter.is_published
+          ch.is_published
         )
     );
 
 
   const readable =
     published.filter(
-      chapter =>
+      ch =>
         Number(
-          chapter.page_count || 0
+          ch.page_count ||
+          0
         ) > 0
     );
 
 
   const totalPages =
     readable.reduce(
-      (sum,chapter) =>
+
+      (
+        sum,
+        ch
+      ) =>
+
         sum +
         Number(
-          chapter.page_count || 0
+          ch.page_count ||
+          0
         ),
+
       0
+
     );
 
 
-  if (
+  if(
     !comic.is_published
-  ) {
+  ){
 
     return {
-      rowClass:"draft",
-      badgeClass:"draft",
-      label:"BORRADOR",
+
+      rowClass:
+        "draft",
+
+      badgeClass:
+        "draft",
+
+      label:
+        "BORRADOR",
+
       detail:
-        "El cómic no aparece para los lectores."
+        "No visible para lectores."
+
     };
 
   }
 
 
-  if (
-    all.length === 0
-  ) {
+  if(
+    !all.length
+  ){
 
     return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTA CREAR UNA PARTE",
+
+      rowClass:
+        "warning",
+
+      badgeClass:
+        "warn",
+
+      label:
+        "FALTA PARTE",
+
       detail:
-        "Pulsa Partes y crea la Parte 1."
+        "Crea la Parte 1."
+
     };
 
   }
 
 
-  if (
-    published.length === 0
-  ) {
+  if(
+    !published.length
+  ){
 
     return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTA PUBLICAR UNA PARTE",
+
+      rowClass:
+        "warning",
+
+      badgeClass:
+        "warn",
+
+      label:
+        "FALTA PUBLICAR",
+
       detail:
-        "La obra tiene partes, pero ninguna está publicada."
+        "Ninguna parte está publicada."
+
     };
 
   }
 
 
-  if (
-    readable.length === 0
-  ) {
+  if(
+    !readable.length
+  ){
 
     return {
-      rowClass:"warning",
-      badgeClass:"warn",
-      label:"⚠ FALTAN PÁGINAS",
+
+      rowClass:
+        "warning",
+
+      badgeClass:
+        "warn",
+
+      label:
+        "FALTAN PÁGINAS",
+
       detail:
-        "La parte está publicada, pero todavía no tiene imágenes."
+        "No hay imágenes para leer."
+
     };
 
   }
 
 
   return {
-    rowClass:"ready",
-    badgeClass:"ok",
-    label:"✓ LISTO PARA LEER",
+
+    rowClass:
+      "ready",
+
+    badgeClass:
+      "ok",
+
+    label:
+      "LISTO PARA LEER",
+
     detail:
-      `${readable.length} parte(s) disponible(s) · ${totalPages} páginas`
+      `${readable.length} parte(s) · ${totalPages} páginas`
+
   };
 
 }
@@ -4880,7 +6551,7 @@ function calculateReadiness(
    ADMIN COMICS
 ========================= */
 
-async function loadAdminComics() {
+async function loadAdminComics(){
 
   const data =
     await api(
@@ -4889,14 +6560,19 @@ async function loadAdminComics() {
 
 
   const comics =
-    data.comics || [];
+    data.comics ||
+    [];
 
 
   const box =
-    qs("#adminList");
+    qs(
+      "#adminList"
+    );
 
 
-  if (!comics.length) {
+  if(
+    !comics.length
+  ){
 
     box.innerHTML = `
 
@@ -4912,168 +6588,182 @@ async function loadAdminComics() {
 
 
   box.innerHTML =
-    comics.map(comic => {
+    comics
+      .map(
+        comic => {
 
-      const cover =
-        comic.cover_url
-        ?
-        `background-image:url('${comic.cover_url}')`
-        :
-        "";
-
-
-      return `
-
-        <div
-          class="admin-row"
-          id="adminComic-${comic.id}"
-        >
-
-          <div
-            class="admin-cover"
-            style="${cover}"
-          ></div>
+          const cover =
+            comic.cover_url
+            ?
+            `background-image:url('${comic.cover_url}')`
+            :
+            "";
 
 
-          <div>
-
-            <div class="admin-title-line">
-
-              <strong>
-                ${esc(comic.title)}
-              </strong>
-
-            </div>
-
-
-            <small>
-
-              ${esc(
-                comic.genre ||
-                "Sin género"
-              )}
-
-              ·
-
-              ${comic.part_count}
-              parte(s)
-
-              ·
-
-              ${
-                comic.is_published
-                ?
-                "Publicado"
-                :
-                "Borrador"
-              }
-
-            </small>
-
+          return `
 
             <div
-              class="readiness"
-              id="readiness-${comic.id}"
+              class="admin-row"
+              id="adminComic-${comic.id}"
             >
 
-              <span
-                class="ready-badge loading"
-              >
-                Comprobando contenido...
-              </span>
+              <div
+                class="admin-cover"
+                style="${cover}"
+              ></div>
+
+
+              <div>
+
+                <div class="admin-title">
+
+                  ${esc(
+                    comic.title
+                  )}
+
+                </div>
+
+                <div class="admin-meta">
+
+                  ${esc(
+                    comic.genre ||
+                    "Sin género"
+                  )}
+
+                  ·
+
+                  ${Number(
+                    comic.part_count ||
+                    0
+                  )}
+                  parte(s)
+
+                  ·
+
+                  ${
+                    comic.is_published
+                    ?
+                    "Publicado"
+                    :
+                    "Borrador"
+                  }
+
+                </div>
+
+
+                <div
+                  class="readiness"
+                  id="readiness-${comic.id}"
+                >
+
+                  <span
+                    class="ready-badge loading"
+                  >
+                    Comprobando...
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="row-actions">
+
+                <button
+                  data-edit="${comic.id}"
+                >
+                  Editar
+                </button>
+
+                <button
+                  data-parts="${comic.id}"
+                >
+                  Partes
+                </button>
+
+                <button
+                  data-delete="${comic.id}"
+                >
+                  Eliminar
+                </button>
+
+              </div>
 
             </div>
 
-          </div>
+          `;
+
+        }
+      )
+      .join("");
 
 
-          <div class="row-actions">
+  qsa(
+    "[data-edit]"
+  )
+  .forEach(
+    btn => {
 
-            <button
-              data-edit="${comic.id}"
-            >
-              Editar
-            </button>
-
-            <button
-              data-parts="${comic.id}"
-            >
-              Partes
-            </button>
-
-            <button
-              data-delete="${comic.id}"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-    })
-    .join("");
-
-
-  qsa("[data-edit]")
-    .forEach(button => {
-
-      button.addEventListener(
+      btn.addEventListener(
         "click",
-        () => {
-
+        () =>
           editComic(
-            Number(
-              button.dataset.edit
-            ),
-            comics
-          );
 
-        }
+            Number(
+              btn.dataset.edit
+            ),
+
+            comics
+
+          )
       );
 
-    });
+    }
+  );
 
 
-  qsa("[data-parts]")
-    .forEach(button => {
+  qsa(
+    "[data-parts]"
+  )
+  .forEach(
+    btn => {
 
-      button.addEventListener(
+      btn.addEventListener(
         "click",
-        () => {
-
+        () =>
           manageParts(
-            Number(
-              button.dataset.parts
-            ),
-            comics
-          );
 
-        }
+            Number(
+              btn.dataset.parts
+            ),
+
+            comics
+
+          )
       );
 
-    });
+    }
+  );
 
 
-  qsa("[data-delete]")
-    .forEach(button => {
+  qsa(
+    "[data-delete]"
+  )
+  .forEach(
+    btn => {
 
-      button.addEventListener(
+      btn.addEventListener(
         "click",
-        () => {
-
+        () =>
           deleteComic(
             Number(
-              button.dataset.delete
+              btn.dataset.delete
             )
-          );
-
-        }
+          )
       );
 
-    });
+    }
+  );
 
 
   await Promise.all(
@@ -5081,7 +6771,7 @@ async function loadAdminComics() {
     comics.map(
       async comic => {
 
-        try {
+        try{
 
           const result =
             await api(
@@ -5091,8 +6781,12 @@ async function loadAdminComics() {
 
           const status =
             calculateReadiness(
+
               comic,
-              result.chapters || []
+
+              result.chapters ||
+              []
+
             );
 
 
@@ -5102,35 +6796,44 @@ async function loadAdminComics() {
             );
 
 
-          if (row) {
-
-            row.classList.add(
-              status.rowClass
-            );
-
-          }
-
-
           const indicator =
             qs(
               `#readiness-${comic.id}`
             );
 
 
-          if (indicator) {
+          row
+            ?.classList
+            .add(
+              status.rowClass
+            );
+
+
+          if(
+            indicator
+          ){
 
             indicator.innerHTML = `
 
               <span
                 class="ready-badge ${status.badgeClass}"
               >
+
                 ${status.label}
+
               </span>
 
               <span
-                class="readiness-detail"
+                style="
+                  font-size:10px;
+                  color:#8f95ad
+                "
               >
-                ${esc(status.detail)}
+
+                ${esc(
+                  status.detail
+                )}
+
               </span>
 
             `;
@@ -5139,7 +6842,7 @@ async function loadAdminComics() {
 
         }
 
-        catch {
+        catch{
 
           const indicator =
             qs(
@@ -5147,7 +6850,9 @@ async function loadAdminComics() {
             );
 
 
-          if (indicator) {
+          if(
+            indicator
+          ){
 
             indicator.innerHTML = `
 
@@ -5171,59 +6876,90 @@ async function loadAdminComics() {
 }
 
 
-qs("#refreshAdminBtn")
-  .addEventListener(
-    "click",
-    async () => {
+/* =========================
+   REFRESH ADMIN
+========================= */
 
-      await Promise.all([
-        loadStats(),
-        loadAdminComics(),
-        loadCatalog(currentPage),
-        loadPopular(),
-        loadUpdates()
-      ]);
+qs(
+  "#refreshAdminBtn"
+)
+.addEventListener(
+  "click",
+  async () => {
 
-    }
-  );
+    await Promise.all([
+
+      loadStats(),
+
+      loadAdminComics(),
+
+      loadCatalog(
+        currentPage
+      ),
+
+      loadPopular(),
+
+      loadUpdates(),
+
+      loadRandomPool()
+
+    ]);
+
+  }
+);
 
 
 /* =========================
    NEW COMIC
 ========================= */
 
-qs("#newComicBtn")
-  .addEventListener(
-    "click",
-    () => {
+qs(
+  "#newComicBtn"
+)
+.addEventListener(
+  "click",
+  () => {
 
-      qs("#comicForm")
-        .reset();
-
-
-      qs("#comicId")
-        .value = "";
-
-
-      qs("#comicPublished")
-        .checked = true;
+    qs(
+      "#comicForm"
+    )
+    .reset();
 
 
-      qs("#comicFormTitle")
-        .textContent =
-          "Nuevo cómic";
+    qs(
+      "#comicId"
+    )
+    .value =
+      "";
 
 
-      qs("#comicMsg")
-        .textContent = "";
+    qs(
+      "#comicPublished"
+    )
+    .checked =
+      true;
 
 
-      openModal(
-        "comicModal"
-      );
+    qs(
+      "#comicFormTitle"
+    )
+    .textContent =
+      "Nuevo cómic";
 
-    }
-  );
+
+    qs(
+      "#comicMsg"
+    )
+    .textContent =
+      "";
+
+
+    openModal(
+      "comicModal"
+    );
+
+  }
+);
 
 
 /* =========================
@@ -5233,76 +6969,109 @@ qs("#newComicBtn")
 function editComic(
   id,
   comics
-) {
+){
 
   const comic =
     comics.find(
       c =>
-        Number(c.id) === id
+        Number(
+          c.id
+        ) === id
     );
 
 
-  if (!comic) {
+  if(
+    !comic
+  ){
 
     return;
 
   }
 
 
-  qs("#comicId")
-    .value =
-      comic.id;
+  qs(
+    "#comicId"
+  )
+  .value =
+    comic.id;
 
 
-  qs("#comicTitle")
-    .value =
-      comic.title || "";
+  qs(
+    "#comicTitle"
+  )
+  .value =
+    comic.title ||
+    "";
 
 
-  qs("#comicSlug")
-    .value =
-      comic.slug || "";
+  qs(
+    "#comicSlug"
+  )
+  .value =
+    comic.slug ||
+    "";
 
 
-  qs("#comicAuthor")
-    .value =
-      comic.author || "";
+  qs(
+    "#comicAuthor"
+  )
+  .value =
+    comic.author ||
+    "";
 
 
-  qs("#comicGenre")
-    .value =
-      comic.genre || "";
+  qs(
+    "#comicGenre"
+  )
+  .value =
+    comic.genre ||
+    "";
 
 
-  qs("#comicStatus")
-    .value =
-      comic.status ||
-      "En emisión";
+  qs(
+    "#comicStatus"
+  )
+  .value =
+    comic.status ||
+    "En emisión";
 
 
-  qs("#comicDescription")
-    .value =
-      comic.description || "";
+  qs(
+    "#comicDescription"
+  )
+  .value =
+    comic.description ||
+    "";
 
 
-  qs("#comicPublished")
-    .checked =
-      Boolean(
-        comic.is_published
-      );
+  qs(
+    "#comicPublished"
+  )
+  .checked =
+    Boolean(
+      comic.is_published
+    );
 
 
-  qs("#comicCover")
-    .value = "";
+  qs(
+    "#comicCover"
+  )
+  .value =
+    "";
 
 
-  qs("#comicFormTitle")
-    .textContent =
-      "Editar cómic";
+  qs(
+    "#comicFormTitle"
+  )
+  .textContent =
+    "Editar cómic";
 
 
-  qs("#comicMsg")
-    .textContent = "";
+  qs(
+    "#comicMsg"
+  )
+  .textContent =
+    "";
 
 
   openModal(
@@ -5316,194 +7085,285 @@ function editComic(
    SAVE COMIC
 ========================= */
 
-qs("#comicForm")
-  .addEventListener(
-    "submit",
-    async event => {
+qs(
+  "#comicForm"
+)
+.addEventListener(
+  "submit",
+  async event => {
 
-      event.preventDefault();
+    event.preventDefault();
 
 
-      const id =
-        Number(
-          qs("#comicId")
-            .value ||
-          0
+    const id =
+      Number(
+        qs(
+          "#comicId"
+        )
+        .value ||
+        0
+      );
+
+
+    const payload = {
+
+      title:
+        qs(
+          "#comicTitle"
+        )
+        .value,
+
+      slug:
+        qs(
+          "#comicSlug"
+        )
+        .value,
+
+      author:
+        qs(
+          "#comicAuthor"
+        )
+        .value,
+
+      genre:
+        qs(
+          "#comicGenre"
+        )
+        .value,
+
+      status:
+        qs(
+          "#comicStatus"
+        )
+        .value,
+
+      description:
+        qs(
+          "#comicDescription"
+        )
+        .value,
+
+      is_published:
+        qs(
+          "#comicPublished"
+        )
+        .checked
+
+    };
+
+
+    try{
+
+      let comicId =
+        id;
+
+
+      if(
+        id
+      ){
+
+        await api(
+          `/api/admin/comics/${id}`,
+          {
+
+            method:
+              "PUT",
+
+            headers:{
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              )
+
+          }
         );
 
+      }
 
-      const payload = {
+      else{
 
-        title:
-          qs("#comicTitle").value,
-
-        slug:
-          qs("#comicSlug").value,
-
-        author:
-          qs("#comicAuthor").value,
-
-        genre:
-          qs("#comicGenre").value,
-
-        status:
-          qs("#comicStatus").value,
-
-        description:
-          qs("#comicDescription").value,
-
-        is_published:
-          qs("#comicPublished").checked
-
-      };
-
-
-      try {
-
-        let comicId =
-          id;
-
-
-        if (id) {
-
+        const result =
           await api(
-            `/api/admin/comics/${id}`,
+            "/api/admin/comics",
             {
-              method:"PUT",
+
+              method:
+                "POST",
 
               headers:{
+
                 "Content-Type":
                   "application/json"
+
               },
 
               body:
                 JSON.stringify(
                   payload
                 )
+
             }
           );
 
-        }
 
-        else {
+        comicId =
+          result.id;
 
-          const result =
-            await api(
-              "/api/admin/comics",
-              {
-                method:"POST",
-
-                headers:{
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body:
-                  JSON.stringify(
-                    payload
-                  )
-              }
-            );
+      }
 
 
-          comicId =
-            result.id;
-
-        }
-
-
-        const cover =
-          qs("#comicCover")
-            .files[0];
+      const cover =
+        qs(
+          "#comicCover"
+        )
+        .files[0];
 
 
-        if (cover) {
+      if(
+        cover
+      ){
 
-          const form =
-            new FormData();
-
-
-          form.append(
-            "cover",
-            cover
-          );
+        const form =
+          new FormData();
 
 
-          await api(
-            `/api/admin/comics/${comicId}/cover`,
-            {
-              method:"POST",
-              body:form
-            }
-          );
-
-        }
+        form.append(
+          "cover",
+          cover
+        );
 
 
-        await Promise.all([
-          loadAdminComics(),
-          loadStats(),
-          loadCatalog(currentPage),
-          loadPopular(),
-          loadUpdates()
-        ]);
+        await api(
+          `/api/admin/comics/${comicId}/cover`,
+          {
 
+            method:
+              "POST",
 
-        closeModal(
-          "comicModal"
+            body:
+              form
+
+          }
         );
 
       }
 
-      catch(error) {
 
-        qs("#comicMsg")
-          .className =
-            "msg error";
+      await Promise.all([
+
+        loadAdminComics(),
+
+        loadStats(),
+
+        loadCatalog(
+          currentPage
+        ),
+
+        loadPopular(),
+
+        loadUpdates(),
+
+        loadRandomPool()
+
+      ]);
 
 
-        qs("#comicMsg")
-          .textContent =
-            error.message;
-
-      }
+      closeModal(
+        "comicModal"
+      );
 
     }
-  );
+
+    catch(
+      error
+    ){
+
+      qs(
+        "#comicMsg"
+      )
+      .className =
+        "msg error";
+
+
+      qs(
+        "#comicMsg"
+      )
+      .textContent =
+        error.message;
+
+    }
+
+  }
+);
 
 
 /* =========================
    DELETE COMIC
 ========================= */
 
-async function deleteComic(id) {
+async function deleteComic(
+  id
+){
 
-  if (
+  if(
     !confirm(
       "¿Eliminar este cómic y todas sus páginas?"
     )
-  ) {
+  ){
 
     return;
 
   }
 
 
-  await api(
-    `/api/admin/comics/${id}`,
-    {
-      method:"DELETE"
-    }
-  );
+  try{
+
+    await api(
+      `/api/admin/comics/${id}`,
+      {
+
+        method:
+          "DELETE"
+
+      }
+    );
 
 
-  await Promise.all([
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(1),
-    loadPopular(),
-    loadUpdates()
-  ]);
+    await Promise.all([
+
+      loadAdminComics(),
+
+      loadStats(),
+
+      loadCatalog(
+        1
+      ),
+
+      loadPopular(),
+
+      loadUpdates(),
+
+      loadRandomPool()
+
+    ]);
+
+  }
+
+  catch(
+    error
+  ){
+
+    alert(
+      error.message
+    );
+
+  }
 
 }
 
@@ -5515,7 +7375,7 @@ async function deleteComic(id) {
 async function manageParts(
   id,
   comics
-) {
+){
 
   currentComicForChapters =
     id;
@@ -5524,32 +7384,45 @@ async function manageParts(
   const comic =
     comics.find(
       c =>
-        Number(c.id) === id
+        Number(
+          c.id
+        ) === id
     );
 
 
-  qs("#chaptersTitle")
-    .textContent =
-      "Partes · " +
-      (
-        comic?.title || ""
-      );
+  qs(
+    "#chaptersTitle"
+  )
+  .textContent =
+    `Partes · ${comic?.title || ""}`;
 
 
-  qs("#chapterNumber")
-    .value = 1;
+  qs(
+    "#chapterNumber"
+  )
+  .value =
+    1;
 
 
-  qs("#chapterTitle")
-    .value = "";
+  qs(
+    "#chapterTitle"
+  )
+  .value =
+    "";
 
 
-  qs("#chapterPublished")
-    .checked = true;
+  qs(
+    "#chapterPublished"
+  )
+  .checked =
+    true;
 
 
-  qs("#chapterMsg")
-    .textContent = "";
+  qs(
+    "#chapterMsg"
+  )
+  .textContent =
+    "";
 
 
   openModal(
@@ -5562,7 +7435,11 @@ async function manageParts(
 }
 
 
-async function loadParts() {
+/* =========================
+   LOAD PARTS
+========================= */
+
+async function loadParts(){
 
   const data =
     await api(
@@ -5571,15 +7448,19 @@ async function loadParts() {
 
 
   currentAdminChapters =
-    data.chapters || [];
+    data.chapters ||
+    [];
 
 
-  qs("#chaptersList")
-    .innerHTML =
-      currentAdminChapters.length
-      ?
-      currentAdminChapters.map(
-        chapter => `
+  qs(
+    "#chaptersList"
+  )
+  .innerHTML =
+    currentAdminChapters.length
+    ?
+    currentAdminChapters
+      .map(
+        ch => `
 
           <div class="chapter-row">
 
@@ -5588,29 +7469,33 @@ async function loadParts() {
               <strong>
 
                 Parte
-                ${chapter.chapter_number}
+                ${ch.chapter_number}
 
                 ${
-                  chapter.title
+                  ch.title
                   ?
                   " · " +
-                  esc(chapter.title)
+                  esc(
+                    ch.title
+                  )
                   :
                   ""
                 }
 
               </strong>
 
-
               <small>
 
-                ${chapter.page_count}
+                ${Number(
+                  ch.page_count ||
+                  0
+                )}
                 páginas
 
                 ·
 
                 ${
-                  chapter.is_published
+                  ch.is_published
                   ?
                   "Publicada"
                   :
@@ -5626,17 +7511,23 @@ async function loadParts() {
                   type="file"
                   multiple
                   accept="image/*"
-                  data-files="${chapter.id}"
+                  data-files="${ch.id}"
                 >
 
-                <br><br>
-
-                <button
-                  class="btn secondary small"
-                  data-upload="${chapter.id}"
+                <div
+                  style="
+                    margin-top:8px
+                  "
                 >
-                  Subir páginas
-                </button>
+
+                  <button
+                    class="btn secondary small"
+                    data-upload="${ch.id}"
+                  >
+                    Subir páginas
+                  </button>
+
+                </div>
 
               </div>
 
@@ -5646,19 +7537,19 @@ async function loadParts() {
             <div class="row-actions">
 
               <button
-                data-edit-chapter="${chapter.id}"
+                data-edit-chapter="${ch.id}"
               >
                 Editar
               </button>
 
               <button
-                data-manage-pages="${chapter.id}"
+                data-manage-pages="${ch.id}"
               >
                 Páginas
               </button>
 
               <button
-                data-delchapter="${chapter.id}"
+                data-delchapter="${ch.id}"
               >
                 Eliminar
               </button>
@@ -5668,71 +7559,88 @@ async function loadParts() {
           </div>
 
         `
-      ).join("")
-      :
-      `
+      )
+      .join("")
+    :
+    `
 
-        <div class="empty">
-          Todavía no hay partes.
-        </div>
+      <div class="empty">
+        Todavía no hay partes.
+      </div>
 
-      `;
+    `;
 
 
-  qsa("[data-upload]")
-    .forEach(button => {
+  qsa(
+    "[data-upload]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           uploadPages(
             Number(
-              button.dataset.upload
+              btn.dataset.upload
             )
           );
 
-    });
+    }
+  );
 
 
-  qsa("[data-edit-chapter]")
-    .forEach(button => {
+  qsa(
+    "[data-edit-chapter]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           openEditChapter(
             Number(
-              button.dataset.editChapter
+              btn.dataset.editChapter
             )
           );
 
-    });
+    }
+  );
 
 
-  qsa("[data-manage-pages]")
-    .forEach(button => {
+  qsa(
+    "[data-manage-pages]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           openPagesManager(
             Number(
-              button.dataset.managePages
+              btn.dataset.managePages
             )
           );
 
-    });
+    }
+  );
 
 
-  qsa("[data-delchapter]")
-    .forEach(button => {
+  qsa(
+    "[data-delchapter]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           deleteChapter(
             Number(
-              button.dataset.delchapter
+              btn.dataset.delchapter
             )
           );
 
-    });
+    }
+  );
 
 }
 
@@ -5741,117 +7649,164 @@ async function loadParts() {
    ADD PART
 ========================= */
 
-qs("#addChapterBtn")
-  .addEventListener(
-    "click",
-    async () => {
+qs(
+  "#addChapterBtn"
+)
+.addEventListener(
+  "click",
+  async () => {
 
-      try {
+    try{
 
-        await api(
-          `/api/admin/comics/${currentComicForChapters}/chapters`,
-          {
-            method:"POST",
+      await api(
+        `/api/admin/comics/${currentComicForChapters}/chapters`,
+        {
 
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
+          method:
+            "POST",
 
-            body:
-              JSON.stringify({
+          headers:{
 
-                chapter_number:
-                  Number(
-                    qs("#chapterNumber")
-                      .value
-                  ),
+            "Content-Type":
+              "application/json"
 
-                title:
-                  qs("#chapterTitle")
-                    .value,
+          },
 
-                is_published:
-                  qs("#chapterPublished")
-                    .checked
+          body:
+            JSON.stringify({
 
-              })
-          }
-        );
+              chapter_number:
+                Number(
+                  qs(
+                    "#chapterNumber"
+                  )
+                  .value
+                ),
 
+              title:
+                qs(
+                  "#chapterTitle"
+                )
+                .value,
 
-        await Promise.all([
-          loadParts(),
-          loadAdminComics(),
-          loadStats(),
-          loadCatalog(currentPage),
-          loadUpdates()
-        ]);
+              is_published:
+                qs(
+                  "#chapterPublished"
+                )
+                .checked
 
-      }
+            })
 
-      catch(error) {
-
-        qs("#chapterMsg")
-          .className =
-            "msg error";
+        }
+      );
 
 
-        qs("#chapterMsg")
-          .textContent =
-            error.message;
+      await Promise.all([
 
-      }
+        loadParts(),
+
+        loadAdminComics(),
+
+        loadStats(),
+
+        loadCatalog(
+          currentPage
+        ),
+
+        loadUpdates(),
+
+        loadRandomPool()
+
+      ]);
 
     }
-  );
+
+    catch(
+      error
+    ){
+
+      qs(
+        "#chapterMsg"
+      )
+      .className =
+        "msg error";
+
+
+      qs(
+        "#chapterMsg"
+      )
+      .textContent =
+        error.message;
+
+    }
+
+  }
+);
 
 
 /* =========================
    EDIT PART
 ========================= */
 
-function openEditChapter(id) {
+function openEditChapter(
+  id
+){
 
-  const chapter =
+  const ch =
     currentAdminChapters
       .find(
-        ch =>
-          Number(ch.id) === id
+        item =>
+          Number(
+            item.id
+          ) === id
       );
 
 
-  if (!chapter) {
+  if(
+    !ch
+  ){
 
     return;
 
   }
 
 
-  qs("#editChapterId")
-    .value =
-      chapter.id;
+  qs(
+    "#editChapterId"
+  )
+  .value =
+    ch.id;
 
 
-  qs("#editChapterNumber")
-    .value =
-      chapter.chapter_number;
+  qs(
+    "#editChapterNumber"
+  )
+  .value =
+    ch.chapter_number;
 
 
-  qs("#editChapterTitle")
-    .value =
-      chapter.title || "";
+  qs(
+    "#editChapterTitle"
+  )
+  .value =
+    ch.title ||
+    "";
 
 
-  qs("#editChapterPublished")
-    .checked =
-      Boolean(
-        chapter.is_published
-      );
+  qs(
+    "#editChapterPublished"
+  )
+  .checked =
+    Boolean(
+      ch.is_published
+    );
 
 
-  qs("#editChapterMsg")
-    .textContent = "";
+  qs(
+    "#editChapterMsg"
+  )
+  .textContent =
+    "";
 
 
   openModal(
@@ -5861,92 +7816,122 @@ function openEditChapter(id) {
 }
 
 
-qs("#saveChapterBtn")
-  .addEventListener(
-    "click",
-    async () => {
+qs(
+  "#saveChapterBtn"
+)
+.addEventListener(
+  "click",
+  async () => {
 
-      const id =
-        Number(
-          qs("#editChapterId")
-            .value
-        );
-
-
-      try {
-
-        await api(
-          `/api/admin/chapters/${id}`,
-          {
-            method:"PUT",
-
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify({
-
-                chapter_number:
-                  Number(
-                    qs("#editChapterNumber")
-                      .value
-                  ),
-
-                title:
-                  qs("#editChapterTitle")
-                    .value,
-
-                is_published:
-                  qs("#editChapterPublished")
-                    .checked
-
-              })
-
-          }
-        );
+    const id =
+      Number(
+        qs(
+          "#editChapterId"
+        )
+        .value
+      );
 
 
-        await Promise.all([
-          loadParts(),
-          loadAdminComics(),
-          loadCatalog(currentPage),
-          loadUpdates(),
-          loadStats()
-        ]);
+    try{
+
+      await api(
+        `/api/admin/chapters/${id}`,
+        {
+
+          method:
+            "PUT",
+
+          headers:{
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              chapter_number:
+                Number(
+                  qs(
+                    "#editChapterNumber"
+                  )
+                  .value
+                ),
+
+              title:
+                qs(
+                  "#editChapterTitle"
+                )
+                .value,
+
+              is_published:
+                qs(
+                  "#editChapterPublished"
+                )
+                .checked
+
+            })
+
+        }
+      );
 
 
-        closeModal(
-          "editChapterModal"
-        );
+      await Promise.all([
 
-      }
+        loadParts(),
 
-      catch(error) {
+        loadAdminComics(),
 
-        qs("#editChapterMsg")
-          .className =
-            "msg error";
+        loadCatalog(
+          currentPage
+        ),
+
+        loadUpdates(),
+
+        loadStats(),
+
+        loadRandomPool()
+
+      ]);
 
 
-        qs("#editChapterMsg")
-          .textContent =
-            error.message;
-
-      }
+      closeModal(
+        "editChapterModal"
+      );
 
     }
-  );
+
+    catch(
+      error
+    ){
+
+      qs(
+        "#editChapterMsg"
+      )
+      .className =
+        "msg error";
+
+
+      qs(
+        "#editChapterMsg"
+      )
+      .textContent =
+        error.message;
+
+    }
+
+  }
+);
 
 
 /* =========================
-   UPLOAD
+   UPLOAD PAGES
 ========================= */
 
 async function uploadPages(
   chapterId
-) {
+){
 
   const input =
     qs(
@@ -5954,10 +7939,10 @@ async function uploadPages(
     );
 
 
-  if (
+  if(
     !input ||
     !input.files.length
-  ) {
+  ){
 
     alert(
       "Selecciona imágenes."
@@ -5969,17 +7954,32 @@ async function uploadPages(
 
 
   const files =
-    [...input.files]
-      .sort(
-        (a,b) =>
-          a.name.localeCompare(
-            b.name,
-            undefined,
-            {
-              numeric:true
-            }
-          )
-      );
+    [
+      ...input.files
+    ]
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        a.name.localeCompare(
+
+          b.name,
+
+          undefined,
+
+          {
+
+            numeric:
+              true,
+
+            sensitivity:
+              "base"
+
+          }
+
+        )
+    );
 
 
   const form =
@@ -5995,26 +7995,42 @@ async function uploadPages(
   );
 
 
-  try {
+  try{
 
     await api(
       `/api/admin/chapters/${chapterId}/pages`,
       {
-        method:"POST",
-        body:form
+
+        method:
+          "POST",
+
+        body:
+          form
+
       }
     );
 
 
-    input.value = "";
+    input.value =
+      "";
 
 
     await Promise.all([
+
       loadParts(),
+
       loadAdminComics(),
+
       loadStats(),
-      loadCatalog(currentPage),
-      loadUpdates()
+
+      loadCatalog(
+        currentPage
+      ),
+
+      loadUpdates(),
+
+      loadRandomPool()
+
     ]);
 
 
@@ -6024,7 +8040,9 @@ async function uploadPages(
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
     alert(
       error.message
@@ -6039,34 +8057,63 @@ async function uploadPages(
    DELETE PART
 ========================= */
 
-async function deleteChapter(id) {
+async function deleteChapter(
+  id
+){
 
-  if (
+  if(
     !confirm(
-      "¿Eliminar esta parte?"
+      "¿Eliminar esta parte y sus páginas?"
     )
-  ) {
+  ){
 
     return;
 
   }
 
 
-  await api(
-    `/api/admin/chapters/${id}`,
-    {
-      method:"DELETE"
-    }
-  );
+  try{
+
+    await api(
+      `/api/admin/chapters/${id}`,
+      {
+
+        method:
+          "DELETE"
+
+      }
+    );
 
 
-  await Promise.all([
-    loadParts(),
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(currentPage),
-    loadUpdates()
-  ]);
+    await Promise.all([
+
+      loadParts(),
+
+      loadAdminComics(),
+
+      loadStats(),
+
+      loadCatalog(
+        currentPage
+      ),
+
+      loadUpdates(),
+
+      loadRandomPool()
+
+    ]);
+
+  }
+
+  catch(
+    error
+  ){
+
+    alert(
+      error.message
+    );
+
+  }
 
 }
 
@@ -6075,10 +8122,33 @@ async function deleteChapter(id) {
    PAGE MANAGER
 ========================= */
 
-async function openPagesManager(id) {
+async function openPagesManager(
+  id
+){
 
   currentManagedChapter =
     id;
+
+
+  const ch =
+    currentAdminChapters
+      .find(
+        item =>
+          Number(
+            item.id
+          ) === id
+      );
+
+
+  qs(
+    "#pagesTitle"
+  )
+  .textContent =
+    ch
+    ?
+    `Páginas · Parte ${ch.chapter_number}`
+    :
+    "Gestionar páginas";
 
 
   openModal(
@@ -6091,7 +8161,7 @@ async function openPagesManager(id) {
 }
 
 
-async function loadManagedPages() {
+async function loadManagedPages(){
 
   const data =
     await api(
@@ -6100,7 +8170,8 @@ async function loadManagedPages() {
 
 
   managedPages =
-    data.pages || [];
+    data.pages ||
+    [];
 
 
   renderManagedPages();
@@ -6108,14 +8179,20 @@ async function loadManagedPages() {
 }
 
 
-function renderManagedPages() {
+function renderManagedPages(){
 
-  qs("#pagesGrid")
-    .innerHTML =
-      managedPages.length
-      ?
-      managedPages.map(
-        (page,index) => `
+  qs(
+    "#pagesGrid"
+  )
+  .innerHTML =
+    managedPages.length
+    ?
+    managedPages
+      .map(
+        (
+          page,
+          index
+        ) => `
 
           <div class="page-card">
 
@@ -6123,17 +8200,23 @@ function renderManagedPages() {
 
               <img
                 src="${page.url}"
-                alt="Página"
+                alt="Página ${index + 1}"
+                loading="lazy"
               >
 
             </div>
 
 
-            <div class="page-bottom">
+            <div class="page-info">
 
-              <div class="page-number">
-                Página ${index + 1}
-              </div>
+              <strong
+                style="
+                  font-size:11px
+                "
+              >
+                Página
+                ${index + 1}
+              </strong>
 
 
               <div class="page-actions">
@@ -6155,7 +8238,8 @@ function renderManagedPages() {
                   data-right="${page.id}"
                   ${
                     index ===
-                    managedPages.length - 1
+                    managedPages.length -
+                    1
                     ?
                     "disabled"
                     :
@@ -6179,73 +8263,99 @@ function renderManagedPages() {
           </div>
 
         `
-      ).join("")
-      :
-      `
+      )
+      .join("")
+    :
+    `
 
-        <div class="empty">
-          No hay páginas.
-        </div>
+      <div class="empty">
+        No hay páginas.
+      </div>
 
-      `;
+    `;
 
 
-  qsa("[data-left]")
-    .forEach(button => {
+  qsa(
+    "[data-left]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           movePage(
+
             Number(
-              button.dataset.left
+              btn.dataset.left
             ),
+
             -1
+
           );
 
-    });
+    }
+  );
 
 
-  qsa("[data-right]")
-    .forEach(button => {
+  qsa(
+    "[data-right]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           movePage(
+
             Number(
-              button.dataset.right
+              btn.dataset.right
             ),
+
             1
+
           );
 
-    });
+    }
+  );
 
 
-  qsa("[data-delpage]")
-    .forEach(button => {
+  qsa(
+    "[data-delpage]"
+  )
+  .forEach(
+    btn => {
 
-      button.onclick =
+      btn.onclick =
         () =>
           deletePage(
             Number(
-              button.dataset.delpage
+              btn.dataset.delpage
             )
           );
 
-    });
+    }
+  );
 
 }
 
 
+/* =========================
+   MOVE PAGE
+========================= */
+
 async function movePage(
   id,
   direction
-) {
+){
 
   const index =
-    managedPages.findIndex(
-      p =>
-        Number(p.id) === id
-    );
+    managedPages
+      .findIndex(
+        p =>
+          Number(
+            p.id
+          ) === id
+      );
 
 
   const newIndex =
@@ -6253,12 +8363,12 @@ async function movePage(
     direction;
 
 
-  if (
+  if(
     index < 0 ||
     newIndex < 0 ||
     newIndex >=
     managedPages.length
-  ) {
+  ){
 
     return;
 
@@ -6266,7 +8376,9 @@ async function movePage(
 
 
   const copy =
-    [...managedPages];
+    [
+      ...managedPages
+    ];
 
 
   [
@@ -6285,26 +8397,33 @@ async function movePage(
   renderManagedPages();
 
 
-  try {
+  try{
 
     await api(
       `/api/admin/chapters/${currentManagedChapter}/pages/reorder`,
       {
-        method:"POST",
+
+        method:
+          "POST",
 
         headers:{
+
           "Content-Type":
             "application/json"
+
         },
 
         body:
           JSON.stringify({
 
             page_ids:
-              managedPages.map(
-                p =>
-                  Number(p.id)
-              )
+              managedPages
+                .map(
+                  p =>
+                    Number(
+                      p.id
+                    )
+                )
 
           })
 
@@ -6316,7 +8435,9 @@ async function movePage(
 
   }
 
-  catch(error) {
+  catch(
+    error
+  ){
 
     alert(
       error.message
@@ -6330,35 +8451,69 @@ async function movePage(
 }
 
 
-async function deletePage(id) {
+/* =========================
+   DELETE PAGE
+========================= */
 
-  if (
+async function deletePage(
+  id
+){
+
+  if(
     !confirm(
       "¿Eliminar esta página?"
     )
-  ) {
+  ){
 
     return;
 
   }
 
 
-  await api(
-    `/api/admin/pages/${id}`,
-    {
-      method:"DELETE"
-    }
-  );
+  try{
+
+    await api(
+      `/api/admin/pages/${id}`,
+      {
+
+        method:
+          "DELETE"
+
+      }
+    );
 
 
-  await Promise.all([
-    loadManagedPages(),
-    loadParts(),
-    loadAdminComics(),
-    loadStats(),
-    loadCatalog(currentPage),
-    loadUpdates()
-  ]);
+    await Promise.all([
+
+      loadManagedPages(),
+
+      loadParts(),
+
+      loadAdminComics(),
+
+      loadStats(),
+
+      loadCatalog(
+        currentPage
+      ),
+
+      loadUpdates(),
+
+      loadRandomPool()
+
+    ]);
+
+  }
+
+  catch(
+    error
+  ){
+
+    alert(
+      error.message
+    );
+
+  }
 
 }
 
@@ -6367,41 +8522,68 @@ async function deletePage(id) {
    START
 ========================= */
 
-async function startNightInk() {
+async function startNightInk(){
+
+  showAgeGate();
+
 
   const route =
     getRoute();
 
 
   history.replaceState(
-    route.type === "comic"
+
+    route.type ===
+    "comic"
     ?
     {
-      type:"comic",
-      slug:route.slug,
-      fromSite:false
+
+      type:
+        "comic",
+
+      slug:
+        route.slug,
+
+      fromSite:
+        false
+
     }
     :
     {
-      type:"home"
+
+      type:
+        "home"
+
     },
+
     "",
+
     location.pathname +
     location.search +
     location.hash
+
   );
 
 
   await Promise.all([
-    loadCatalog(1),
+
+    loadCatalog(
+      1
+    ),
+
     loadPopular(),
-    loadUpdates()
+
+    loadUpdates(),
+
+    loadRandomPool()
+
   ]);
 
 
-  if (
-    route.type === "comic"
-  ) {
+  if(
+    route.type ===
+    "comic"
+  ){
 
     await openComicDirect(
       route.slug,
@@ -6410,7 +8592,7 @@ async function startNightInk() {
 
   }
 
-  else {
+  else{
 
     setHomeMetadata();
 
@@ -6422,6 +8604,7 @@ async function startNightInk() {
 startNightInk();
 
 </script>
+
 
 </body>
 </html>

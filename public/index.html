@@ -28,26 +28,178 @@ footer{padding:25px 0 38px;border-top:1px solid #292f43;color:#81899d;font-size:
 @media(max-width:1000px){.header-main{grid-template-columns:auto minmax(250px,1fr) auto}.header-chip{display:none}.portal-layout{grid-template-columns:185px minmax(0,1fr)}.right-rail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.right-rail .side-panel{margin-bottom:0}.pages-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.header-main{grid-template-columns:1fr;gap:10px;padding:12px 0}.header-side{justify-content:flex-start}.intro-strip{grid-template-columns:1fr}.portal-layout{grid-template-columns:1fr}.portal-main{order:1}.left-rail{order:2;display:grid;grid-template-columns:1fr 1fr;gap:12px}.right-rail{order:3;grid-column:auto;grid-template-columns:1fr}.comic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.stats{grid-template-columns:repeat(3,1fr)}.pages-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:560px){.wrap{width:min(100% - 18px,1420px)}.brand{font-size:23px}.nav-link{padding:13px 11px;font-size:11px}.intro-strip{padding:15px}.intro-strip h1{font-size:20px}.intro-stat{display:grid;grid-template-columns:repeat(3,1fr)}.intro-stat span{min-width:0}.comic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.section-heading{align-items:flex-start;flex-direction:column}.left-rail{grid-template-columns:1fr}.update-item{grid-template-columns:48px minmax(0,1fr)}.update-open{grid-column:1/-1}.admin-row{grid-template-columns:48px minmax(0,1fr)}.admin-row .row-actions{grid-column:1/-1;justify-content:flex-start}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.pages-grid{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}.detail-cover{max-width:210px}.reader-bar{grid-template-columns:1fr}.reader-title{order:-1}.reader-left,.reader-right{justify-content:center}.reader-pages{width:100%}.reader-end{width:calc(100% - 16px);margin:12px auto 28px;padding:18px 14px}}
+
+
+/* ===== NIGHTINK MOBILE + MONETIZATION LAYOUT ===== */
+.mobile-site-header,.mobile-menu-panel,.mobile-search-panel{display:none}
+.ad-slot{
+  width:100%;min-height:90px;display:flex;align-items:center;justify-content:center;
+  padding:12px;border:1px dashed #46506f;border-radius:9px;
+  background:linear-gradient(135deg,#171b28,#20243a);color:#818aa5;
+  text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase
+}
+.ad-slot strong{display:block;color:#c6cada;font-size:11px;margin-bottom:4px}
+.ad-home-top{margin:0 auto 18px;max-width:970px}
+.ad-main-mid{margin:8px 0 24px;min-height:100px}
+.ad-sidebar{min-height:250px;margin-bottom:14px}
+.reader-ad{width:min(880px,calc(100% - 24px));margin:14px auto;min-height:100px}
+.reader-ad-mid{margin:4px 0 8px;width:100%}
+.reader-extras{width:min(880px,calc(100% - 24px));margin:0 auto 54px}
+.reader-share-block{padding:18px 0 8px}
+.reader-share-title{color:#a9afc2;font-size:12px;font-weight:800;margin-bottom:10px}
+.reader-share-actions{display:flex;gap:8px;flex-wrap:wrap}
+.reader-share-actions button{min-width:105px}
+.reader-related{margin-top:22px}
+.reader-related-heading{position:relative;margin:0 0 14px;padding:0 0 10px;font-size:21px}
+.reader-related-heading:after{content:"";position:absolute;left:0;bottom:0;width:120px;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple))}
+.reader-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.reader-related-card{overflow:hidden;border:1px solid #343b52;border-radius:7px;background:#171b28;cursor:pointer}
+.reader-related-cover{aspect-ratio:3/4;background:linear-gradient(145deg,#4b3a7b,#171925);background-size:cover;background-position:center}
+.reader-related-title{padding:9px;font-size:11px;font-weight:800;line-height:1.35;min-height:48px}
+.reader-float-nav{position:fixed;right:16px;bottom:20px;z-index:210;display:flex;flex-direction:column;gap:9px}
+.reader-float-nav button{width:48px;height:48px;border:1px solid #465074;border-radius:14px;background:#22273a;color:#fff;font-size:18px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.reader-float-nav button:hover{background:#2c3249}
+
+@media(max-width:760px){
+  .site-header,.navbar,.intro-strip{display:none!important}
+  .mobile-site-header{display:block;position:sticky;top:0;z-index:80;background:#181c2d;border-bottom:2px solid #383f64}
+  .mobile-header-row{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+  .mobile-brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:22px}
+  .mobile-brand .brand-icon{width:42px;height:42px}
+  .mobile-actions{display:flex;gap:8px}
+  .mobile-icon-btn{width:48px;height:48px;border:1px solid #454d73;border-radius:13px;background:#22273a;color:#fff;font-size:20px;font-weight:800}
+  .mobile-menu-panel,.mobile-search-panel{position:sticky;top:74px;z-index:79;padding:12px 14px;background:#141827;border-bottom:1px solid #343b58}
+  .mobile-menu-panel.open,.mobile-search-panel.open{display:block}
+  .mobile-menu-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .mobile-menu-links a,.mobile-genre-btn{padding:11px;border:1px solid #353d59;border-radius:8px;background:#1e2335;color:#e6e8ef;text-align:left;font-size:12px;font-weight:700}
+  .mobile-genre-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .mobile-search-row{display:flex;gap:8px}
+  .mobile-search-row input{flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid #3d4566;border-radius:8px;background:#0f121c;color:#fff}
+  .mobile-search-row button{width:50px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:900}
+
+  main.wrap{width:100%;padding:0 12px}
+  .ad-home-top{width:calc(100% - 24px);margin:14px auto 18px;min-height:90px}
+  .portal-layout{display:block;padding-bottom:28px}
+  .left-rail,.right-rail{display:none!important}
+  .portal-main{width:100%}
+  .section{margin-bottom:24px}
+  .section-heading{margin-bottom:10px}
+  .section-heading h2{font-size:20px}
+  .comic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .comic-card{border-radius:8px}
+  .card-title{font-size:12px;min-height:34px}
+  .card-meta{font-size:8.5px}
+  .ad-main-mid{min-height:100px}
+
+  /* Reader inspired by a compact mobile comic portal */
+  .reader{background:#0b0e19}
+  .reader-bar{height:70px;grid-template-columns:auto 1fr auto;padding:0 10px;background:#181c2d;border-bottom:2px solid #3b4266}
+  .reader-left,.reader-right{gap:7px}
+  .reader-title{order:0;text-align:left;font-size:15px;padding-left:4px}
+  .reader-bar .btn{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:12px;font-size:0}
+  #closeReader:after{content:"←";font-size:21px}
+  #readerInfo:after{content:"ⓘ";font-size:20px}
+  #readerShare:after{content:"↗";font-size:21px}
+  .reader-pages{width:100%;padding:14px 14px 4px;display:block;background:#0b0e19}
+  .reader-pages img{width:100%;margin:0 0 12px;border-radius:9px;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+  .reader-ad{width:calc(100% - 28px);margin:12px auto;min-height:90px}
+  .reader-ad-mid{width:100%;margin:0 0 12px;min-height:100px}
+  .reader-end{width:calc(100% - 28px);margin:10px auto 14px;padding:18px 14px;border-radius:10px}
+  .reader-end h3{font-size:19px}
+  .reader-end .btn{width:auto;height:auto;font-size:13px;padding:11px 16px}
+  .reader-extras{width:calc(100% - 28px);margin:0 auto 72px}
+  .reader-share-block{padding:12px 0 8px}
+  .reader-share-actions{display:grid;grid-template-columns:1fr 1fr}
+  .reader-share-actions button{min-width:0}
+  .reader-related-heading{font-size:22px}
+  .reader-related-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .reader-related-title{font-size:12px;min-height:50px}
+  .reader-float-nav{right:12px;bottom:18px}
+  .reader-float-nav button{width:52px;height:52px;border-radius:15px}
+}
+
+@media(max-width:390px){
+  .mobile-header-row{padding:0 10px}
+  .mobile-actions{gap:6px}.mobile-icon-btn{width:44px;height:44px}
+  .mobile-brand{font-size:19px}.mobile-brand .brand-icon{width:38px;height:38px}
+  main.wrap{padding:0 9px}.comic-grid{gap:8px}
+  .reader-pages{padding-left:10px;padding-right:10px}
+  .reader-ad,.reader-end,.reader-extras{width:calc(100% - 20px)}
+}
+
 </style>
 </head>
 <body>
 <div id="ageGate" class="age-gate"><div class="age-card"><div class="age-badge">18+</div><h1>Contenido para adultos</h1><p>NightInk está destinado únicamente a personas mayores de edad.</p><div class="age-warning">Al continuar confirmas que tienes al menos 18 años o la edad legal aplicable en tu jurisdicción para acceder a contenido para adultos.</div><div class="age-actions"><button id="ageEnter" class="age-enter">Tengo 18 años o más — Entrar</button><button id="ageExit" class="age-exit">Salir</button></div><div class="age-note">Esta confirmación se guarda únicamente en este navegador.</div></div></div>
 <header class="site-header"><div class="wrap header-main"><a href="/" class="brand"><div class="brand-icon">NI</div><div class="brand-name">NightInk<small>COMICS +18</small></div></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor o cómic..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"><span class="header-chip">Lectura directa</span><button id="openAdmin" class="admin-button">Admin</button></div></div></header>
 <nav class="navbar"><div class="wrap navbar-inner"><a class="nav-link active" href="/">Inicio</a><a class="nav-link" href="#ultimos">Últimos</a><a class="nav-link" href="#actualizaciones">Actualizaciones</a><a class="nav-link" href="#azar">Al azar</a><a class="nav-link" href="#categorias">Categorías</a></div></nav>
-<div class="wrap intro-strip"><div><h1>NightInk Comics</h1><p>Elige un cómic y entra directamente a la lectura.</p></div><div class="intro-stat"><span><strong>+18</strong>Adultos</span><span><strong>↓</strong>Lectura vertical</span><span><strong>⚡</strong>Acceso directo</span></div></div>
+<div class="mobile-site-header">
+  <div class="mobile-header-row">
+    <a href="/" class="mobile-brand"><div class="brand-icon">NI</div><span>NightInk</span></a>
+    <div class="mobile-actions">
+      <button id="mobileMenuBtn" class="mobile-icon-btn" aria-label="Menú">☰</button>
+      <button id="mobileSearchBtn" class="mobile-icon-btn" aria-label="Buscar">⌕</button>
+      <button id="mobileAdminBtn" class="mobile-icon-btn" aria-label="Administrador">⚙</button>
+    </div>
+  </div>
+  <div id="mobileMenuPanel" class="mobile-menu-panel">
+    <div class="mobile-menu-links">
+      <a href="#ultimos">Últimos</a><a href="#actualizaciones">Actualizaciones</a>
+      <a href="#azar">Al azar</a><a href="#categorias">Categorías</a>
+    </div>
+    <div class="mobile-genre-grid">
+      <button class="mobile-genre-btn" data-mobile-genre="">Todos</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Romance">Romance</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Fantasía">Fantasía</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Drama">Drama</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Misterio">Misterio</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Thriller">Thriller</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Acción">Acción</button>
+      <button class="mobile-genre-btn" data-mobile-genre="Otros">Otros</button>
+    </div>
+  </div>
+  <div id="mobileSearchPanel" class="mobile-search-panel">
+    <div class="mobile-search-row">
+      <input id="mobileSearchInput" placeholder="Buscar cómic...">
+      <button id="mobileSearchGo">⌕</button>
+    </div>
+  </div>
+</div>
+<div class="wrap intro-strip"><div><h1>NightInk Comics</h1><p>Elige un cómic y entra directamente a la lectura.</p></div><div class="intro-stat"><span><strong>+18</strong>Adultos</span><span><strong>↓</strong>Lectura vertical</span><span><strong>⚡</strong>Acceso directo</span></div></div><div class="wrap ad-slot ad-home-top" data-ad-slot="home-top"><div><strong>Publicidad</strong>Banner superior adaptable</div></div>
 <main class="wrap">
 <section id="adminShell" class="admin-shell"><div class="admin-head"><h2>Panel de administración</h2><div class="admin-actions"><button id="newComicBtn" class="btn primary">+ Nuevo cómic</button><button id="refreshAdminBtn" class="btn secondary">Actualizar</button><button id="logoutAdminBtn" class="btn secondary">Cerrar</button></div></div><div id="stats" class="stats"></div><div id="adminList" class="admin-list"></div></section>
 <div class="portal-layout">
 <aside class="left-rail"><section id="categorias" class="side-panel"><div class="side-heading">Categorías</div><div class="side-content"><div class="category-list"><button class="category-btn active" data-genre="">Todos los cómics</button><button class="category-btn" data-genre="Romance">Romance</button><button class="category-btn" data-genre="Fantasía">Fantasía</button><button class="category-btn" data-genre="Drama">Drama</button><button class="category-btn" data-genre="Misterio">Misterio</button><button class="category-btn" data-genre="Thriller">Thriller</button><button class="category-btn" data-genre="Acción">Acción</button><button class="category-btn" data-genre="Otros">Otros</button></div></div></section><section class="side-panel"><div class="side-heading">Etiquetas</div><div class="side-content"><div class="tags"><span class="tag" data-tag="Romance">Romance</span><span class="tag" data-tag="Fantasía">Fantasía</span><span class="tag" data-tag="Drama">Drama</span><span class="tag" data-tag="Misterio">Misterio</span><span class="tag" data-tag="Thriller">Thriller</span><span class="tag" data-tag="Acción">Acción</span><span class="tag" data-tag="Otros">Otros</span></div></div></section><section class="side-panel"><div class="side-heading">Explorar</div><div class="side-content"><div class="quick-links"><a href="#ultimos" class="quick-link">Últimos añadidos</a><a href="#actualizaciones" class="quick-link">Actualizaciones</a><a href="#azar" class="quick-link">Selección al azar</a></div></div></section></aside>
-<div class="portal-main"><section id="ultimos" class="section"><div class="section-heading"><h2>Últimos cómics</h2><div class="section-tools"><button class="tab active" data-sort="latest">Nuevos</button><button class="tab" data-sort="popular">Más vistos</button></div></div><div id="comicGrid" class="comic-grid"><div class="empty">Cargando catálogo...</div></div><div id="pagination" class="pagination"></div></section><section id="actualizaciones" class="section"><div class="section-heading"><h2>Actualizaciones recientes</h2><small>Cómics con páginas disponibles</small></div><div id="updatesList" class="updates-list"><div class="empty">Cargando...</div></div></section><section id="azar" class="section"><div class="section-heading"><h2>Cómics al azar</h2><button id="randomRefresh" class="tab">Cambiar selección</button></div><div id="randomGrid" class="comic-grid"><div class="empty">Cargando...</div></div></section></div>
-<aside class="right-rail"><section class="side-panel"><div class="side-heading">Más vistos</div><div class="side-content"><div id="popularList" class="popular-list"><div class="empty">Cargando...</div></div></div></section><section class="side-panel"><div class="side-heading">NightInk</div><div class="side-content" style="color:#a4aabd;font-size:10px;line-height:1.65">Cada publicación es un cómic completo. Si existe una continuación, se publica como un nuevo cómic.</div></section></aside>
+<div class="portal-main"><section id="ultimos" class="section"><div class="section-heading"><h2>Últimos cómics</h2><div class="section-tools"><button class="tab active" data-sort="latest">Nuevos</button><button class="tab" data-sort="popular">Más vistos</button></div></div><div id="comicGrid" class="comic-grid"><div class="empty">Cargando catálogo...</div></div><div id="pagination" class="pagination"></div></section><div class="ad-slot ad-main-mid" data-ad-slot="home-middle"><div><strong>Publicidad</strong>Espacio publicitario entre secciones</div></div><section id="actualizaciones" class="section"><div class="section-heading"><h2>Actualizaciones recientes</h2><small>Cómics con páginas disponibles</small></div><div id="updatesList" class="updates-list"><div class="empty">Cargando...</div></div></section><section id="azar" class="section"><div class="section-heading"><h2>Cómics al azar</h2><button id="randomRefresh" class="tab">Cambiar selección</button></div><div id="randomGrid" class="comic-grid"><div class="empty">Cargando...</div></div></section></div>
+<aside class="right-rail"><section class="side-panel"><div class="side-heading">Más vistos</div><div class="side-content"><div id="popularList" class="popular-list"><div class="empty">Cargando...</div></div></div></section><div class="ad-slot ad-sidebar" data-ad-slot="desktop-sidebar"><div><strong>Publicidad</strong>300 × 250</div></div><section class="side-panel"><div class="side-heading">NightInk</div><div class="side-content" style="color:#a4aabd;font-size:10px;line-height:1.65">Cada publicación es un cómic completo. Si existe una continuación, se publica como un nuevo cómic.</div></section></aside>
 </div></main>
 <footer><div class="wrap">NightInk Comics · Contenido +18 · Privacidad · Términos · Reportar contenido</div></footer>
 <div id="loginModal" class="modal"><div class="panel" style="width:min(410px,100%)"><h2>Administrador</h2><div class="field"><label>Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password"></div><div id="loginMsg" class="msg"></div><div class="modal-actions"><button class="btn secondary" data-close="loginModal">Cancelar</button><button id="loginBtn" class="btn primary">Entrar</button></div></div></div>
 <div id="comicModal" class="modal"><div class="panel"><h2 id="comicFormTitle">Nuevo cómic</h2><form id="comicForm"><input id="comicId" type="hidden"><div class="form-grid"><div class="field"><label>Título</label><input id="comicTitle" required></div><div class="field"><label>Slug</label><input id="comicSlug" placeholder="Opcional"></div><div class="field"><label>Autor</label><input id="comicAuthor"></div><div class="field"><label>Género</label><input id="comicGenre"></div><div class="field"><label>Estado</label><select id="comicStatus"><option>En emisión</option><option>Completo</option><option>Pausado</option></select></div><div class="field"><label>Portada</label><input id="comicCover" type="file" accept="image/*"></div><div class="field full"><label>Descripción</label><textarea id="comicDescription"></textarea></div><div class="field full"><label class="check"><input id="comicPublished" type="checkbox"> Publicado</label></div></div><div id="comicMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="comicModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div></div>
 <div id="pagesModal" class="modal"><div class="panel wide"><div class="modal-head"><h2 id="pagesTitle">Páginas del cómic</h2><button class="btn secondary" data-close="pagesModal">Cerrar</button></div><div class="upload-box"><p>Selecciona todas las imágenes del cómic. NightInk las ordenará por nombre: 001, 002, 003...</p><input id="comicPagesInput" type="file" multiple accept="image/*"><br><button id="uploadComicPagesBtn" class="btn primary" style="margin-top:10px">Subir páginas</button><div id="pagesMsg" class="msg"></div></div><div id="pagesGrid" class="pages-grid"></div></div></div>
 <div id="detailModal" class="modal"><div class="panel" style="width:min(900px,100%)"><div class="modal-head"><h2 id="detailTitle"></h2><button class="btn secondary" data-close="detailModal">Cerrar</button></div><div class="detail"><div id="detailCover" class="detail-cover"></div><div><div id="detailMeta" class="detail-meta"></div><p id="detailDescription" class="detail-desc"></p><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button id="shareComicBtn" class="btn primary">Compartir</button><button id="copyComicBtn" class="btn secondary">Copiar enlace</button></div><div id="shareMessage" class="msg success"></div></div></div></div></div>
-<div id="reader" class="reader"><div class="reader-bar"><div class="reader-left"><button id="closeReader" class="btn secondary small">← Volver</button></div><strong id="readerTitle" class="reader-title">NightInk</strong><div class="reader-right"><button id="readerInfo" class="btn secondary small">Información</button><button id="readerShare" class="btn secondary small">Compartir</button></div></div><div id="readerPages" class="reader-pages"></div><div id="readerEnd" class="reader-end"><h3 id="readerEndTitle">Fin</h3><p>Has llegado al final del cómic.</p><button id="readerBackHome" class="btn primary">← Volver al catálogo</button></div></div>
+<div id="reader" class="reader">
+  <div class="reader-bar">
+    <div class="reader-left"><button id="closeReader" class="btn secondary small">← Volver</button></div>
+    <strong id="readerTitle" class="reader-title">NightInk</strong>
+    <div class="reader-right"><button id="readerInfo" class="btn secondary small">Información</button><button id="readerShare" class="btn secondary small">Compartir</button></div>
+  </div>
+  <div class="ad-slot reader-ad" data-ad-slot="reader-top"><div><strong>Publicidad</strong>Banner antes del cómic</div></div>
+  <div id="readerPages" class="reader-pages"></div>
+  <div class="ad-slot reader-ad" data-ad-slot="reader-bottom"><div><strong>Publicidad</strong>Banner al terminar la lectura</div></div>
+  <div id="readerEnd" class="reader-end"><h3 id="readerEndTitle">Fin</h3><p>Has llegado al final del cómic.</p><button id="readerBackHome" class="btn primary">← Volver al catálogo</button></div>
+  <div class="reader-extras">
+    <div class="reader-share-block">
+      <div class="reader-share-title">Compartir este cómic</div>
+      <div class="reader-share-actions"><button id="readerCopyLink" class="btn secondary">Copiar enlace</button><button id="readerShareBottom" class="btn primary">Compartir</button></div>
+    </div>
+    <section class="reader-related">
+      <h2 class="reader-related-heading">Cómics relacionados</h2>
+      <div id="readerRelatedGrid" class="reader-related-grid"><div class="empty">Cargando recomendaciones...</div></div>
+    </section>
+  </div>
+  <div class="reader-float-nav"><button id="readerGoTop" aria-label="Ir arriba">↑</button><button id="readerGoBottom" aria-label="Ir abajo">↓</button></div>
+</div>
 <script>
 const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],AGE_KEY="nightink_age_verified_v4";
 let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedGenre="",sortMode="latest",searchQuery="",searchTimer=null,randomPool=[];
@@ -66,7 +218,53 @@ async function loadPopular(){try{const d=await api("/api/comics?page=1&limit=8&s
 async function loadUpdates(){try{const d=await api("/api/updates?limit=8"),u=d.updates||[];qs("#updatesList").innerHTML=u.length?u.map(x=>{const cover=x.cover_url?`background-image:url('${x.cover_url}')`:"";return `<div class="update-item" data-update-slug="${esc(x.slug)}"><div class="update-cover" style="${cover}"></div><div class="update-main"><div class="update-title">${esc(x.comic_title)}</div><div class="update-meta">${Number(x.page_count||0)} páginas · ${esc(x.genre||"Sin categoría")}</div></div><div class="update-open">Abrir</div></div>`}).join(""):'<div class="empty">Todavía no hay actualizaciones con páginas.</div>';qsa("[data-update-slug]").forEach(i=>i.onclick=()=>openComicDirect(i.dataset.updateSlug,true))}catch(e){qs("#updatesList").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 async function loadRandomPool(){try{const d=await api("/api/comics?page=1&limit=30&sort=latest");randomPool=d.comics||[];renderRandom()}catch(e){qs("#randomGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}function renderRandom(){const x=[...randomPool].sort(()=>Math.random()-.5).slice(0,5);qs("#randomGrid").innerHTML=x.length?x.map(c=>comicCardHTML(c,"data-random")).join(""):'<div class="empty">Todavía no hay suficientes cómics.</div>';qsa("[data-random]").forEach(c=>c.onclick=()=>openComicDirect(c.dataset.random,true))}qs("#randomRefresh").onclick=renderRandom;
 function prepareComicInfo(c){qs("#detailTitle").textContent=c.title;qs("#detailMeta").textContent=[c.author,c.genre,c.status,`${c.views} vistas`].filter(Boolean).join(" · ");qs("#detailDescription").textContent=c.description||"";qs("#detailCover").style.backgroundImage=c.cover_url?`url("${c.cover_url}")`:"";qs("#shareMessage").textContent=""}
-async function openComicDirect(slug,pushRoute=true){try{const d=await api("/api/comics/"+encodeURIComponent(slug)),c=d.comic,chapters=d.chapters||[];currentPublicComic=c;currentPublicSlug=c.slug;setComicMetadata(c);prepareComicInfo(c);if(pushRoute)history.pushState({type:"comic",slug:c.slug,fromSite:true},"",comicPath(c.slug));const readable=chapters.find(ch=>Number(ch.page_count||0)>0);qs("#readerTitle").textContent=c.title;qs("#readerEndTitle").textContent=`Fin de ${c.title}`;if(!readable){qs("#readerPages").innerHTML=`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;qs("#readerEnd").style.display="none";openReader();return}const p=await api(`/api/chapters/${readable.id}/pages`),pages=p.pages||[];qs("#readerPages").innerHTML=pages.length?pages.map(pg=>`<img src="${pg.url}" alt="Página ${pg.page_number}" loading="lazy">`).join(""):`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;qs("#readerEnd").style.display=pages.length?"block":"none";openReader();loadPopular()}catch(e){alert(e.message)}}
+function readerAdHtml(){return `<div class="ad-slot reader-ad-mid" data-ad-slot="reader-middle"><div><strong>Publicidad</strong>Anuncio dentro de la lectura</div></div>`}
+function buildReaderPages(pages){
+  if(!pages.length)return "";
+  const middle=Math.floor(pages.length/2);
+  return pages.map((pg,i)=>{
+    const image=`<img src="${pg.url}" alt="Página ${pg.page_number}" loading="lazy">`;
+    if(pages.length>=4 && i===middle)return readerAdHtml()+image;
+    return image;
+  }).join("");
+}
+async function loadReaderRelated(comic){
+  const box=qs("#readerRelatedGrid");
+  if(!box)return;
+  box.innerHTML='<div class="empty">Cargando recomendaciones...</div>';
+  try{
+    const params=new URLSearchParams({page:"1",limit:"12",sort:"popular"});
+    if(comic.genre)params.set("genre",comic.genre);
+    const d=await api("/api/comics?"+params.toString());
+    let items=(d.comics||[]).filter(x=>x.slug!==comic.slug).slice(0,4);
+    if(!items.length){
+      const fallback=await api("/api/comics?page=1&limit=8&sort=latest");
+      items=(fallback.comics||[]).filter(x=>x.slug!==comic.slug).slice(0,4);
+    }
+    box.innerHTML=items.length?items.map(x=>{
+      const cover=x.cover_url?`background-image:url('${x.cover_url}')`:"";
+      return `<article class="reader-related-card" data-related="${esc(x.slug)}"><div class="reader-related-cover" style="${cover}"></div><div class="reader-related-title">${esc(x.title)}</div></article>`;
+    }).join(""):'<div class="empty">No hay recomendaciones todavía.</div>';
+    qsa("[data-related]").forEach(card=>card.onclick=()=>openComicDirect(card.dataset.related,true));
+  }catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+async function openComicDirect(slug,pushRoute=true){
+  try{
+    const d=await api("/api/comics/"+encodeURIComponent(slug)),c=d.comic,chapters=d.chapters||[];
+    currentPublicComic=c;currentPublicSlug=c.slug;setComicMetadata(c);prepareComicInfo(c);
+    if(pushRoute)history.pushState({type:"comic",slug:c.slug,fromSite:true},"",comicPath(c.slug));
+    const readable=chapters.find(ch=>Number(ch.page_count||0)>0);
+    qs("#readerTitle").textContent=c.title;qs("#readerEndTitle").textContent=`Fin de ${c.title}`;
+    if(!readable){
+      qs("#readerPages").innerHTML=`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;
+      qs("#readerEnd").style.display="none";openReader();loadReaderRelated(c);return;
+    }
+    const p=await api(`/api/chapters/${readable.id}/pages`),pages=p.pages||[];
+    qs("#readerPages").innerHTML=pages.length?buildReaderPages(pages):`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;
+    qs("#readerEnd").style.display=pages.length?"block":"none";
+    openReader();loadPopular();loadReaderRelated(c);
+  }catch(e){alert(e.message)}
+}
 function openReader(){closeModal("detailModal");qs("#reader").classList.add("open");document.body.classList.add("reader-locked");qs("#reader").scrollTop=0}function comicUrl(){return location.origin+comicPath(currentPublicSlug)}async function shareCurrentComic(){if(!currentPublicComic)return;const url=comicUrl();try{if(navigator.share){await navigator.share({title:currentPublicComic.title,url});return}await navigator.clipboard.writeText(url);alert("Enlace copiado.")}catch(e){if(e?.name!=="AbortError")alert("No se pudo compartir.")}}qs("#readerShare").onclick=shareCurrentComic;qs("#shareComicBtn").onclick=shareCurrentComic;qs("#copyComicBtn").onclick=async()=>{try{await navigator.clipboard.writeText(comicUrl());qs("#shareMessage").textContent="Enlace copiado."}catch{qs("#shareMessage").textContent=comicUrl()}};qs("#readerInfo").onclick=()=>openModal("detailModal");
 function exitComic(){qs("#reader").classList.remove("open");closeModal("detailModal");document.body.classList.remove("reader-locked");const s=history.state;if(s?.type==="comic"&&s?.fromSite){history.back();return}history.replaceState({type:"home"},"","/");currentPublicComic=null;currentPublicSlug=null;setHomeMetadata();window.scrollTo(0,0)}qs("#closeReader").onclick=exitComic;qs("#readerBackHome").onclick=exitComic;window.addEventListener("popstate",async()=>{const r=getRoute();qs("#reader").classList.remove("open");closeModal("detailModal");document.body.classList.remove("reader-locked");if(r.type==="comic")await openComicDirect(r.slug,false);else{currentPublicComic=null;currentPublicSlug=null;setHomeMetadata()}});
 function runSearch(){searchQuery=qs("#searchInput").value.trim();loadCatalog(1);qs("#ultimos").scrollIntoView({behavior:"smooth"})}qs("#searchBtn").onclick=runSearch;qs("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch()});qs("#searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=e.target.value.trim();loadCatalog(1)},350)});qsa(".category-btn").forEach(b=>b.onclick=()=>{selectedGenre=b.dataset.genre;qsa(".category-btn").forEach(i=>i.classList.toggle("active",i===b));loadCatalog(1);qs("#ultimos").scrollIntoView({behavior:"smooth"})});qsa(".tag").forEach(t=>t.onclick=()=>{selectedGenre=t.dataset.tag;qsa(".category-btn").forEach(i=>i.classList.toggle("active",i.dataset.genre===selectedGenre));loadCatalog(1);qs("#ultimos").scrollIntoView({behavior:"smooth"})});qsa(".tab[data-sort]").forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;qsa(".tab[data-sort]").forEach(i=>i.classList.toggle("active",i===b));loadCatalog(1)});
@@ -82,6 +280,20 @@ async function openComicPages(comicId){const c=currentAdminComics.find(x=>Number
 qs("#uploadComicPagesBtn").onclick=async()=>{const input=qs("#comicPagesInput");if(!currentManagedChapter){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="No se pudo preparar el cómic.";return}if(!input.files.length){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="Selecciona las imágenes del cómic.";return}const files=[...input.files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"})),f=new FormData();files.forEach(file=>f.append("pages",file));try{qs("#pagesMsg").className="msg";qs("#pagesMsg").textContent="Subiendo páginas...";await api(`/api/admin/chapters/${currentManagedChapter}/pages`,{method:"POST",body:f});input.value="";qs("#pagesMsg").className="msg success";qs("#pagesMsg").textContent="Páginas subidas correctamente.";await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage),loadUpdates(),loadRandomPool()])}catch(e){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent=e.message}};
 async function loadManagedPages(){const d=await api(`/api/admin/chapters/${currentManagedChapter}/pages`);managedPages=d.pages||[];renderManagedPages()}function renderManagedPages(){qs("#pagesGrid").innerHTML=managedPages.length?managedPages.map((p,i)=>`<div class="page-card"><div class="page-thumb"><img src="${p.url}" alt="Página ${i+1}" loading="lazy"></div><div class="page-info"><strong style="font-size:10px">Página ${i+1}</strong><div class="page-actions"><button data-left="${p.id}" ${i===0?"disabled":""}>←</button><button data-right="${p.id}" ${i===managedPages.length-1?"disabled":""}>→</button><button class="delete-page" data-delpage="${p.id}">Eliminar</button></div></div></div>`).join(""):'<div class="empty">Todavía no hay páginas.</div>';qsa("[data-left]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.left),-1));qsa("[data-right]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.right),1));qsa("[data-delpage]").forEach(b=>b.onclick=()=>deletePage(Number(b.dataset.delpage)))}
 async function movePage(id,direction){const i=managedPages.findIndex(p=>Number(p.id)===id),j=i+direction;if(i<0||j<0||j>=managedPages.length)return;const copy=[...managedPages];[copy[i],copy[j]]=[copy[j],copy[i]];managedPages=copy;renderManagedPages();try{await api(`/api/admin/chapters/${currentManagedChapter}/pages/reorder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({page_ids:managedPages.map(p=>Number(p.id))})});await loadManagedPages()}catch(e){alert(e.message);await loadManagedPages()}}async function deletePage(id){if(!confirm("¿Eliminar esta página?"))return;try{await api(`/api/admin/pages/${id}`,{method:"DELETE"});await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage),loadUpdates(),loadRandomPool()])}catch(e){alert(e.message)}}
+
+function closeMobilePanels(){qs("#mobileMenuPanel")?.classList.remove("open");qs("#mobileSearchPanel")?.classList.remove("open")}
+qs("#mobileMenuBtn")?.addEventListener("click",()=>{const p=qs("#mobileMenuPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening)p.classList.add("open")});
+qs("#mobileSearchBtn")?.addEventListener("click",()=>{const p=qs("#mobileSearchPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening){p.classList.add("open");qs("#mobileSearchInput")?.focus()}});
+qs("#mobileAdminBtn")?.addEventListener("click",()=>{closeMobilePanels();qs("#openAdmin")?.click()});
+function runMobileSearch(){searchQuery=(qs("#mobileSearchInput")?.value||"").trim();loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#ultimos")?.scrollIntoView({behavior:"smooth"}),100)}
+qs("#mobileSearchGo")?.addEventListener("click",runMobileSearch);
+qs("#mobileSearchInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")runMobileSearch()});
+qsa("[data-mobile-genre]").forEach(btn=>btn.addEventListener("click",()=>{selectedGenre=btn.dataset.mobileGenre;qsa(".category-btn").forEach(i=>i.classList.toggle("active",i.dataset.genre===selectedGenre));loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#ultimos")?.scrollIntoView({behavior:"smooth"}),100)}));
+qs("#readerGoTop")?.addEventListener("click",()=>qs("#reader")?.scrollTo({top:0,behavior:"smooth"}));
+qs("#readerGoBottom")?.addEventListener("click",()=>{const r=qs("#reader");if(r)r.scrollTo({top:r.scrollHeight,behavior:"smooth"})});
+qs("#readerShareBottom")?.addEventListener("click",shareCurrentComic);
+qs("#readerCopyLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(comicUrl());alert("Enlace copiado.")}catch{alert(comicUrl())}});
+
 async function startNightInk(){showAgeGate();const r=getRoute();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{type:"home"},"",location.pathname+location.search+location.hash);await Promise.all([loadCatalog(1),loadPopular(),loadUpdates(),loadRandomPool()]);if(r.type==="comic")await openComicDirect(r.slug,false);else setHomeMetadata()}startNightInk();
 </script>
 </body>

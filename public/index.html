@@ -3,8 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>EroToonX | Cómics para adultos +18</title>
-<meta id="metaDescription" name="description" content="EroToonX: catálogo de cómics para adultos +18 con lectura directa y vertical.">
+<meta id="metaDescription" name="description" content="EroToonX es un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="theme-color" content="#0d0f18">
+<meta name="rating" content="adult">
+
+<link id="canonicalUrl" rel="canonical" href="https://erotoonx.com/">
+<link rel="alternate" hreflang="es" href="https://erotoonx.com/">
+<link rel="alternate" hreflang="x-default" href="https://erotoonx.com/">
+
+<meta property="og:type" id="ogType" content="website">
+<meta property="og:site_name" content="EroToonX">
+<meta property="og:title" id="ogTitle" content="EroToonX | Cómics para adultos +18">
+<meta property="og:description" id="ogDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
+<meta property="og:url" id="ogUrl" content="https://erotoonx.com/">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" id="twitterTitle" content="EroToonX | Cómics para adultos +18">
+<meta name="twitter:description" id="twitterDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "EroToonX",
+  "url": "https://erotoonx.com/",
+  "description": "Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
+  "inLanguage": "es",
+  "isFamilyFriendly": false
+}
+</script>
 <style>
 :root{--bg:#0d0f18;--surface:#181c2a;--surface2:#202536;--surface3:#272d42;--border:#343b53;--text:#f5f6fb;--muted:#9da5b9;--pink:#e74ca9;--purple:#7657ed;--orange:#f2a53b;--good:#45c98e;--warning:#edb05c;--danger:#ef6a80}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:radial-gradient(circle at 50% -10%,rgba(118,87,237,.08),transparent 30%),var(--bg);font-family:Arial,Helvetica,sans-serif}body.age-locked,body.reader-locked{overflow:hidden}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:100%}.wrap{width:min(1420px,calc(100% - 26px));margin:auto}.hidden{display:none!important}
@@ -228,7 +258,37 @@ function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt
 function openModal(id){qs("#"+id)?.classList.add("open")}function closeModal(id){qs("#"+id)?.classList.remove("open")}qsa("[data-close]").forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.close)));
 function showAgeGate(){if(localStorage.getItem(AGE_KEY)!=="yes"){qs("#ageGate").classList.add("open");document.body.classList.add("age-locked")}}qs("#ageEnter").onclick=()=>{localStorage.setItem(AGE_KEY,"yes");qs("#ageGate").classList.remove("open");document.body.classList.remove("age-locked")};qs("#ageExit").onclick=()=>location.replace("https://www.google.com/");
 async function api(url,options={}){const headers=new Headers(options.headers||{});if(adminToken)headers.set("X-Admin-Token",adminToken);const response=await fetch(url,{...options,headers});let data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.error||"Error del servidor");return data}
-function getRoute(){const m=location.pathname.match(/^\/comic\/([^/]+)\/?$/);return m?{type:"comic",slug:decodeURIComponent(m[1])}:{type:"home"}}function comicPath(slug){return "/comic/"+encodeURIComponent(slug)}function setHomeMetadata(){document.title="EroToonX | Cómics para adultos +18";qs("#metaDescription").content="EroToonX: catálogo de cómics para adultos +18 con lectura directa y vertical."}function setComicMetadata(c){document.title=`${c.title} | EroToonX Comics`;qs("#metaDescription").content=c.description?c.description.slice(0,150):`Lee ${c.title} en EroToonX Comics`}
+function getRoute(){const m=location.pathname.match(/^\/comic\/([^/]+)\/?$/);return m?{type:"comic",slug:decodeURIComponent(m[1])}:{type:"home"}}function comicPath(slug){return "/comic/"+encodeURIComponent(slug)}
+function applySeoMetadata(title,description,url,type="website"){
+  document.title=title;
+  qs("#metaDescription").content=description;
+  qs("#canonicalUrl").href=url;
+  qs("#ogType").content=type;
+  qs("#ogTitle").content=title;
+  qs("#ogDescription").content=description;
+  qs("#ogUrl").content=url;
+  qs("#twitterTitle").content=title;
+  qs("#twitterDescription").content=description;
+}
+function setHomeMetadata(){
+  applySeoMetadata(
+    "EroToonX | Cómics para adultos +18",
+    "EroToonX es un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
+    "https://erotoonx.com/",
+    "website"
+  );
+}
+function setComicMetadata(c){
+  const description=c.description
+    ? c.description.replace(/\s+/g," ").trim().slice(0,155)
+    : `Lee ${c.title} en EroToonX, con lectura directa y adaptada a móvil.`;
+  applySeoMetadata(
+    `${c.title} | EroToonX`,
+    description,
+    `https://erotoonx.com${comicPath(c.slug)}`,
+    "article"
+  );
+}
 function comicCardHTML(c,dataAttr="data-comic"){const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"",ph=c.cover_url?"":`<div class="cover-placeholder">${esc(c.title)}</div>`;return `<article class="comic-card" ${dataAttr}="${esc(c.slug)}"><div class="cover" style="${cover}">${ph}<span class="card-badge">Abrir</span></div><div class="card-body"><h3 class="card-title">${esc(c.title)}</h3><div class="card-meta"><span>${esc(c.genre||"Sin categoría")}</span><span>${Number(c.views||0)} vistas</span></div></div></article>`}
 async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"15",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedGenre)p.set("genre",selectedGenre);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);renderCatalog();renderPagination()}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 function renderCatalog(){const g=qs("#comicGrid");if(!catalog.length){g.innerHTML='<div class="empty">No encontramos cómics.</div>';return}g.innerHTML=catalog.map(c=>comicCardHTML(c)).join("");qsa("[data-comic]").forEach(card=>card.onclick=()=>openComicDirect(card.dataset.comic,true))}

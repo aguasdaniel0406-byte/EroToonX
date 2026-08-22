@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>DMCA y Reporte de Contenido | NightInk Comics</title>
+<meta name="description" content="Procedimiento para reportar contenido y presentar solicitudes de retirada en NightInk Comics.">
+
+<style>
+:root{
+  --bg:#0d0f18;
+  --surface:#171b28;
+  --surface2:#202536;
+  --border:#343b53;
+  --text:#f5f6fb;
+  --muted:#9da5b9;
+  --pink:#e74ca9;
+  --purple:#7657ed;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(118,87,237,.08),transparent 30%),
+    var(--bg);
+  color:var(--text);
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.wrap{
+  width:min(1000px,calc(100% - 24px));
+  margin:auto;
+}
+
+header{
+  background:#0b0d15;
+  border-bottom:1px solid #242a3c;
+}
+
+.header{
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:24px;
+  font-weight:900;
+}
+
+.logo{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:linear-gradient(135deg,#f2a53b,var(--pink) 48%,var(--purple));
+  font-size:12px;
+}
+
+.back{
+  padding:10px 14px;
+  border:1px solid #3a4159;
+  border-radius:7px;
+  background:#252a3c;
+  font-size:12px;
+  font-weight:800;
+}
+
+.hero{
+  margin:24px auto 18px;
+  padding:24px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:
+    linear-gradient(110deg,rgba(231,76,169,.11),rgba(118,87,237,.08) 48%,transparent 80%),
+    var(--surface);
+}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:30px;
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.65;
+  font-size:13px;
+}
+
+.content{
+  margin-bottom:40px;
+  padding:26px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface);
+}
+
+.content h2{
+  margin:30px 0 10px;
+  padding-bottom:8px;
+  border-bottom:1px solid #353c56;
+  font-size:19px;
+}
+
+.content h2:first-child{
+  margin-top:0;
+}
+
+.content p,
+.content li{
+  color:#d8dce7;
+  font-size:13px;
+  line-height:1.75;
+}
+
+.content ul,
+.content ol{
+  padding-left:22px;
+}
+
+.note{
+  margin:18px 0;
+  padding:14px;
+  border:1px solid #514b8e;
+  border-radius:7px;
+  background:rgba(118,87,237,.08);
+  color:#dfe2eb;
+  font-size:12px;
+  line-height:1.65;
+}
+
+.warning{
+  margin:18px 0;
+  padding:14px;
+  border:1px solid #80435e;
+  border-radius:7px;
+  background:rgba(231,76,169,.07);
+  color:#f0dce8;
+  font-size:12px;
+  line-height:1.65;
+}
+
+.report-box{
+  margin:18px 0;
+  padding:18px;
+  border:1px solid #3d4664;
+  border-radius:8px;
+  background:#111520;
+}
+
+.report-box strong{
+  display:block;
+  margin-bottom:8px;
+  color:#fff;
+}
+
+.legal-nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:28px;
+}
+
+.legal-nav a{
+  padding:9px 11px;
+  border:1px solid #353c54;
+  border-radius:6px;
+  background:var(--surface2);
+  color:#d9dce6;
+  font-size:11px;
+}
+
+footer{
+  padding:24px 0 36px;
+  border-top:1px solid #292f43;
+  color:#81899d;
+  font-size:10px;
+}
+
+@media(max-width:600px){
+  .header{min-height:64px}
+  .brand{font-size:20px}
+  .hero{padding:19px}
+  .hero h1{font-size:25px}
+  .content{padding:19px}
+  .content h2{font-size:17px}
+  .content p,.content li{font-size:12.5px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap header">
+
+    <a href="/" class="brand">
+      <div class="logo">NI</div>
+      <div>NightInk</div>
+    </a>
+
+    <a href="/" class="back">
+      ← Volver a NightInk
+    </a>
+
+  </div>
+</header>
+
+<section class="wrap hero">
+
+  <h1>DMCA / Reportar contenido</h1>
+
+  <p>
+    Procedimiento para solicitar revisión o retirada de contenido potencialmente infractor o ilegal.
+  </p>
+
+</section>
+
+<main class="wrap content">
+
+<h2>1. Compromiso con los derechos de terceros</h2>
+
+<p>
+NightInk Comics respeta los derechos de propiedad intelectual de autores, artistas, editores y demás titulares.
+</p>
+
+<p>
+Si considera que contenido disponible en NightInk vulnera sus derechos, puede presentar una solicitud para que el material sea revisado y, cuando corresponda, retirado o restringido.
+</p>
+
+
+<h2>2. Solicitudes relacionadas con derechos de autor</h2>
+
+<p>
+Para facilitar una revisión rápida, la solicitud debería incluir la siguiente información:
+</p>
+
+<ol>
+  <li>Identificación de la obra protegida cuyos derechos considera vulnerados.</li>
+  <li>Identificación precisa del contenido de NightInk objeto de la reclamación.</li>
+  <li>La URL completa de la página donde aparece el material.</li>
+  <li>Nombre del titular de los derechos o de su representante autorizado.</li>
+  <li>Información de contacto suficiente para responder a la solicitud.</li>
+  <li>Una explicación breve del motivo por el cual considera que el uso no está autorizado.</li>
+  <li>Una declaración de buena fe indicando que la información proporcionada es correcta.</li>
+</ol>
+
+
+<div class="report-box">
+<strong>Importante</strong>
+No basta con indicar únicamente el nombre de NightInk o el título general de una obra. Incluya la URL exacta del contenido que desea reportar siempre que sea posible.
+</div>
+
+
+<h2>3. Procedimiento DMCA</h2>
+
+<p>
+Cuando resulte aplicable la Digital Millennium Copyright Act de Estados Unidos ("DMCA"), una notificación de retirada puede requerir información adicional conforme a la legislación estadounidense.
+</p>
+
+<p>
+Esto normalmente puede incluir:
+</p>
+
+<ul>
+  <li>Una firma física o electrónica de la persona autorizada para actuar en nombre del titular.</li>
+  <li>Identificación de la obra protegida.</li>
+  <li>Identificación del material presuntamente infractor y su ubicación.</li>
+  <li>Información de contacto del reclamante.</li>
+  <li>Una declaración de buena fe.</li>
+  <li>Una declaración de que la información de la notificación es exacta y de que el reclamante está autorizado para actuar.</li>
+</ul>
+
+<div class="note">
+La existencia de esta página no significa por sí sola que NightInk haya designado o registrado un agente DMCA ante las autoridades estadounidenses. Ese procedimiento deberá completarse por separado si resulta necesario para la estructura legal definitiva del servicio.
+</div>
+
+
+<h2>4. Reportes de contenido ilegal</h2>
+
+<p>
+También puede utilizarse este procedimiento para reportar material que el usuario considere ilegal o gravemente contrario a las políticas de NightInk.
+</p>
+
+<p>
+En esos casos, la solicitud debería explicar de forma clara:
+</p>
+
+<ul>
+  <li>Qué contenido se está reportando.</li>
+  <li>La URL donde aparece.</li>
+  <li>La razón concreta por la que considera que el material debería ser retirado.</li>
+  <li>Cualquier información adicional que facilite su evaluación.</li>
+</ul>
+
+
+<h2>5. Protección de menores</h2>
+
+<div class="warning">
+NightInk no permite contenido sexual que involucre menores ni representaciones sexualizadas de personas presentadas como menores.
+</div>
+
+<p>
+Los reportes creíbles relacionados con posible explotación sexual infantil u otro contenido ilegal de especial gravedad podrán recibir tratamiento prioritario y podrán ser comunicados a los proveedores de infraestructura o autoridades competentes cuando exista una obligación legal.
+</p>
+
+
+<h2>6. Revisión de las solicitudes</h2>
+
+<p>
+NightInk podrá revisar la información presentada y solicitar datos adicionales cuando sean necesarios para identificar el contenido, verificar la legitimidad de la reclamación o adoptar una decisión.
+</p>
+
+<p>
+Dependiendo de las circunstancias, NightInk podrá:
+</p>
+
+<ul>
+  <li>Retirar el contenido.</li>
+  <li>Restringir temporalmente el acceso.</li>
+  <li>Solicitar información adicional.</li>
+  <li>Rechazar una solicitud insuficiente o manifiestamente infundada.</li>
+  <li>Tomar otras medidas razonables conforme a la legislación aplicable.</li>
+</ul>
+
+
+<h2>7. Reclamaciones falsas o abusivas</h2>
+
+<p>
+No deben presentarse solicitudes falsas, engañosas o realizadas con la intención de eliminar contenido legítimo mediante abuso del procedimiento.
+</p>
+
+<p>
+El reclamante es responsable de la exactitud de la información que proporcione y de las consecuencias legales que puedan derivarse de una declaración falsa.
+</p>
+
+
+<h2>8. Contra-notificaciones</h2>
+
+<p>
+Cuando la legislación aplicable establezca un procedimiento de contra-notificación, la persona responsable del contenido retirado podrá tener derecho a responder a la reclamación.
+</p>
+
+<p>
+Cualquier contra-notificación deberá cumplir los requisitos legales correspondientes y será evaluada según las circunstancias del caso.
+</p>
+
+
+<h2>9. Contenido alojado por terceros</h2>
+
+<p>
+En algunos casos, NightInk puede enlazar a contenido alojado por proveedores externos.
+</p>
+
+<p>
+Cuando NightInk no controle directamente el material, podremos proporcionar información razonable sobre el proveedor correspondiente o dirigir al reclamante hacia el procedimiento de reporte del servicio que aloja el contenido.
+</p>
+
+
+<h2>10. Información personal incluida en una reclamación</h2>
+
+<p>
+La información enviada como parte de una reclamación podrá tratarse para evaluar el reporte, comunicarse con las partes implicadas, cumplir obligaciones legales y mantener registros relacionados con el procedimiento.
+</p>
+
+<p>
+El tratamiento de esta información también está sujeto a la Política de Privacidad de NightInk.
+</p>
+
+
+<h2>11. Canal de reporte</h2>
+
+<p>
+NightInk habilitará un canal específico para recibir solicitudes de retirada y reportes de contenido.
+</p>
+
+<div class="report-box">
+<strong>Canal pendiente de activación</strong>
+Antes del lanzamiento público definitivo se añadirá aquí una dirección de correo o formulario específico para reportes legales y de derechos de autor.
+</div>
+
+
+<h2>12. Información que debe conservar el reclamante</h2>
+
+<p>
+Recomendamos conservar una copia de cualquier solicitud enviada, junto con las URLs, capturas, fechas y documentación que respalde la reclamación.
+</p>
+
+
+<h2>13. Cambios en este procedimiento</h2>
+
+<p>
+NightInk podrá actualizar este procedimiento para adaptarlo a cambios legales, técnicos u operativos.
+</p>
+
+<p>
+La versión publicada en esta página será la versión vigente.
+</p>
+
+
+<div class="legal-nav">
+
+<a href="/privacy.html">
+Política de Privacidad
+</a>
+
+<a href="/terms.html">
+Términos de Uso
+</a>
+
+<a href="/legal.html">
+Aviso Legal
+</a>
+
+<a href="/contact.html">
+Contacto
+</a>
+
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    NightInk Comics · Contenido exclusivo para adultos +18
+  </div>
+</footer>
+
+</body>
+</html>

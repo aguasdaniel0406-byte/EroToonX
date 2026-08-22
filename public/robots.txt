@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+
+Sitemap: https://nightink-app.aguasdaniel0406.workers.dev/sitemap.xml

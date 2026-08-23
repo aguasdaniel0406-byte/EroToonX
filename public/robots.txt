@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
 
-Disallow: /api/
+Allow: /api/comics
+Allow: /api/updates
+Allow: /api/chapters/
+
+Disallow: /api/admin/
+Disallow: /api/health
 
 Sitemap: https://erotoonx.com/sitemap.xml

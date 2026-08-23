@@ -286,6 +286,31 @@ async function publicComics(env, url) {
   });
 }
 
+async function publicGenres(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      TRIM(genre) AS genre,
+      COUNT(*) AS comic_count
+    FROM comics
+    WHERE
+      is_published = 1
+      AND genre IS NOT NULL
+      AND TRIM(genre) != ''
+    GROUP BY LOWER(TRIM(genre))
+    ORDER BY comic_count DESC, genre COLLATE NOCASE ASC
+    `
+  ).all();
+
+  return json({
+    ok: true,
+    genres: (rows.results || []).map((row) => ({
+      name: row.genre,
+      count: Number(row.comic_count || 0)
+    }))
+  });
+}
+
 async function adminComics(env) {
   const rows = await env.DB.prepare(
     `
@@ -1261,6 +1286,20 @@ export default {
           env,
           url
         );
+      }
+
+
+      /*
+      ========================================
+      PUBLIC GENRES / CATEGORIES
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/genres"
+      ) {
+        return publicGenres(env);
       }
 
 

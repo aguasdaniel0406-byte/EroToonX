@@ -161,6 +161,15 @@ async function publicComics(env, url) {
   const genre =
     (url.searchParams.get("genre") || "").trim();
 
+  const universe =
+    (url.searchParams.get("universe") || "").trim();
+
+  const series =
+    (url.searchParams.get("series") || "").trim();
+
+  const tag =
+    (url.searchParams.get("tag") || "").trim();
+
   const where = [
     "c.is_published = 1"
   ];
@@ -174,6 +183,9 @@ async function publicComics(env, url) {
         LOWER(c.title) LIKE LOWER(?)
         OR LOWER(c.author) LIKE LOWER(?)
         OR LOWER(c.description) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.universe, '')) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.series, '')) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.tags, '')) LIKE LOWER(?)
       )
       `
     );
@@ -181,6 +193,9 @@ async function publicComics(env, url) {
     const like = `%${q}%`;
 
     binds.push(
+      like,
+      like,
+      like,
       like,
       like,
       like
@@ -210,6 +225,52 @@ async function publicComics(env, url) {
 
     binds.push(
       genre
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  }
+
+  if (universe) {
+    where.push(
+      "LOWER(TRIM(COALESCE(c.universe, ''))) = LOWER(?)"
+    );
+    binds.push(universe);
+  }
+
+  if (series) {
+    where.push(
+      "LOWER(TRIM(COALESCE(c.series, ''))) = LOWER(?)"
+    );
+    binds.push(series);
+  }
+
+  if (tag) {
+    where.push(
+      `
+      INSTR(
+        ',' || LOWER(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                COALESCE(
+                  NULLIF(TRIM(c.tags), ''),
+                  c.genre,
+                  ''
+                ),
+                ',  ', ','
+              ),
+              ', ', ','
+            ),
+            ' ,', ','
+          )
+        ) || ',',
+        ',' || LOWER(?) || ','
+      ) > 0
+      `
+    );
+
+    binds.push(
+      tag
         .replace(/\s+/g, " ")
         .trim()
     );
@@ -304,6 +365,60 @@ async function publicComics(env, url) {
   });
 }
 
+function splitTagList(value = "") {
+  return String(value || "")
+    .split(",")
+    .map((tag) =>
+      tag
+        .replace(/\s+/g, " ")
+        .trim()
+    )
+    .filter(Boolean)
+    .filter((tag) =>
+      !/^(artist|autor|author)\s*:/i.test(tag)
+    );
+}
+
+function addCount(counts, value) {
+  const clean =
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  if (!clean) {
+    return;
+  }
+
+  const key =
+    clean.toLocaleLowerCase("es");
+
+  const current =
+    counts.get(key);
+
+  if (current) {
+    current.count += 1;
+  } else {
+    counts.set(key, {
+      name: clean,
+      count: 1
+    });
+  }
+}
+
+function sortedCounts(counts) {
+  return [...counts.values()]
+    .sort((a, b) =>
+      b.count - a.count ||
+      a.name.localeCompare(
+        b.name,
+        "es",
+        {
+          sensitivity: "base"
+        }
+      )
+    );
+}
+
 async function publicGenres(env) {
   const rows = await env.DB.prepare(
     `
@@ -323,55 +438,132 @@ async function publicGenres(env) {
   for (const row of rows.results || []) {
     const seenInComic = new Set();
 
-    const tags = String(row.genre || "")
-      .split(",")
-      .map((tag) =>
-        tag
-          .replace(/\s+/g, " ")
-          .trim()
-      )
-      .filter(Boolean)
-      .filter((tag) =>
-        !/^(artist|autor|author)\s*:/i.test(tag)
-      );
-
-    for (const tag of tags) {
-      const key = tag.toLocaleLowerCase("es");
+    for (const item of splitTagList(row.genre)) {
+      const key =
+        item.toLocaleLowerCase("es");
 
       if (seenInComic.has(key)) {
         continue;
       }
 
       seenInComic.add(key);
-
-      const current = counts.get(key);
-
-      if (current) {
-        current.count += 1;
-      } else {
-        counts.set(key, {
-          name: tag,
-          count: 1
-        });
-      }
+      addCount(counts, item);
     }
   }
 
-  const genres = [...counts.values()]
-    .sort((a, b) =>
-      b.count - a.count ||
-      a.name.localeCompare(
-        b.name,
-        "es",
-        {
-          sensitivity: "base"
-        }
-      )
+  return json({
+    ok: true,
+    genres:
+      sortedCounts(counts)
+  });
+}
+
+async function publicUniverses(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT universe
+    FROM comics
+    WHERE
+      is_published = 1
+      AND universe IS NOT NULL
+      AND TRIM(universe) != ''
+    `
+  ).all();
+
+  const counts = new Map();
+
+  for (const row of rows.results || []) {
+    addCount(
+      counts,
+      row.universe
     );
+  }
 
   return json({
     ok: true,
-    genres
+    universes:
+      sortedCounts(counts)
+  });
+}
+
+async function publicTags(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      tags,
+      genre
+    FROM comics
+    WHERE
+      is_published = 1
+      AND (
+        (
+          tags IS NOT NULL
+          AND TRIM(tags) != ''
+        )
+        OR
+        (
+          genre IS NOT NULL
+          AND TRIM(genre) != ''
+        )
+      )
+    `
+  ).all();
+
+  const counts = new Map();
+
+  for (const row of rows.results || []) {
+    const source =
+      String(row.tags || "").trim()
+        ? row.tags
+        : row.genre;
+
+    const seenInComic = new Set();
+
+    for (const item of splitTagList(source)) {
+      const key =
+        item.toLocaleLowerCase("es");
+
+      if (seenInComic.has(key)) {
+        continue;
+      }
+
+      seenInComic.add(key);
+      addCount(counts, item);
+    }
+  }
+
+  return json({
+    ok: true,
+    tags:
+      sortedCounts(counts)
+  });
+}
+
+async function publicSeries(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT series
+    FROM comics
+    WHERE
+      is_published = 1
+      AND series IS NOT NULL
+      AND TRIM(series) != ''
+    `
+  ).all();
+
+  const counts = new Map();
+
+  for (const row of rows.results || []) {
+    addCount(
+      counts,
+      row.series
+    );
+  }
+
+  return json({
+    ok: true,
+    series:
+      sortedCounts(counts)
   });
 }
 
@@ -455,6 +647,10 @@ async function getSeoHomeComics(env, limit = 15) {
       c.title,
       c.description,
       c.genre,
+      c.universe,
+      c.series,
+      c.series_number,
+      c.tags,
       c.author,
       c.status,
       c.views,
@@ -631,7 +827,10 @@ function renderComicStructuredData(comic) {
     description:
       comic.description || undefined,
     genre:
-      comic.genre || undefined,
+      comic.tags ||
+      comic.universe ||
+      comic.genre ||
+      undefined,
     author:
       comic.author
         ? {
@@ -993,9 +1192,26 @@ ${structured}
 
   <p>
     ${
-      comic.genre
-        ? `<strong>Categoría:</strong> ${escapeHtml(comic.genre)} · `
+      comic.universe
+        ? `<strong>Universo:</strong> ${escapeHtml(comic.universe)} · `
         : ""
+    }
+    ${
+      comic.series
+        ? `<strong>Serie:</strong> ${escapeHtml(comic.series)}${
+            comic.series_number !== null &&
+            comic.series_number !== undefined
+              ? ` #${escapeHtml(comic.series_number)}`
+              : ""
+          } · `
+        : ""
+    }
+    ${
+      comic.tags
+        ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.tags)} · `
+        : comic.genre
+          ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.genre)} · `
+          : ""
     }
     ${
       comic.author
@@ -1366,6 +1582,27 @@ export default {
         return publicGenres(env);
       }
 
+      if (
+        method === "GET" &&
+        path === "/api/universes"
+      ) {
+        return publicUniverses(env);
+      }
+
+      if (
+        method === "GET" &&
+        path === "/api/tags"
+      ) {
+        return publicTags(env);
+      }
+
+      if (
+        method === "GET" &&
+        path === "/api/series"
+      ) {
+        return publicSeries(env);
+      }
+
 
       /*
       ========================================
@@ -1400,6 +1637,10 @@ export default {
             c.slug,
             c.title AS comic_title,
             c.genre,
+            c.universe,
+            c.series,
+            c.series_number,
+            c.tags,
             c.cover_key,
 
             CASE
@@ -1844,6 +2085,27 @@ export default {
           );
         }
 
+        const seriesNumber =
+          body.series_number === null ||
+          body.series_number === undefined ||
+          String(body.series_number).trim() === ""
+            ? null
+            : Number(body.series_number);
+
+        if (
+          seriesNumber !== null &&
+          !Number.isFinite(seriesNumber)
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de serie inválido"
+            },
+            400
+          );
+        }
+
         try {
           const result = await env.DB.prepare(
             `
@@ -1852,6 +2114,10 @@ export default {
               title,
               description,
               genre,
+              universe,
+              series,
+              series_number,
+              tags,
               author,
               status,
               is_published,
@@ -1860,6 +2126,10 @@ export default {
             )
 
             VALUES (
+              ?,
+              ?,
+              ?,
+              ?,
               ?,
               ?,
               ?,
@@ -1880,6 +2150,16 @@ export default {
               ),
               String(
                 body.genre || ""
+              ),
+              String(
+                body.universe || ""
+              ).trim(),
+              String(
+                body.series || ""
+              ).trim(),
+              seriesNumber,
+              String(
+                body.tags || ""
               ),
               String(
                 body.author || ""
@@ -1975,6 +2255,27 @@ export default {
             title
           );
 
+        const seriesNumber =
+          body.series_number === null ||
+          body.series_number === undefined ||
+          String(body.series_number).trim() === ""
+            ? null
+            : Number(body.series_number);
+
+        if (
+          seriesNumber !== null &&
+          !Number.isFinite(seriesNumber)
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de serie inválido"
+            },
+            400
+          );
+        }
+
         try {
           await env.DB.prepare(
             `
@@ -1985,6 +2286,10 @@ export default {
               title = ?,
               description = ?,
               genre = ?,
+              universe = ?,
+              series = ?,
+              series_number = ?,
+              tags = ?,
               author = ?,
               status = ?,
               is_published = ?,
@@ -2002,6 +2307,16 @@ export default {
               ),
               String(
                 body.genre || ""
+              ),
+              String(
+                body.universe || ""
+              ).trim(),
+              String(
+                body.series || ""
+              ).trim(),
+              seriesNumber,
+              String(
+                body.tags || ""
               ),
               String(
                 body.author || ""

@@ -189,11 +189,29 @@ async function publicComics(env, url) {
 
   if (genre) {
     where.push(
-      "LOWER(c.genre) = LOWER(?)"
+      `
+      INSTR(
+        ',' || LOWER(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                COALESCE(c.genre, ''),
+                ',  ', ','
+              ),
+              ', ', ','
+            ),
+            ' ,', ','
+          )
+        ) || ',',
+        ',' || LOWER(?) || ','
+      ) > 0
+      `
     );
 
     binds.push(
       genre
+        .replace(/\s+/g, " ")
+        .trim()
     );
   }
 
@@ -290,24 +308,70 @@ async function publicGenres(env) {
   const rows = await env.DB.prepare(
     `
     SELECT
-      TRIM(genre) AS genre,
-      COUNT(*) AS comic_count
+      id,
+      genre
     FROM comics
     WHERE
       is_published = 1
       AND genre IS NOT NULL
       AND TRIM(genre) != ''
-    GROUP BY LOWER(TRIM(genre))
-    ORDER BY comic_count DESC, genre COLLATE NOCASE ASC
     `
   ).all();
 
+  const counts = new Map();
+
+  for (const row of rows.results || []) {
+    const seenInComic = new Set();
+
+    const tags = String(row.genre || "")
+      .split(",")
+      .map((tag) =>
+        tag
+          .replace(/\s+/g, " ")
+          .trim()
+      )
+      .filter(Boolean)
+      .filter((tag) =>
+        !/^(artist|autor|author)\s*:/i.test(tag)
+      );
+
+    for (const tag of tags) {
+      const key = tag.toLocaleLowerCase("es");
+
+      if (seenInComic.has(key)) {
+        continue;
+      }
+
+      seenInComic.add(key);
+
+      const current = counts.get(key);
+
+      if (current) {
+        current.count += 1;
+      } else {
+        counts.set(key, {
+          name: tag,
+          count: 1
+        });
+      }
+    }
+  }
+
+  const genres = [...counts.values()]
+    .sort((a, b) =>
+      b.count - a.count ||
+      a.name.localeCompare(
+        b.name,
+        "es",
+        {
+          sensitivity: "base"
+        }
+      )
+    );
+
   return json({
     ok: true,
-    genres: (rows.results || []).map((row) => ({
-      name: row.genre,
-      count: Number(row.comic_count || 0)
-    }))
+    genres
   });
 }
 

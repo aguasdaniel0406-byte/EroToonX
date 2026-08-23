@@ -972,6 +972,139 @@ ${structured}
   );
 }
 
+
+function escapeXml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function sitemapDate(value) {
+  if (!value) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+async function serveDynamicSitemap(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      slug,
+      updated_at
+
+    FROM comics
+
+    WHERE
+      is_published = 1
+
+    ORDER BY
+      updated_at DESC,
+      id DESC
+    `
+  ).all();
+
+  const comics =
+    rows.results || [];
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+  const staticUrls = [
+    {
+      loc: `${SITE_ORIGIN}/`,
+      lastmod: today,
+      changefreq: "daily",
+      priority: "1.0"
+    },
+    {
+      loc: `${SITE_ORIGIN}/privacy.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/terms.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/legal.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/dmca.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/contact.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    }
+  ];
+
+  const comicUrls =
+    comics.map(comic => ({
+      loc:
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+      lastmod:
+        sitemapDate(comic.updated_at),
+      changefreq:
+        "weekly",
+      priority:
+        "0.8"
+    }));
+
+  const urls =
+    [...staticUrls, ...comicUrls];
+
+  const body =
+    urls.map(item => `
+  <url>
+    <loc>${escapeXml(item.loc)}</loc>
+    <lastmod>${escapeXml(item.lastmod)}</lastmod>
+    <changefreq>${escapeXml(item.changefreq)}</changefreq>
+    <priority>${escapeXml(item.priority)}</priority>
+  </url>`).join("");
+
+  const xml =
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}
+</urlset>`;
+
+  return new Response(
+    xml,
+    {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/xml; charset=utf-8",
+
+        "Cache-Control":
+          "public, max-age=300"
+      }
+    }
+  );
+}
+
 export default {
   async fetch(
     request,
@@ -987,6 +1120,22 @@ export default {
       request.method.toUpperCase();
 
     try {
+
+      /*
+      ========================================
+      DYNAMIC SITEMAP
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/sitemap.xml"
+      ) {
+        return serveDynamicSitemap(
+          env
+        );
+      }
+
 
       /*
       ========================================

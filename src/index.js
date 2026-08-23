@@ -320,6 +320,658 @@ async function adminComics(env) {
   });
 }
 
+
+const SITE_ORIGIN = "https://erotoonx.com";
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function escapeAttr(value = "") {
+  return escapeHtml(value);
+}
+
+function absoluteUrl(path = "/") {
+  if (!path) {
+    return SITE_ORIGIN + "/";
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  return SITE_ORIGIN + (path.startsWith("/") ? path : `/${path}`);
+}
+
+function isSearchCrawler(request) {
+  const ua =
+    request.headers.get("User-Agent") || "";
+
+  return /Googlebot|Google-InspectionTool|GoogleOther|bingbot|BingPreview|DuckDuckBot|YandexBot/i.test(
+    ua
+  );
+}
+
+async function getSeoHomeComics(env, limit = 15) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.author,
+      c.status,
+      c.views,
+      c.updated_at,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url,
+
+      (
+        SELECT COUNT(*)
+        FROM pages p
+        JOIN chapters ch
+          ON ch.id = p.chapter_id
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS page_count
+
+    FROM comics c
+
+    WHERE
+      c.is_published = 1
+
+    ORDER BY
+      c.updated_at DESC,
+      c.id DESC
+
+    LIMIT ?
+    `
+  )
+    .bind(limit)
+    .all();
+
+  return rows.results || [];
+}
+
+async function getSeoComic(env, slug) {
+  const comic = await env.DB.prepare(
+    `
+    SELECT
+      c.*,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url,
+
+      (
+        SELECT COUNT(*)
+        FROM pages p
+        JOIN chapters ch
+          ON ch.id = p.chapter_id
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS page_count
+
+    FROM comics c
+
+    WHERE
+      c.slug = ?
+
+    AND
+      c.is_published = 1
+
+    LIMIT 1
+    `
+  )
+    .bind(slug)
+    .first();
+
+  return comic || null;
+}
+
+function renderSeoComicCards(comics) {
+  if (!comics.length) {
+    return `
+      <div class="empty">
+        Aún no hay cómics publicados.
+      </div>
+    `;
+  }
+
+  return comics.map(comic => {
+    const title =
+      escapeHtml(comic.title || "Cómic");
+
+    const slug =
+      encodeURIComponent(comic.slug || "");
+
+    const genre =
+      escapeHtml(
+        comic.genre || "Sin categoría"
+      );
+
+    const views =
+      Number(comic.views || 0);
+
+    const coverUrl =
+      comic.cover_url
+        ? absoluteUrl(comic.cover_url)
+        : "";
+
+    const coverStyle =
+      coverUrl
+        ? `background-image:url('${escapeAttr(coverUrl)}')`
+        : "";
+
+    const placeholder =
+      coverUrl
+        ? ""
+        : `<div class="cover-placeholder">${title}</div>`;
+
+    return `
+      <a
+        class="comic-card"
+        href="/comic/${slug}"
+        aria-label="Abrir ${escapeAttr(title)}"
+      >
+        <div
+          class="cover"
+          style="${coverStyle}"
+        >
+          ${placeholder}
+          <span class="card-badge">Abrir</span>
+        </div>
+
+        <div class="card-body">
+          <h3 class="card-title">
+            ${title}
+          </h3>
+
+          <div class="card-meta">
+            <span>${genre}</span>
+            <span>${views} vistas</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join("");
+}
+
+function renderHomeStructuredData(comics) {
+  const itemListElement =
+    comics.map((comic, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url:
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+      name:
+        comic.title
+    }));
+
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Últimos cómics de EroToonX",
+    itemListElement
+  }).replace(/</g, "\\u003c");
+}
+
+function renderComicStructuredData(comic) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name:
+      comic.title,
+    url:
+      `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+    description:
+      comic.description || undefined,
+    genre:
+      comic.genre || undefined,
+    author:
+      comic.author
+        ? {
+            "@type": "Person",
+            name: comic.author
+          }
+        : undefined,
+    image:
+      comic.cover_url
+        ? absoluteUrl(comic.cover_url)
+        : undefined,
+    dateModified:
+      comic.updated_at || undefined,
+    isFamilyFriendly:
+      false,
+    inLanguage:
+      "es"
+  };
+
+  for (const key of Object.keys(data)) {
+    if (data[key] === undefined) {
+      delete data[key];
+    }
+  }
+
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c");
+}
+
+function replaceHeadMetadata(
+  html,
+  {
+    title,
+    description,
+    canonical,
+    type = "website",
+    image = null
+  }
+) {
+  const safeTitle =
+    escapeHtml(title);
+
+  const safeDescription =
+    escapeAttr(description);
+
+  const safeCanonical =
+    escapeAttr(canonical);
+
+  html = html.replace(
+    /<title>[\s\S]*?<\/title>/i,
+    `<title>${safeTitle}</title>`
+  );
+
+  html = html.replace(
+    /<meta id="metaDescription" name="description" content="[^"]*">/i,
+    `<meta id="metaDescription" name="description" content="${safeDescription}">`
+  );
+
+  html = html.replace(
+    /<link id="canonicalUrl" rel="canonical" href="[^"]*">/i,
+    `<link id="canonicalUrl" rel="canonical" href="${safeCanonical}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:type" id="ogType" content="[^"]*">/i,
+    `<meta property="og:type" id="ogType" content="${escapeAttr(type)}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:title" id="ogTitle" content="[^"]*">/i,
+    `<meta property="og:title" id="ogTitle" content="${safeTitle}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:description" id="ogDescription" content="[^"]*">/i,
+    `<meta property="og:description" id="ogDescription" content="${safeDescription}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:url" id="ogUrl" content="[^"]*">/i,
+    `<meta property="og:url" id="ogUrl" content="${safeCanonical}">`
+  );
+
+  html = html.replace(
+    /<meta name="twitter:title" id="twitterTitle" content="[^"]*">/i,
+    `<meta name="twitter:title" id="twitterTitle" content="${safeTitle}">`
+  );
+
+  html = html.replace(
+    /<meta name="twitter:description" id="twitterDescription" content="[^"]*">/i,
+    `<meta name="twitter:description" id="twitterDescription" content="${safeDescription}">`
+  );
+
+  if (image) {
+    const safeImage =
+      escapeAttr(image);
+
+    html = html.replace(
+      "</head>",
+      `
+<meta property="og:image" content="${safeImage}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${safeImage}">
+</head>`
+    );
+  }
+
+  return html;
+}
+
+function skipAgeGateForCrawler(
+  html,
+  request
+) {
+  if (!isSearchCrawler(request)) {
+    return html;
+  }
+
+  html = html.replace(
+    "async function startEroToonX(){showAgeGate();",
+    "async function startEroToonX(){"
+  );
+
+  html = html.replace(
+    "</head>",
+    `
+<style id="crawler-agegate-bypass">
+#ageGate{display:none!important}
+body.age-locked{overflow:auto!important}
+body.age-locked .site-header,
+body.age-locked .navbar,
+body.age-locked .mobile-site-header,
+body.age-locked .intro-strip,
+body.age-locked main,
+body.age-locked footer{
+  pointer-events:auto!important;
+  filter:none!important;
+  user-select:auto!important
+}
+</style>
+</head>`
+  );
+
+  return html;
+}
+
+async function fetchIndexAsset(
+  request,
+  env
+) {
+  const assetUrl =
+    new URL(
+      "/index.html",
+      request.url
+    );
+
+  const assetRequest =
+    new Request(
+      assetUrl.toString(),
+      {
+        method: "GET",
+        headers: request.headers
+      }
+    );
+
+  return env.ASSETS.fetch(
+    assetRequest
+  );
+}
+
+async function serveSeoHtml(
+  request,
+  env,
+  url
+) {
+  const assetResponse =
+    await fetchIndexAsset(
+      request,
+      env
+    );
+
+  if (!assetResponse.ok) {
+    return assetResponse;
+  }
+
+  let html =
+    await assetResponse.text();
+
+  const path =
+    url.pathname;
+
+  if (
+    path === "/" ||
+    path === "/index.html"
+  ) {
+    const comics =
+      await getSeoHomeComics(
+        env,
+        15
+      );
+
+    const cards =
+      renderSeoComicCards(
+        comics
+      );
+
+    html = html.replace(
+      /<div id="comicGrid" class="comic-grid">[\s\S]*?<\/div><div id="pagination"/i,
+      `<div id="comicGrid" class="comic-grid">${cards}</div><div id="pagination"`
+    );
+
+    const structured =
+      renderHomeStructuredData(
+        comics
+      );
+
+    html = html.replace(
+      "</head>",
+      `
+<script type="application/ld+json">
+${structured}
+</script>
+</head>`
+    );
+
+    html = replaceHeadMetadata(
+      html,
+      {
+        title:
+          "EroToonX | Cómics para adultos +18",
+
+        description:
+          "Explora EroToonX, un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
+
+        canonical:
+          `${SITE_ORIGIN}/`,
+
+        type:
+          "website"
+      }
+    );
+  }
+
+  else {
+    const match =
+      path.match(
+        /^\/comic\/([^/]+)\/?$/
+      );
+
+    if (match) {
+      const slug =
+        decodeURIComponent(
+          match[1]
+        );
+
+      const comic =
+        await getSeoComic(
+          env,
+          slug
+        );
+
+      if (!comic) {
+        return new Response(
+          `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>Cómic no encontrado | EroToonX</title>
+</head>
+<body>
+<h1>Cómic no encontrado</h1>
+<p>El contenido solicitado no está disponible.</p>
+<p><a href="/">Volver a EroToonX</a></p>
+</body>
+</html>`,
+          {
+            status: 404,
+            headers: {
+              "Content-Type":
+                "text/html; charset=utf-8"
+            }
+          }
+        );
+      }
+
+      const title =
+        comic.title ||
+        "Cómic";
+
+      const description =
+        String(
+          comic.description ||
+          `Lee ${title} en EroToonX.`
+        )
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 155);
+
+      const canonical =
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`;
+
+      const image =
+        comic.cover_url
+          ? absoluteUrl(
+              comic.cover_url
+            )
+          : null;
+
+      html = replaceHeadMetadata(
+        html,
+        {
+          title:
+            `${title} | EroToonX`,
+
+          description,
+
+          canonical,
+
+          type:
+            "article",
+
+          image
+        }
+      );
+
+      const structured =
+        renderComicStructuredData(
+          comic
+        );
+
+      html = html.replace(
+        "</head>",
+        `
+<script type="application/ld+json">
+${structured}
+</script>
+</head>`
+      );
+
+      const pageCount =
+        Number(
+          comic.page_count || 0
+        );
+
+      const detail =
+        `
+<section
+  id="serverComicSeo"
+  class="wrap seo-summary"
+  aria-label="Información del cómic"
+>
+  <h1>${escapeHtml(title)}</h1>
+
+  <p>
+    ${escapeHtml(description)}
+  </p>
+
+  <p>
+    ${
+      comic.genre
+        ? `<strong>Categoría:</strong> ${escapeHtml(comic.genre)} · `
+        : ""
+    }
+    ${
+      comic.author
+        ? `<strong>Autor:</strong> ${escapeHtml(comic.author)} · `
+        : ""
+    }
+    <strong>Páginas:</strong> ${pageCount}
+  </p>
+</section>
+`;
+
+      html = html.replace(
+        '<div id="reader" class="reader">',
+        `${detail}<div id="reader" class="reader">`
+      );
+    }
+  }
+
+  html =
+    skipAgeGateForCrawler(
+      html,
+      request
+    );
+
+  const headers =
+    new Headers(
+      assetResponse.headers
+    );
+
+  headers.set(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+
+  headers.set(
+    "Cache-Control",
+    "public, max-age=60"
+  );
+
+  headers.set(
+    "Vary",
+    "User-Agent"
+  );
+
+  headers.delete(
+    "Content-Length"
+  );
+
+  headers.delete(
+    "Content-Encoding"
+  );
+
+  headers.delete(
+    "ETag"
+  );
+
+  return new Response(
+    html,
+    {
+      status: 200,
+      headers
+    }
+  );
+}
+
 export default {
   async fetch(
     request,
@@ -335,6 +987,28 @@ export default {
       request.method.toUpperCase();
 
     try {
+
+      /*
+      ========================================
+      SERVER-RENDERED SEO
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        (
+          path === "/" ||
+          path === "/index.html" ||
+          /^\/comic\/[^/]+\/?$/.test(path)
+        )
+      ) {
+        return serveSeoHtml(
+          request,
+          env,
+          url
+        );
+      }
+
 
       /*
       ========================================
@@ -2090,7 +2764,7 @@ export default {
 
     catch(error) {
       console.error(
-        "NightInk Worker error:",
+        "EroToonX Worker error:",
         error
       );
 

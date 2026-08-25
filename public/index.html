@@ -267,11 +267,24 @@ body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer
   .category-grid{grid-template-columns:1fr 1fr}
 }
 
+
+/* ===== ADMIN PRIVADO /admin1043130208 ===== */
+body.admin-route .navbar,
+body.admin-route .mobile-site-header,
+body.admin-route .top-ad-wrap,
+body.admin-route .portal-layout-clean,
+body.admin-route footer{display:none!important}
+body.admin-route .site-header .search-area,
+body.admin-route .site-header .header-side{display:none!important}
+body.admin-route .header-main{grid-template-columns:1fr;min-height:78px}
+body.admin-route main.wrap{padding-top:24px}
+body.admin-route #adminShell{margin-top:0}
+
 </style>
 </head>
 <body>
 
-<header class="site-header"><div class="wrap header-main"><a href="/" class="brand"><div class="brand-icon">EX</div><div class="brand-name">EroToonX<small>COMICS +18</small></div></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor o cómic..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"><button id="openAdmin" class="admin-button">Admin</button></div></div></header>
+<header class="site-header"><div class="wrap header-main"><a href="/" class="brand"><div class="brand-icon">EX</div><div class="brand-name">EroToonX<small>COMICS +18</small></div></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor o cómic..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"></div></div></header>
 <nav class="navbar"><div class="wrap navbar-inner"><a class="nav-link active" data-nav-home href="/">Inicio</a><a class="nav-link" data-nav-categories href="/categorias">Categorías</a></div></nav>
 <div class="mobile-site-header">
   <div class="mobile-header-row">
@@ -279,7 +292,6 @@ body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer
     <div class="mobile-actions">
       <button id="mobileMenuBtn" class="mobile-icon-btn" aria-label="Menú">☰</button>
       <button id="mobileSearchBtn" class="mobile-icon-btn" aria-label="Buscar">⌕</button>
-      <button id="mobileAdminBtn" class="mobile-icon-btn" aria-label="Administrador">⚙</button>
     </div>
   </div>
   <div id="mobileMenuPanel" class="mobile-menu-panel">
@@ -351,7 +363,7 @@ body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer
     </nav>
   </div>
 </footer>
-<div id="loginModal" class="modal"><div class="panel" style="width:min(410px,100%)"><h2>Administrador</h2><div class="field"><label>Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password"></div><div id="loginMsg" class="msg"></div><div class="modal-actions"><button class="btn secondary" data-close="loginModal">Cancelar</button><button id="loginBtn" class="btn primary">Entrar</button></div></div></div>
+<div id="loginModal" class="modal"><div class="panel" style="width:min(410px,100%)"><h2>Administrador</h2><div class="field"><label>Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password"></div><div id="loginMsg" class="msg"></div><div class="modal-actions"><button id="adminCancelBtn" class="btn secondary" data-close="loginModal">Volver al sitio</button><button id="loginBtn" class="btn primary">Entrar</button></div></div></div>
 <div id="comicModal" class="modal"><div class="panel"><h2 id="comicFormTitle">Nuevo cómic</h2><form id="comicForm"><input id="comicId" type="hidden"><div class="form-grid"><div class="field"><label>Título</label><input id="comicTitle" required></div><div class="field"><label>Slug</label><input id="comicSlug" placeholder="Opcional"></div><div class="field"><label>Autor</label><input id="comicAuthor" placeholder="Ej. Milftoon"></div><div class="field full"><label>Etiquetas</label><input id="comicTags" placeholder="Separadas por comas: Milfs, Big ass, Big breasts..."></div><div class="field"><label>Estado</label><select id="comicStatus"><option>En emisión</option><option>Completo</option><option>Pausado</option></select></div><div class="field"><label>Portada</label><input id="comicCover" type="file" accept="image/*"></div><div class="field full"><label>Descripción</label><textarea id="comicDescription"></textarea></div><div class="field full"><label class="check"><input id="comicPublished" type="checkbox"> Publicado</label></div></div><div id="comicMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="comicModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div></div>
 <div id="pagesModal" class="modal"><div class="panel wide"><div class="modal-head"><h2 id="pagesTitle">Páginas del cómic</h2><button class="btn secondary" data-close="pagesModal">Cerrar</button></div><div class="upload-box"><p>Selecciona todas las imágenes del cómic. EroToonX las ordenará por nombre: 001, 002, 003...</p><input id="comicPagesInput" type="file" multiple accept="image/*"><br><button id="uploadComicPagesBtn" class="btn primary" style="margin-top:10px">Subir páginas</button><div id="pagesMsg" class="msg"></div></div><div id="pagesGrid" class="pages-grid"></div></div></div>
 <div id="detailModal" class="modal"><div class="panel" style="width:min(900px,100%)"><div class="modal-head"><h2 id="detailTitle"></h2><button class="btn secondary" data-close="detailModal">Cerrar</button></div><div class="detail"><div id="detailCover" class="detail-cover"></div><div><div id="detailMeta" class="detail-meta"></div><p id="detailDescription" class="detail-desc"></p><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button id="shareComicBtn" class="btn primary">Compartir</button><button id="copyComicBtn" class="btn secondary">Copiar enlace</button></div><div id="shareMessage" class="msg success"></div></div></div></div></div>
@@ -398,7 +410,7 @@ qs("#ageEnter").onclick=()=>{
 qs("#ageExit").onclick=()=>location.replace("https://www.google.com/");
 async function api(url,options={}){const headers=new Headers(options.headers||{});if(adminToken)headers.set("X-Admin-Token",adminToken);const response=await fetch(url,{...options,headers});let data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.error||"Error del servidor");return data}
 function routeSlug(value=""){return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}
-function getRoute(){const p=location.pathname;const comic=p.match(/^\/comic\/([^/]+)\/?$/);if(comic)return{type:"comic",slug:decodeURIComponent(comic[1])};if(/^\/categorias\/?$/.test(p))return{type:"categories"};const category=p.match(/^\/categoria\/([^/]+)\/?$/);if(category)return{type:"category",slug:decodeURIComponent(category[1])};return{type:"home"}}
+function getRoute(){const p=location.pathname;if(/^\/admin1043130208\/?$/.test(p))return{type:"admin"};const comic=p.match(/^\/comic\/([^/]+)\/?$/);if(comic)return{type:"comic",slug:decodeURIComponent(comic[1])};if(/^\/categorias\/?$/.test(p))return{type:"categories"};const category=p.match(/^\/categoria\/([^/]+)\/?$/);if(category)return{type:"category",slug:decodeURIComponent(category[1])};return{type:"home"}}
 function comicPath(slug){return "/comic/"+encodeURIComponent(slug)}
 function categoryPath(name){return "/categoria/"+encodeURIComponent(routeSlug(name))}
 function applySeoMetadata(title,description,url,type="website"){
@@ -413,10 +425,22 @@ function applySeoMetadata(title,description,url,type="website"){
   qs("#twitterDescription").content=description;
 }
 function setHomeMetadata(){
+  const robots=document.querySelector('meta[name="robots"]');
+  if(robots)robots.content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
   applySeoMetadata(
     "EroToonX | Cómics para adultos +18",
     "EroToonX es un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
     "https://erotoonx.com/",
+    "website"
+  );
+}
+function setAdminMetadata(){
+  const robots=document.querySelector('meta[name="robots"]');
+  if(robots)robots.content="noindex,nofollow,noarchive";
+  applySeoMetadata(
+    "Administración | EroToonX",
+    "Acceso privado de administración.",
+    "https://erotoonx.com/admin1043130208",
     "website"
   );
 }
@@ -542,6 +566,23 @@ async function openCategory(name,push=true){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 async function handleRoute(route,initial=false){
+  if(route.type==="admin"){
+    closeReaderOnly();
+    document.body.classList.add("admin-route");
+    document.body.classList.remove("age-locked");
+    qs("#ageGate")?.classList.remove("open");
+    setAdminMetadata();
+    if(adminToken){
+      try{await showAdmin();return}
+      catch{adminToken="";sessionStorage.removeItem("nightink_admin_token")}
+    }
+    qs("#adminShell")?.classList.remove("visible");
+    qs("#loginMsg").textContent="";
+    openModal("loginModal");
+    setTimeout(()=>qs("#adminPassword")?.focus(),50);
+    return;
+  }
+  document.body.classList.remove("admin-route");
   if(route.type==="comic"){await openComicDirect(route.slug,false);return}
   closeReaderOnly();
   if(route.type==="categories"){
@@ -569,8 +610,8 @@ qsa("[data-nav-home],[data-mobile-home]").forEach(a=>a.addEventListener("click",
 qsa("[data-nav-categories],[data-mobile-categories]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();closeMobilePanels();history.pushState({type:"categories"},"","/categorias");handleRoute({type:"categories"},false)}));
 
 qsa(".tab[data-sort]").forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;qsa(".tab[data-sort]").forEach(i=>i.classList.toggle("active",i===b));loadCatalog(1)});
-qs("#openAdmin").onclick=async()=>{if(adminToken){try{await showAdmin();return}catch{adminToken="";sessionStorage.removeItem("nightink_admin_token")}}qs("#loginMsg").textContent="";openModal("loginModal");qs("#adminPassword").focus()};qs("#loginBtn").onclick=loginAdmin;qs("#adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")loginAdmin()});async function loginAdmin(){const password=qs("#adminPassword").value;try{await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});adminToken=password;sessionStorage.setItem("nightink_admin_token",password);closeModal("loginModal");await showAdmin()}catch(e){qs("#loginMsg").className="msg error";qs("#loginMsg").textContent=e.message}}
-async function showAdmin(){qs("#adminShell").classList.add("visible");await Promise.all([loadStats(),loadAdminComics()]);qs("#adminShell").scrollIntoView({behavior:"smooth"})}qs("#logoutAdminBtn").onclick=()=>{adminToken="";sessionStorage.removeItem("nightink_admin_token");qs("#adminShell").classList.remove("visible")};qs("#refreshAdminBtn").onclick=async()=>{await Promise.all([loadStats(),loadAdminComics(),loadCategoryIndex()]);if(getRoute().type!=="categories")await loadCatalog(currentPage);if(getRoute().type==="home")await loadRandomPool()};
+qs("#loginBtn").onclick=loginAdmin;qs("#adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")loginAdmin()});qs("#adminCancelBtn")?.addEventListener("click",()=>{if(getRoute().type==="admin")location.href="/"});async function loginAdmin(){const password=qs("#adminPassword").value;try{await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});adminToken=password;sessionStorage.setItem("nightink_admin_token",password);closeModal("loginModal");await showAdmin()}catch(e){qs("#loginMsg").className="msg error";qs("#loginMsg").textContent=e.message}}
+async function showAdmin(){qs("#adminShell").classList.add("visible");await Promise.all([loadStats(),loadAdminComics()]);qs("#adminShell").scrollIntoView({behavior:"smooth"})}qs("#logoutAdminBtn").onclick=()=>{adminToken="";sessionStorage.removeItem("nightink_admin_token");qs("#adminShell").classList.remove("visible");if(getRoute().type==="admin"){qs("#adminPassword").value="";qs("#loginMsg").textContent="";openModal("loginModal");setTimeout(()=>qs("#adminPassword")?.focus(),50)}};qs("#refreshAdminBtn").onclick=async()=>{await Promise.all([loadStats(),loadAdminComics(),loadCategoryIndex()]);if(getRoute().type!=="categories")await loadCatalog(currentPage);if(getRoute().type==="home")await loadRandomPool()};
 async function loadStats(){const d=await api("/api/admin/stats"),s=d.stats||{};qs("#stats").innerHTML=`<div class="stat"><strong>${Number(s.comics||0)}</strong><small>Cómics</small></div><div class="stat"><strong>${Number(s.pages||0)}</strong><small>Páginas</small></div><div class="stat"><strong>${Number(s.views||0)}</strong><small>Vistas</small></div>`}
 async function getOrCreateInternalChapter(comicId){const d=await api(`/api/admin/comics/${comicId}/chapters`),arr=d.chapters||[];if(arr.length)return arr[0];await api(`/api/admin/comics/${comicId}/chapters`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chapter_number:1,title:"",is_published:true})});const again=await api(`/api/admin/comics/${comicId}/chapters`),ch=(again.chapters||[])[0];if(!ch)throw new Error("No se pudo preparar el cómic para subir páginas.");return ch}
 async function loadAdminComics(){const d=await api("/api/admin/comics");currentAdminComics=d.comics||[];const box=qs("#adminList");if(!currentAdminComics.length){box.innerHTML='<div class="empty">No hay cómics.</div>';return}box.innerHTML=currentAdminComics.map(c=>{const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"";const meta=[c.author,c.tags||c.genre].filter(Boolean).join(" · ")||"Sin etiquetas";return `<div class="admin-row" id="adminComic-${c.id}"><div class="admin-cover" style="${cover}"></div><div><div class="admin-title">${esc(c.title)}</div><div class="admin-meta">${esc(meta)} · ${c.is_published?"Publicado":"Borrador"}</div><div id="ready-${c.id}"><span class="ready-badge draft">Comprobando...</span></div></div><div class="row-actions"><button data-edit="${c.id}">Editar</button><button data-pages="${c.id}">Páginas</button><button data-delete="${c.id}">Eliminar</button></div></div>`}).join("");qsa("[data-edit]").forEach(b=>b.onclick=()=>editComic(Number(b.dataset.edit)));qsa("[data-pages]").forEach(b=>b.onclick=()=>openComicPages(Number(b.dataset.pages)));qsa("[data-delete]").forEach(b=>b.onclick=()=>deleteComic(Number(b.dataset.delete)));await Promise.all(currentAdminComics.map(async c=>{try{const r=await api(`/api/admin/comics/${c.id}/chapters`),readable=(r.chapters||[]).find(ch=>Number(ch.page_count||0)>0),el=qs(`#ready-${c.id}`);if(!el)return;if(!c.is_published)el.innerHTML='<span class="ready-badge draft">BORRADOR</span>';else if(!readable)el.innerHTML='<span class="ready-badge warn">FALTAN PÁGINAS</span>';else el.innerHTML=`<span class="ready-badge ok">LISTO · ${Number(readable.page_count||0)} páginas</span>`}catch{}}))}
@@ -585,7 +626,6 @@ async function movePage(id,direction){const i=managedPages.findIndex(p=>Number(p
 function closeMobilePanels(){qs("#mobileMenuPanel")?.classList.remove("open");qs("#mobileSearchPanel")?.classList.remove("open")}
 qs("#mobileMenuBtn")?.addEventListener("click",()=>{const p=qs("#mobileMenuPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening)p.classList.add("open")});
 qs("#mobileSearchBtn")?.addEventListener("click",()=>{const p=qs("#mobileSearchPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening){p.classList.add("open");qs("#mobileSearchInput")?.focus()}});
-qs("#mobileAdminBtn")?.addEventListener("click",()=>{closeMobilePanels();qs("#openAdmin")?.click()});
 function runMobileSearch(){searchQuery=(qs("#mobileSearchInput")?.value||"").trim();if(["categories","category"].includes(getRoute().type)){history.pushState({type:"home"},"","/");selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#catalogView")?.scrollIntoView({behavior:"smooth"}),100)}
 qs("#mobileSearchGo")?.addEventListener("click",runMobileSearch);
 qs("#mobileSearchInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")runMobileSearch()});
@@ -595,7 +635,7 @@ qs("#readerGoBottom")?.addEventListener("click",()=>{const r=qs("#reader");if(r)
 qs("#readerShareBottom")?.addEventListener("click",shareCurrentComic);
 qs("#readerCopyLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(comicUrl());alert("Enlace copiado.")}catch{alert(comicUrl())}});
 
-async function startEroToonX(){showAgeGate();const r=getRoute();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);await loadCategoryIndex();await handleRoute(r,true)}startEroToonX();
+async function startEroToonX(){const r=getRoute();if(r.type!=="admin")showAgeGate();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);if(r.type!=="admin")await loadCategoryIndex();await handleRoute(r,true)}startEroToonX();
 </script>
 </body>
 </html>

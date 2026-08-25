@@ -79,6 +79,12 @@ footer{padding:25px 0 38px;border-top:1px solid #292f43;color:#81899d;font-size:
 .ad-slot strong{display:block;color:#c6cada;font-size:11px;margin-bottom:4px}
 .ad-home-top{margin:0 auto 18px;max-width:970px}
 .ad-main-mid{margin:8px 0 24px;min-height:100px}
+.ad-between-sections{
+  margin:20px 0 26px;
+  min-height:100px;
+  max-width:970px;
+}
+
 .ad-sidebar{min-height:250px;margin-bottom:14px}
 .reader-ad{width:min(880px,calc(100% - 24px));margin:14px auto;min-height:100px}
 .reader-ad-mid{margin:4px 0 8px;width:100%}
@@ -332,6 +338,10 @@ body.admin-route #adminShell{margin-top:0}
       <div id="pagination" class="pagination"></div>
     </section>
 
+    <div id="betweenSectionsAd" class="ad-slot ad-between-sections" data-ad-slot="home-between-latest-random">
+      <div><strong>Publicidad</strong>Banner entre Últimos cómics y Cómics al azar</div>
+    </div>
+
     <section id="randomSection" class="section">
       <div class="section-heading"><h2>Cómics al azar</h2><button id="randomRefresh" class="tab">Cambiar selección</button></div>
       <div id="randomGrid" class="comic-grid"><div class="empty">Cargando...</div></div>
@@ -542,6 +552,7 @@ function showHomeView(){
   qs("#categoriesView")?.classList.add("view-hidden");
   qs("#catalogView")?.classList.remove("view-hidden");
   qs("#randomSection")?.classList.remove("view-hidden");
+  qs("#betweenSectionsAd")?.classList.remove("view-hidden");
   qs("#categoryBackBtn")?.classList.add("view-hidden");
   qs("#catalogTitle").textContent="Últimos cómics";
   updateNav("home");
@@ -549,6 +560,7 @@ function showHomeView(){
 function showCategoriesView(){
   qs("#catalogView")?.classList.add("view-hidden");
   qs("#randomSection")?.classList.add("view-hidden");
+  qs("#betweenSectionsAd")?.classList.add("view-hidden");
   qs("#categoriesView")?.classList.remove("view-hidden");
   updateNav("categories");
 }
@@ -559,6 +571,7 @@ async function openCategory(name,push=true){
   qs("#categoriesView")?.classList.add("view-hidden");
   qs("#catalogView")?.classList.remove("view-hidden");
   qs("#randomSection")?.classList.add("view-hidden");
+  qs("#betweenSectionsAd")?.classList.add("view-hidden");
   qs("#categoryBackBtn")?.classList.remove("view-hidden");
   qs("#catalogTitle").textContent=`Cómics de ${name}`;
   updateNav("category");

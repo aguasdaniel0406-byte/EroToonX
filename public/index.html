@@ -320,9 +320,14 @@ body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer
       <div id="pagination" class="pagination"></div>
     </section>
 
+    <section id="randomSection" class="section">
+      <div class="section-heading"><h2>Cómics al azar</h2><button id="randomRefresh" class="tab">Cambiar selección</button></div>
+      <div id="randomGrid" class="comic-grid"><div class="empty">Cargando...</div></div>
+    </section>
+
     <section id="categoriesView" class="section view-hidden">
-      <div class="section-heading"><h2>Categorías</h2><small>Explora por universo</small></div>
-      <div id="universeGrid" class="universe-grid"><div class="empty">Cargando categorías...</div></div>
+      <div class="section-heading"><h2>Categorías</h2><small>Explora por etiqueta</small></div>
+      <div id="categoryGrid" class="universe-grid"><div class="empty">Cargando categorías...</div></div>
     </section>
   </div>
 
@@ -374,7 +379,7 @@ body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer
 </div>
 <script>
 const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],AGE_KEY="erotoonx_age_verified_v1";
-let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedUniverse="",selectedUniverseSlug="",sortMode="latest",searchQuery="",searchTimer=null,universeIndex=[];
+let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedUniverse="",selectedUniverseSlug="",selectedTag="",selectedTagSlug="",sortMode="latest",searchQuery="",searchTimer=null,universeIndex=[],categoryIndex=[],randomPool=[];
 let adminToken=sessionStorage.getItem("nightink_admin_token")||"",currentAdminComics=[],currentManagedComic=null,currentManagedChapter=null,managedPages=[];
 let currentPublicComic=null,currentPublicSlug=null;
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
@@ -427,9 +432,9 @@ function setComicMetadata(c){
   );
 }
 function comicCardHTML(c,dataAttr="data-comic"){const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"",ph=c.cover_url?"":`<div class="cover-placeholder">${esc(c.title)}</div>`,meta=c.universe||c.author||"EroToonX";return `<article class="comic-card" ${dataAttr}="${esc(c.slug)}"><div class="cover" style="${cover}">${ph}<span class="card-badge">Abrir</span></div><div class="card-body"><h3 class="card-title">${esc(c.title)}</h3><div class="card-meta"><span>${esc(meta)}</span><span>${Number(c.views||0)} vistas</span></div></div></article>`}
-async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"20",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedUniverse)p.set("universe",selectedUniverse);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);renderCatalog();renderPagination()}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"20",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedTag)p.set("tag",selectedTag);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);renderCatalog();renderPagination()}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 function renderCatalog(){const g=qs("#comicGrid");if(!catalog.length){g.innerHTML='<div class="empty">No encontramos cómics.</div>';return}const parts=[];catalog.forEach((c,i)=>{parts.push(comicCardHTML(c));if(i===7)parts.push('<div class="ad-slot mobile-inline-ad" data-ad-slot="mobile-catalog"><div><strong>Publicidad</strong>Banner móvil</div></div>')});g.innerHTML=parts.join("");qsa("[data-comic]").forEach(card=>card.onclick=()=>openComicDirect(card.dataset.comic,true))}
-function renderPagination(){const box=qs("#pagination"),total=Number(pagination.total_pages||1),page=Number(pagination.page||1);if(total<=1){box.innerHTML="";return}let h=`<button class="page-btn" data-page="${page-1}" ${page===1?"disabled":""}>←</button>`,pages=[];for(let i=1;i<=total;i++)if(total<=7||i===1||i===total||Math.abs(i-page)<=2)pages.push(i);let last=0;for(const i of pages){if(last&&i-last>1)h+='<button class="page-btn" disabled>…</button>';h+=`<button class="page-btn ${i===page?"active":""}" data-page="${i}">${i}</button>`;last=i}h+=`<button class="page-btn" data-page="${page+1}" ${page===total?"disabled":""}>→</button>`;box.innerHTML=h;qsa("[data-page]").forEach(b=>b.onclick=()=>{const n=Number(b.dataset.page);if(n>=1&&n<=total){loadCatalog(n);qs("#ultimos").scrollIntoView({behavior:"smooth"})}})}
+function renderPagination(){const box=qs("#pagination"),total=Number(pagination.total_pages||1),page=Number(pagination.page||1);if(total<=1){box.innerHTML="";return}let h=`<button class="page-btn" data-page="${page-1}" ${page===1?"disabled":""}>←</button>`,pages=[];for(let i=1;i<=total;i++)if(total<=7||i===1||i===total||Math.abs(i-page)<=2)pages.push(i);let last=0;for(const i of pages){if(last&&i-last>1)h+='<button class="page-btn" disabled>…</button>';h+=`<button class="page-btn ${i===page?"active":""}" data-page="${i}">${i}</button>`;last=i}h+=`<button class="page-btn" data-page="${page+1}" ${page===total?"disabled":""}>→</button>`;box.innerHTML=h;qsa("[data-page]").forEach(b=>b.onclick=()=>{const n=Number(b.dataset.page);if(n>=1&&n<=total){loadCatalog(n);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}})}
 async function loadPopular(){try{const d=await api("/api/comics?page=1&limit=8&sort=popular"),items=d.comics||[];qs("#popularList").innerHTML=items.length?items.map((c,i)=>{const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"";return `<div class="popular-item" data-popular="${esc(c.slug)}"><div class="popular-rank">${i+1}</div><div class="popular-thumb" style="${cover}"></div><div class="popular-copy"><strong>${esc(c.title)}</strong><small>${Number(c.views||0)} vistas</small></div></div>`}).join(""):'<div class="empty">Sin datos.</div>';qsa("[data-popular]").forEach(i=>i.onclick=()=>openComicDirect(i.dataset.popular,true))}catch(e){qs("#popularList").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 async function loadUpdates(){try{const d=await api("/api/updates?limit=8"),u=d.updates||[];qs("#updatesList").innerHTML=u.length?u.map(x=>{const cover=x.cover_url?`background-image:url('${x.cover_url}')`:"";return `<div class="update-item" data-update-slug="${esc(x.slug)}"><div class="update-cover" style="${cover}"></div><div class="update-main"><div class="update-title">${esc(x.comic_title)}</div><div class="update-meta">${Number(x.page_count||0)} páginas · ${esc(x.genre||"Sin categoría")}</div></div><div class="update-open">Abrir</div></div>`}).join(""):'<div class="empty">Todavía no hay actualizaciones con páginas.</div>';qsa("[data-update-slug]").forEach(i=>i.onclick=()=>openComicDirect(i.dataset.updateSlug,true))}catch(e){qs("#updatesList").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 async function loadRandomPool(){try{const d=await api("/api/comics?page=1&limit=30&sort=latest");randomPool=d.comics||[];renderRandom()}catch(e){qs("#randomGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}function renderRandom(){const x=[...randomPool].sort(()=>Math.random()-.5).slice(0,5);qs("#randomGrid").innerHTML=x.length?x.map(c=>comicCardHTML(c,"data-random")).join(""):'<div class="empty">Todavía no hay suficientes cómics.</div>';qsa("[data-random]").forEach(c=>c.onclick=()=>openComicDirect(c.dataset.random,true))}qs("#randomRefresh")?.addEventListener("click",renderRandom);
@@ -486,23 +491,30 @@ function closeReaderOnly(){qs("#reader").classList.remove("open");closeModal("de
 function exitComic(){const s=history.state;if(s?.type==="comic"&&s?.fromSite){history.back();return}closeReaderOnly();history.replaceState({type:"home"},"","/");showHomeView();setHomeMetadata();window.scrollTo(0,0)}
 qs("#closeReader").onclick=exitComic;qs("#readerBackHome").onclick=exitComic;
 window.addEventListener("popstate",async()=>{closeReaderOnly();await handleRoute(getRoute(),false)});
-function runSearch(){searchQuery=qs("#searchInput").value.trim();const r=getRoute();if(r.type==="categories"){history.pushState({type:"home"},"","/");selectedUniverse="";selectedUniverseSlug="";showHomeView()}loadCatalog(1);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}qs("#searchBtn").onclick=runSearch;qs("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch()});qs("#searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=e.target.value.trim();if(getRoute().type!=="categories")loadCatalog(1)},350)});
-function applyGenreFilter(genre){selectedGenre=genre||"";qsa(".category-btn").forEach(i=>i.classList.toggle("active",i.dataset.genre===selectedGenre));qsa(".mobile-genre-btn").forEach(i=>i.classList.toggle("active",i.dataset.mobileGenre===selectedGenre));loadCatalog(1);qs("#ultimos")?.scrollIntoView({behavior:"smooth"})}
-function bindGenreControls(){qsa(".category-btn").forEach(b=>b.onclick=()=>applyGenreFilter(b.dataset.genre));qsa(".tag[data-tag]").forEach(t=>t.onclick=()=>applyGenreFilter(t.dataset.tag));qsa("[data-mobile-genre]").forEach(btn=>btn.onclick=()=>{applyGenreFilter(btn.dataset.mobileGenre);closeMobilePanels()})}
-async function loadGenres(){try{const d=await api("/api/genres"),genres=Array.isArray(d.genres)?d.genres:[];const cat=qs("#dynamicCategoryList"),tags=qs("#dynamicTags"),mobile=qs("#dynamicMobileGenres");const catHtml=`<button class="category-btn ${selectedGenre?"":"active"}" data-genre="">Todos los cómics</button>`+genres.map(g=>`<button class="category-btn ${selectedGenre===g.name?"active":""}" data-genre="${esc(g.name)}"><span>${esc(g.name)}</span><small>${Number(g.count||0)}</small></button>`).join("");const tagHtml=genres.length?genres.map(g=>`<span class="tag" data-tag="${esc(g.name)}">${esc(g.name)} · ${Number(g.count||0)}</span>`).join(""):'<span class="tag">Sin categorías todavía</span>';const mobileHtml=`<button class="mobile-genre-btn ${selectedGenre?"":"active"}" data-mobile-genre="">Todos</button>`+genres.map(g=>`<button class="mobile-genre-btn ${selectedGenre===g.name?"active":""}" data-mobile-genre="${esc(g.name)}">${esc(g.name)} (${Number(g.count||0)})</button>`).join("");if(cat)cat.innerHTML=catHtml;if(tags)tags.innerHTML=tagHtml;if(mobile)mobile.innerHTML=mobileHtml;bindGenreControls()}catch(e){const cat=qs("#dynamicCategoryList"),tags=qs("#dynamicTags"),mobile=qs("#dynamicMobileGenres");if(cat)cat.innerHTML='<button class="category-btn active" data-genre="">Todos los cómics</button>';if(tags)tags.innerHTML='<span class="tag">No se pudieron cargar las categorías</span>';if(mobile)mobile.innerHTML='<button class="mobile-genre-btn" data-mobile-genre="">Todos</button>';bindGenreControls()}}
+function runSearch(){searchQuery=qs("#searchInput").value.trim();const r=getRoute();if(r.type==="categories"||r.type==="category"){history.pushState({type:"home"},"","/");selectedUniverse="";selectedUniverseSlug="";selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}qs("#searchBtn").onclick=runSearch;qs("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch()});qs("#searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=e.target.value.trim();if(getRoute().type!=="categories")loadCatalog(1)},350)});
 
 async function loadUniverseIndex(){
   try{
     const d=await api("/api/universes");
     universeIndex=Array.isArray(d.universes)?d.universes:[];
-    const grid=qs("#universeGrid");
-    if(grid){
-      grid.innerHTML=universeIndex.length?universeIndex.map(u=>`<article class="universe-card" data-universe-name="${esc(u.name)}"><strong>${esc(u.name)}</strong><span>${Number(u.count||0)} cómic${Number(u.count||0)===1?"":"s"}</span></article>`).join(""):'<div class="empty">Todavía no hay categorías disponibles.</div>';
-      qsa("[data-universe-name]").forEach(card=>card.onclick=()=>openUniverse(card.dataset.universeName,true));
-    }
     return universeIndex;
   }catch(e){
-    const grid=qs("#universeGrid");if(grid)grid.innerHTML=`<div class="empty">${esc(e.message)}</div>`;
+    universeIndex=[];
+    return [];
+  }
+}
+async function loadCategoryIndex(){
+  try{
+    const d=await api("/api/tags");
+    categoryIndex=Array.isArray(d.tags)?d.tags:[];
+    const grid=qs("#categoryGrid");
+    if(grid){
+      grid.innerHTML=categoryIndex.length?categoryIndex.map(c=>`<article class="universe-card" data-category-name="${esc(c.name)}"><strong>${esc(c.name)}</strong><span>${Number(c.count||0)} cómic${Number(c.count||0)===1?"":"s"}</span></article>`).join(""):'<div class="empty">Todavía no hay categorías disponibles.</div>';
+      qsa("[data-category-name]").forEach(card=>card.onclick=()=>openCategory(card.dataset.categoryName,true));
+    }
+    return categoryIndex;
+  }catch(e){
+    const grid=qs("#categoryGrid");if(grid)grid.innerHTML=`<div class="empty">${esc(e.message)}</div>`;
     return [];
   }
 }
@@ -511,24 +523,27 @@ function updateNav(routeType){
   qs("[data-nav-categories]")?.classList.toggle("active",routeType==="categories"||routeType==="category");
 }
 function showHomeView(){
-  selectedUniverse="";selectedUniverseSlug="";
+  selectedUniverse="";selectedUniverseSlug="";selectedTag="";selectedTagSlug="";
   qs("#categoriesView")?.classList.add("view-hidden");
   qs("#catalogView")?.classList.remove("view-hidden");
+  qs("#randomSection")?.classList.remove("view-hidden");
   qs("#categoryBackBtn")?.classList.add("view-hidden");
   qs("#catalogTitle").textContent="Últimos cómics";
   updateNav("home");
 }
 function showCategoriesView(){
   qs("#catalogView")?.classList.add("view-hidden");
+  qs("#randomSection")?.classList.add("view-hidden");
   qs("#categoriesView")?.classList.remove("view-hidden");
   updateNav("categories");
 }
-async function openUniverse(name,push=true){
-  selectedUniverse=name||"";selectedUniverseSlug=routeSlug(name||"");searchQuery="";
+async function openCategory(name,push=true){
+  selectedTag=name||"";selectedTagSlug=routeSlug(name||"");selectedUniverse="";selectedUniverseSlug="";searchQuery="";
   qs("#searchInput").value="";if(qs("#mobileSearchInput"))qs("#mobileSearchInput").value="";
-  if(push)history.pushState({type:"category",slug:selectedUniverseSlug},"",categoryPath(name));
+  if(push)history.pushState({type:"category",slug:selectedTagSlug},"",categoryPath(name));
   qs("#categoriesView")?.classList.add("view-hidden");
   qs("#catalogView")?.classList.remove("view-hidden");
+  qs("#randomSection")?.classList.add("view-hidden");
   qs("#categoryBackBtn")?.classList.remove("view-hidden");
   qs("#catalogTitle").textContent=`Cómics de ${name}`;
   updateNav("category");
@@ -540,47 +555,47 @@ async function handleRoute(route,initial=false){
   closeReaderOnly();
   if(route.type==="categories"){
     showCategoriesView();
-    await loadUniverseIndex();
+    await loadCategoryIndex();
     setHomeMetadata();
     if(!initial)window.scrollTo(0,0);
     return;
   }
   if(route.type==="category"){
-    if(!universeIndex.length)await loadUniverseIndex();
-    const match=universeIndex.find(u=>routeSlug(u.name)===route.slug);
-    if(match){await openUniverse(match.name,false);return}
+    if(!categoryIndex.length)await loadCategoryIndex();
+    const match=categoryIndex.find(c=>routeSlug(c.name)===route.slug);
+    if(match){await openCategory(match.name,false);return}
     history.replaceState({type:"categories"},"","/categorias");
     showCategoriesView();
     return;
   }
   showHomeView();
-  await loadCatalog(1);
+  await Promise.all([loadCatalog(1),loadRandomPool()]);
   setHomeMetadata();
   if(!initial)window.scrollTo(0,0);
 }
-qs("#categoryBackBtn")?.addEventListener("click",()=>{history.pushState({type:"categories"},"","/categorias");showCategoriesView();loadUniverseIndex();window.scrollTo({top:0,behavior:"smooth"})});
+qs("#categoryBackBtn")?.addEventListener("click",()=>{history.pushState({type:"categories"},"","/categorias");showCategoriesView();loadCategoryIndex();window.scrollTo({top:0,behavior:"smooth"})});
 qsa("[data-nav-home],[data-mobile-home]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();closeMobilePanels();history.pushState({type:"home"},"","/");handleRoute({type:"home"},false)}));
 qsa("[data-nav-categories],[data-mobile-categories]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();closeMobilePanels();history.pushState({type:"categories"},"","/categorias");handleRoute({type:"categories"},false)}));
 
 qsa(".tab[data-sort]").forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;qsa(".tab[data-sort]").forEach(i=>i.classList.toggle("active",i===b));loadCatalog(1)});
 qs("#openAdmin").onclick=async()=>{if(adminToken){try{await showAdmin();return}catch{adminToken="";sessionStorage.removeItem("nightink_admin_token")}}qs("#loginMsg").textContent="";openModal("loginModal");qs("#adminPassword").focus()};qs("#loginBtn").onclick=loginAdmin;qs("#adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")loginAdmin()});async function loginAdmin(){const password=qs("#adminPassword").value;try{await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});adminToken=password;sessionStorage.setItem("nightink_admin_token",password);closeModal("loginModal");await showAdmin()}catch(e){qs("#loginMsg").className="msg error";qs("#loginMsg").textContent=e.message}}
-async function showAdmin(){qs("#adminShell").classList.add("visible");await Promise.all([loadStats(),loadAdminComics()]);qs("#adminShell").scrollIntoView({behavior:"smooth"})}qs("#logoutAdminBtn").onclick=()=>{adminToken="";sessionStorage.removeItem("nightink_admin_token");qs("#adminShell").classList.remove("visible")};qs("#refreshAdminBtn").onclick=async()=>{await Promise.all([loadStats(),loadAdminComics(),loadUniverseIndex()]);if(getRoute().type!=="categories")await loadCatalog(currentPage)};
+async function showAdmin(){qs("#adminShell").classList.add("visible");await Promise.all([loadStats(),loadAdminComics()]);qs("#adminShell").scrollIntoView({behavior:"smooth"})}qs("#logoutAdminBtn").onclick=()=>{adminToken="";sessionStorage.removeItem("nightink_admin_token");qs("#adminShell").classList.remove("visible")};qs("#refreshAdminBtn").onclick=async()=>{await Promise.all([loadStats(),loadAdminComics(),loadUniverseIndex(),loadCategoryIndex()]);if(getRoute().type!=="categories")await loadCatalog(currentPage);if(getRoute().type==="home")await loadRandomPool()};
 async function loadStats(){const d=await api("/api/admin/stats"),s=d.stats||{};qs("#stats").innerHTML=`<div class="stat"><strong>${Number(s.comics||0)}</strong><small>Cómics</small></div><div class="stat"><strong>${Number(s.pages||0)}</strong><small>Páginas</small></div><div class="stat"><strong>${Number(s.views||0)}</strong><small>Vistas</small></div>`}
 async function getOrCreateInternalChapter(comicId){const d=await api(`/api/admin/comics/${comicId}/chapters`),arr=d.chapters||[];if(arr.length)return arr[0];await api(`/api/admin/comics/${comicId}/chapters`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chapter_number:1,title:"",is_published:true})});const again=await api(`/api/admin/comics/${comicId}/chapters`),ch=(again.chapters||[])[0];if(!ch)throw new Error("No se pudo preparar el cómic para subir páginas.");return ch}
 async function loadAdminComics(){const d=await api("/api/admin/comics");currentAdminComics=d.comics||[];const box=qs("#adminList");if(!currentAdminComics.length){box.innerHTML='<div class="empty">No hay cómics.</div>';return}box.innerHTML=currentAdminComics.map(c=>{const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"";const location=[c.universe,c.series,c.series_number!==null&&c.series_number!==undefined&&String(c.series_number)!==""?`#${c.series_number}`:""].filter(Boolean).join(" · ")||"Sin universo";return `<div class="admin-row" id="adminComic-${c.id}"><div class="admin-cover" style="${cover}"></div><div><div class="admin-title">${esc(c.title)}</div><div class="admin-meta">${esc(location)} · ${c.is_published?"Publicado":"Borrador"}</div><div id="ready-${c.id}"><span class="ready-badge draft">Comprobando...</span></div></div><div class="row-actions"><button data-edit="${c.id}">Editar</button><button data-pages="${c.id}">Páginas</button><button data-delete="${c.id}">Eliminar</button></div></div>`}).join("");qsa("[data-edit]").forEach(b=>b.onclick=()=>editComic(Number(b.dataset.edit)));qsa("[data-pages]").forEach(b=>b.onclick=()=>openComicPages(Number(b.dataset.pages)));qsa("[data-delete]").forEach(b=>b.onclick=()=>deleteComic(Number(b.dataset.delete)));await Promise.all(currentAdminComics.map(async c=>{try{const r=await api(`/api/admin/comics/${c.id}/chapters`),readable=(r.chapters||[]).find(ch=>Number(ch.page_count||0)>0),el=qs(`#ready-${c.id}`);if(!el)return;if(!c.is_published)el.innerHTML='<span class="ready-badge draft">BORRADOR</span>';else if(!readable)el.innerHTML='<span class="ready-badge warn">FALTAN PÁGINAS</span>';else el.innerHTML=`<span class="ready-badge ok">LISTO · ${Number(readable.page_count||0)} páginas</span>`}catch{}}))}
 qs("#newComicBtn").onclick=()=>{qs("#comicForm").reset();qs("#comicId").value="";qs("#comicPublished").checked=true;qs("#comicFormTitle").textContent="Nuevo cómic";qs("#comicMsg").textContent="";openModal("comicModal")};function editComic(id){const c=currentAdminComics.find(x=>Number(x.id)===id);if(!c)return;qs("#comicId").value=c.id;qs("#comicTitle").value=c.title||"";qs("#comicSlug").value=c.slug||"";qs("#comicAuthor").value=c.author||"";qs("#comicUniverse").value=c.universe||"";qs("#comicSeries").value=c.series||"";qs("#comicSeriesNumber").value=c.series_number??"";qs("#comicTags").value=c.tags||c.genre||"";qs("#comicStatus").value=c.status||"En emisión";qs("#comicDescription").value=c.description||"";qs("#comicPublished").checked=Boolean(c.is_published);qs("#comicCover").value="";qs("#comicFormTitle").textContent="Editar cómic";qs("#comicMsg").textContent="";openModal("comicModal")}
-qs("#comicForm").addEventListener("submit",async e=>{e.preventDefault();const id=Number(qs("#comicId").value||0),tags=qs("#comicTags").value.trim(),payload={title:qs("#comicTitle").value,slug:qs("#comicSlug").value,author:qs("#comicAuthor").value,universe:qs("#comicUniverse").value.trim(),series:qs("#comicSeries").value.trim(),series_number:qs("#comicSeriesNumber").value.trim()===""?null:Number(qs("#comicSeriesNumber").value),tags,genre:tags,status:qs("#comicStatus").value,description:qs("#comicDescription").value,is_published:qs("#comicPublished").checked};try{let comicId=id;if(id)await api(`/api/admin/comics/${id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});else{const r=await api("/api/admin/comics",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});comicId=r.id;await getOrCreateInternalChapter(comicId)}const cover=qs("#comicCover").files[0];if(cover){const f=new FormData();f.append("cover",cover);await api(`/api/admin/comics/${comicId}/cover`,{method:"POST",body:f})}closeModal("comicModal");await Promise.all([loadAdminComics(),loadStats(),loadUniverseIndex(),loadCatalog(currentPage)]);if(!id)await openComicPages(comicId)}catch(err){qs("#comicMsg").className="msg error";qs("#comicMsg").textContent=err.message}});
-async function deleteComic(id){if(!confirm("¿Eliminar este cómic y todas sus páginas?"))return;try{await api(`/api/admin/comics/${id}`,{method:"DELETE"});await Promise.all([loadAdminComics(),loadStats(),loadUniverseIndex(),loadCatalog(1)])}catch(e){alert(e.message)}}
+qs("#comicForm").addEventListener("submit",async e=>{e.preventDefault();const id=Number(qs("#comicId").value||0),tags=qs("#comicTags").value.trim(),payload={title:qs("#comicTitle").value,slug:qs("#comicSlug").value,author:qs("#comicAuthor").value,universe:qs("#comicUniverse").value.trim(),series:qs("#comicSeries").value.trim(),series_number:qs("#comicSeriesNumber").value.trim()===""?null:Number(qs("#comicSeriesNumber").value),tags,genre:tags,status:qs("#comicStatus").value,description:qs("#comicDescription").value,is_published:qs("#comicPublished").checked};try{let comicId=id;if(id)await api(`/api/admin/comics/${id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});else{const r=await api("/api/admin/comics",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});comicId=r.id;await getOrCreateInternalChapter(comicId)}const cover=qs("#comicCover").files[0];if(cover){const f=new FormData();f.append("cover",cover);await api(`/api/admin/comics/${comicId}/cover`,{method:"POST",body:f})}closeModal("comicModal");await Promise.all([loadAdminComics(),loadStats(),loadUniverseIndex(),loadCategoryIndex(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool();if(!id)await openComicPages(comicId)}catch(err){qs("#comicMsg").className="msg error";qs("#comicMsg").textContent=err.message}});
+async function deleteComic(id){if(!confirm("¿Eliminar este cómic y todas sus páginas?"))return;try{await api(`/api/admin/comics/${id}`,{method:"DELETE"});await Promise.all([loadAdminComics(),loadStats(),loadUniverseIndex(),loadCategoryIndex(),loadCatalog(1)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){alert(e.message)}}
 async function openComicPages(comicId){const c=currentAdminComics.find(x=>Number(x.id)===comicId);currentManagedComic=comicId;try{const ch=await getOrCreateInternalChapter(comicId);currentManagedChapter=Number(ch.id);qs("#pagesTitle").textContent=`Páginas · ${c?.title||"Cómic"}`;qs("#comicPagesInput").value="";qs("#pagesMsg").textContent="";openModal("pagesModal");await loadManagedPages()}catch(e){alert(e.message)}}
-qs("#uploadComicPagesBtn").onclick=async()=>{const input=qs("#comicPagesInput");if(!currentManagedChapter){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="No se pudo preparar el cómic.";return}if(!input.files.length){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="Selecciona las imágenes del cómic.";return}const files=[...input.files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"})),f=new FormData();files.forEach(file=>f.append("pages",file));try{qs("#pagesMsg").className="msg";qs("#pagesMsg").textContent="Subiendo páginas...";await api(`/api/admin/chapters/${currentManagedChapter}/pages`,{method:"POST",body:f});input.value="";qs("#pagesMsg").className="msg success";qs("#pagesMsg").textContent="Páginas subidas correctamente.";await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)])}catch(e){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent=e.message}};
+qs("#uploadComicPagesBtn").onclick=async()=>{const input=qs("#comicPagesInput");if(!currentManagedChapter){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="No se pudo preparar el cómic.";return}if(!input.files.length){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="Selecciona las imágenes del cómic.";return}const files=[...input.files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"})),f=new FormData();files.forEach(file=>f.append("pages",file));try{qs("#pagesMsg").className="msg";qs("#pagesMsg").textContent="Subiendo páginas...";await api(`/api/admin/chapters/${currentManagedChapter}/pages`,{method:"POST",body:f});input.value="";qs("#pagesMsg").className="msg success";qs("#pagesMsg").textContent="Páginas subidas correctamente.";await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent=e.message}};
 async function loadManagedPages(){const d=await api(`/api/admin/chapters/${currentManagedChapter}/pages`);managedPages=d.pages||[];renderManagedPages()}function renderManagedPages(){qs("#pagesGrid").innerHTML=managedPages.length?managedPages.map((p,i)=>`<div class="page-card"><div class="page-thumb"><img src="${p.url}" alt="Página ${i+1}" loading="lazy"></div><div class="page-info"><strong style="font-size:10px">Página ${i+1}</strong><div class="page-actions"><button data-left="${p.id}" ${i===0?"disabled":""}>←</button><button data-right="${p.id}" ${i===managedPages.length-1?"disabled":""}>→</button><button class="delete-page" data-delpage="${p.id}">Eliminar</button></div></div></div>`).join(""):'<div class="empty">Todavía no hay páginas.</div>';qsa("[data-left]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.left),-1));qsa("[data-right]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.right),1));qsa("[data-delpage]").forEach(b=>b.onclick=()=>deletePage(Number(b.dataset.delpage)))}
-async function movePage(id,direction){const i=managedPages.findIndex(p=>Number(p.id)===id),j=i+direction;if(i<0||j<0||j>=managedPages.length)return;const copy=[...managedPages];[copy[i],copy[j]]=[copy[j],copy[i]];managedPages=copy;renderManagedPages();try{await api(`/api/admin/chapters/${currentManagedChapter}/pages/reorder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({page_ids:managedPages.map(p=>Number(p.id))})});await loadManagedPages()}catch(e){alert(e.message);await loadManagedPages()}}async function deletePage(id){if(!confirm("¿Eliminar esta página?"))return;try{await api(`/api/admin/pages/${id}`,{method:"DELETE"});await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)])}catch(e){alert(e.message)}}
+async function movePage(id,direction){const i=managedPages.findIndex(p=>Number(p.id)===id),j=i+direction;if(i<0||j<0||j>=managedPages.length)return;const copy=[...managedPages];[copy[i],copy[j]]=[copy[j],copy[i]];managedPages=copy;renderManagedPages();try{await api(`/api/admin/chapters/${currentManagedChapter}/pages/reorder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({page_ids:managedPages.map(p=>Number(p.id))})});await loadManagedPages()}catch(e){alert(e.message);await loadManagedPages()}}async function deletePage(id){if(!confirm("¿Eliminar esta página?"))return;try{await api(`/api/admin/pages/${id}`,{method:"DELETE"});await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){alert(e.message)}}
 
 function closeMobilePanels(){qs("#mobileMenuPanel")?.classList.remove("open");qs("#mobileSearchPanel")?.classList.remove("open")}
 qs("#mobileMenuBtn")?.addEventListener("click",()=>{const p=qs("#mobileMenuPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening)p.classList.add("open")});
 qs("#mobileSearchBtn")?.addEventListener("click",()=>{const p=qs("#mobileSearchPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening){p.classList.add("open");qs("#mobileSearchInput")?.focus()}});
 qs("#mobileAdminBtn")?.addEventListener("click",()=>{closeMobilePanels();qs("#openAdmin")?.click()});
-function runMobileSearch(){searchQuery=(qs("#mobileSearchInput")?.value||"").trim();if(getRoute().type==="categories"){history.pushState({type:"home"},"","/");selectedUniverse="";selectedUniverseSlug="";showHomeView()}loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#catalogView")?.scrollIntoView({behavior:"smooth"}),100)}
+function runMobileSearch(){searchQuery=(qs("#mobileSearchInput")?.value||"").trim();if(["categories","category"].includes(getRoute().type)){history.pushState({type:"home"},"","/");selectedUniverse="";selectedUniverseSlug="";selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#catalogView")?.scrollIntoView({behavior:"smooth"}),100)}
 qs("#mobileSearchGo")?.addEventListener("click",runMobileSearch);
 qs("#mobileSearchInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")runMobileSearch()});
 
@@ -589,7 +604,7 @@ qs("#readerGoBottom")?.addEventListener("click",()=>{const r=qs("#reader");if(r)
 qs("#readerShareBottom")?.addEventListener("click",shareCurrentComic);
 qs("#readerCopyLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(comicUrl());alert("Enlace copiado.")}catch{alert(comicUrl())}});
 
-async function startEroToonX(){showAgeGate();const r=getRoute();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);await loadUniverseIndex();await handleRoute(r,true)}startEroToonX();
+async function startEroToonX(){showAgeGate();const r=getRoute();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);await Promise.all([loadUniverseIndex(),loadCategoryIndex()]);await handleRoute(r,true)}startEroToonX();
 </script>
 </body>
 </html>

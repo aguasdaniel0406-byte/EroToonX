@@ -161,12 +161,6 @@ async function publicComics(env, url) {
   const genre =
     (url.searchParams.get("genre") || "").trim();
 
-  const universe =
-    (url.searchParams.get("universe") || "").trim();
-
-  const series =
-    (url.searchParams.get("series") || "").trim();
-
   const tag =
     (url.searchParams.get("tag") || "").trim();
 
@@ -183,8 +177,6 @@ async function publicComics(env, url) {
         LOWER(c.title) LIKE LOWER(?)
         OR LOWER(c.author) LIKE LOWER(?)
         OR LOWER(c.description) LIKE LOWER(?)
-        OR LOWER(COALESCE(c.universe, '')) LIKE LOWER(?)
-        OR LOWER(COALESCE(c.series, '')) LIKE LOWER(?)
         OR LOWER(COALESCE(c.tags, '')) LIKE LOWER(?)
       )
       `
@@ -193,8 +185,6 @@ async function publicComics(env, url) {
     const like = `%${q}%`;
 
     binds.push(
-      like,
-      like,
       like,
       like,
       like,
@@ -228,20 +218,6 @@ async function publicComics(env, url) {
         .replace(/\s+/g, " ")
         .trim()
     );
-  }
-
-  if (universe) {
-    where.push(
-      "LOWER(TRIM(COALESCE(c.universe, ''))) = LOWER(?)"
-    );
-    binds.push(universe);
-  }
-
-  if (series) {
-    where.push(
-      "LOWER(TRIM(COALESCE(c.series, ''))) = LOWER(?)"
-    );
-    binds.push(series);
   }
 
   if (tag) {
@@ -458,34 +434,6 @@ async function publicGenres(env) {
   });
 }
 
-async function publicUniverses(env) {
-  const rows = await env.DB.prepare(
-    `
-    SELECT universe
-    FROM comics
-    WHERE
-      is_published = 1
-      AND universe IS NOT NULL
-      AND TRIM(universe) != ''
-    `
-  ).all();
-
-  const counts = new Map();
-
-  for (const row of rows.results || []) {
-    addCount(
-      counts,
-      row.universe
-    );
-  }
-
-  return json({
-    ok: true,
-    universes:
-      sortedCounts(counts)
-  });
-}
-
 async function publicTags(env) {
   const rows = await env.DB.prepare(
     `
@@ -535,34 +483,6 @@ async function publicTags(env) {
   return json({
     ok: true,
     tags:
-      sortedCounts(counts)
-  });
-}
-
-async function publicSeries(env) {
-  const rows = await env.DB.prepare(
-    `
-    SELECT series
-    FROM comics
-    WHERE
-      is_published = 1
-      AND series IS NOT NULL
-      AND TRIM(series) != ''
-    `
-  ).all();
-
-  const counts = new Map();
-
-  for (const row of rows.results || []) {
-    addCount(
-      counts,
-      row.series
-    );
-  }
-
-  return json({
-    ok: true,
-    series:
       sortedCounts(counts)
   });
 }
@@ -647,9 +567,6 @@ async function getSeoHomeComics(env, limit = 15) {
       c.title,
       c.description,
       c.genre,
-      c.universe,
-      c.series,
-      c.series_number,
       c.tags,
       c.author,
       c.status,
@@ -828,7 +745,6 @@ function renderComicStructuredData(comic) {
       comic.description || undefined,
     genre:
       comic.tags ||
-      comic.universe ||
       comic.genre ||
       undefined,
     author:
@@ -1191,21 +1107,6 @@ ${structured}
   </p>
 
   <p>
-    ${
-      comic.universe
-        ? `<strong>Universo:</strong> ${escapeHtml(comic.universe)} · `
-        : ""
-    }
-    ${
-      comic.series
-        ? `<strong>Serie:</strong> ${escapeHtml(comic.series)}${
-            comic.series_number !== null &&
-            comic.series_number !== undefined
-              ? ` #${escapeHtml(comic.series_number)}`
-              : ""
-          } · `
-        : ""
-    }
     ${
       comic.tags
         ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.tags)} · `
@@ -1584,23 +1485,9 @@ export default {
 
       if (
         method === "GET" &&
-        path === "/api/universes"
-      ) {
-        return publicUniverses(env);
-      }
-
-      if (
-        method === "GET" &&
         path === "/api/tags"
       ) {
         return publicTags(env);
-      }
-
-      if (
-        method === "GET" &&
-        path === "/api/series"
-      ) {
-        return publicSeries(env);
       }
 
 
@@ -1637,9 +1524,6 @@ export default {
             c.slug,
             c.title AS comic_title,
             c.genre,
-            c.universe,
-            c.series,
-            c.series_number,
             c.tags,
             c.cover_key,
 
@@ -2085,27 +1969,6 @@ export default {
           );
         }
 
-        const seriesNumber =
-          body.series_number === null ||
-          body.series_number === undefined ||
-          String(body.series_number).trim() === ""
-            ? null
-            : Number(body.series_number);
-
-        if (
-          seriesNumber !== null &&
-          !Number.isFinite(seriesNumber)
-        ) {
-          return json(
-            {
-              ok: false,
-              error:
-                "Número de serie inválido"
-            },
-            400
-          );
-        }
-
         try {
           const result = await env.DB.prepare(
             `
@@ -2114,9 +1977,6 @@ export default {
               title,
               description,
               genre,
-              universe,
-              series,
-              series_number,
               tags,
               author,
               status,
@@ -2126,9 +1986,6 @@ export default {
             )
 
             VALUES (
-              ?,
-              ?,
-              ?,
               ?,
               ?,
               ?,
@@ -2151,13 +2008,6 @@ export default {
               String(
                 body.genre || ""
               ),
-              String(
-                body.universe || ""
-              ).trim(),
-              String(
-                body.series || ""
-              ).trim(),
-              seriesNumber,
               String(
                 body.tags || ""
               ),
@@ -2255,27 +2105,6 @@ export default {
             title
           );
 
-        const seriesNumber =
-          body.series_number === null ||
-          body.series_number === undefined ||
-          String(body.series_number).trim() === ""
-            ? null
-            : Number(body.series_number);
-
-        if (
-          seriesNumber !== null &&
-          !Number.isFinite(seriesNumber)
-        ) {
-          return json(
-            {
-              ok: false,
-              error:
-                "Número de serie inválido"
-            },
-            400
-          );
-        }
-
         try {
           await env.DB.prepare(
             `
@@ -2286,9 +2115,6 @@ export default {
               title = ?,
               description = ?,
               genre = ?,
-              universe = ?,
-              series = ?,
-              series_number = ?,
               tags = ?,
               author = ?,
               status = ?,
@@ -2308,13 +2134,6 @@ export default {
               String(
                 body.genre || ""
               ),
-              String(
-                body.universe || ""
-              ).trim(),
-              String(
-                body.series || ""
-              ).trim(),
-              seriesNumber,
               String(
                 body.tags || ""
               ),

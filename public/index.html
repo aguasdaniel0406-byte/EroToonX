@@ -1,641 +1,3174 @@
-<!doctype html>
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  });
+}
+
+function getAdminToken(request) {
+  return request.headers.get("X-Admin-Token") || "";
+}
+
+function isAdmin(request, env) {
+  return Boolean(env.ADMIN_TOKEN) &&
+    getAdminToken(request) === env.ADMIN_TOKEN;
+}
+
+function toBool(value) {
+  return value === true ||
+    value === 1 ||
+    value === "1" ||
+    value === "true";
+}
+
+function slugify(value = "") {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+}
+
+function safeName(value = "file") {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "file";
+}
+
+async function touchComic(env, comicId) {
+  await env.DB.prepare(
+    "UPDATE comics SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  )
+    .bind(comicId)
+    .run();
+}
+
+async function touchChapter(env, chapterId) {
+  await env.DB.prepare(
+    "UPDATE chapters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  )
+    .bind(chapterId)
+    .run();
+}
+
+async function renumberPages(env, chapterId) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT id
+    FROM pages
+    WHERE chapter_id = ?
+    ORDER BY page_number ASC, id ASC
+    `
+  )
+    .bind(chapterId)
+    .all();
+
+  const pages = rows.results || [];
+
+  if (!pages.length) {
+    return;
+  }
+
+  for (let i = 0; i < pages.length; i++) {
+    await env.DB.prepare(
+      "UPDATE pages SET page_number = ? WHERE id = ?"
+    )
+      .bind(-(i + 1), pages[i].id)
+      .run();
+  }
+
+  for (let i = 0; i < pages.length; i++) {
+    await env.DB.prepare(
+      "UPDATE pages SET page_number = ? WHERE id = ?"
+    )
+      .bind(i + 1, pages[i].id)
+      .run();
+  }
+}
+
+async function deleteComicMedia(env, comicId) {
+  const comic = await env.DB.prepare(
+    `
+    SELECT cover_key
+    FROM comics
+    WHERE id = ?
+    `
+  )
+    .bind(comicId)
+    .first();
+
+  const rows = await env.DB.prepare(
+    `
+    SELECT p.object_key
+    FROM pages p
+    JOIN chapters ch
+      ON ch.id = p.chapter_id
+    WHERE ch.comic_id = ?
+    `
+  )
+    .bind(comicId)
+    .all();
+
+  const keys = [];
+
+  if (comic?.cover_key) {
+    keys.push(comic.cover_key);
+  }
+
+  for (const row of rows.results || []) {
+    if (row.object_key) {
+      keys.push(row.object_key);
+    }
+  }
+
+  if (keys.length) {
+    await env.MEDIA.delete(keys);
+  }
+}
+
+async function publicComics(env, url) {
+  const page = Math.max(
+    1,
+    Number(
+      url.searchParams.get("page") || 1
+    )
+  );
+
+  const limit = Math.min(
+    50,
+    Math.max(
+      1,
+      Number(
+        url.searchParams.get("limit") || 10
+      )
+    )
+  );
+
+  const sort =
+    url.searchParams.get("sort") === "popular"
+      ? "popular"
+      : "latest";
+
+  const q =
+    (url.searchParams.get("q") || "").trim();
+
+  const genre =
+    (url.searchParams.get("genre") || "").trim();
+
+  const tag =
+    (url.searchParams.get("tag") || "").trim();
+
+  const where = [
+    "c.is_published = 1"
+  ];
+
+  const binds = [];
+
+  if (q) {
+    where.push(
+      `
+      (
+        LOWER(c.title) LIKE LOWER(?)
+        OR LOWER(c.author) LIKE LOWER(?)
+        OR LOWER(c.description) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.tags, '')) LIKE LOWER(?)
+      )
+      `
+    );
+
+    const like = `%${q}%`;
+
+    binds.push(
+      like,
+      like,
+      like,
+      like
+    );
+  }
+
+  if (genre) {
+    where.push(
+      `
+      INSTR(
+        ',' || LOWER(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                COALESCE(c.genre, ''),
+                ',  ', ','
+              ),
+              ', ', ','
+            ),
+            ' ,', ','
+          )
+        ) || ',',
+        ',' || LOWER(?) || ','
+      ) > 0
+      `
+    );
+
+    binds.push(
+      genre
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  }
+
+
+  if (tag) {
+    where.push(
+      `
+      INSTR(
+        ',' || LOWER(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                COALESCE(
+                  NULLIF(TRIM(c.tags), ''),
+                  c.genre,
+                  ''
+                ),
+                ',  ', ','
+              ),
+              ', ', ','
+            ),
+            ' ,', ','
+          )
+        ) || ',',
+        ',' || LOWER(?) || ','
+      ) > 0
+      `
+    );
+
+    binds.push(
+      tag
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  }
+
+  const whereSql =
+    where.join(" AND ");
+
+  const countRow = await env.DB.prepare(
+    `
+    SELECT COUNT(*) AS total
+    FROM comics c
+    WHERE ${whereSql}
+    `
+  )
+    .bind(...binds)
+    .first();
+
+  const total =
+    Number(
+      countRow?.total || 0
+    );
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(total / limit)
+    );
+
+  const safePage =
+    Math.min(
+      page,
+      totalPages
+    );
+
+  const offset =
+    (safePage - 1) * limit;
+
+  const orderSql =
+    sort === "popular"
+      ? "c.views DESC, c.updated_at DESC, c.id DESC"
+      : "c.updated_at DESC, c.id DESC";
+
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.tags,
+      c.author,
+      c.status,
+      c.cover_key,
+      c.views,
+      c.is_published,
+      c.created_at,
+      c.updated_at,
+
+      (
+        SELECT COUNT(*)
+        FROM chapters ch
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS part_count,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url
+
+    FROM comics c
+
+    WHERE ${whereSql}
+
+    ORDER BY ${orderSql}
+
+    LIMIT ?
+    OFFSET ?
+    `
+  )
+    .bind(
+      ...binds,
+      limit,
+      offset
+    )
+    .all();
+
+  return json({
+    ok: true,
+
+    comics:
+      rows.results || [],
+
+    pagination: {
+      page: safePage,
+      limit,
+      total,
+      total_pages: totalPages
+    }
+  });
+}
+
+function splitTagList(value = "") {
+  return String(value || "")
+    .split(",")
+    .map((tag) =>
+      tag
+        .replace(/\s+/g, " ")
+        .trim()
+    )
+    .filter(Boolean)
+    .filter((tag) =>
+      !/^(artist|autor|author)\s*:/i.test(tag)
+    );
+}
+
+function addCount(counts, value) {
+  const clean =
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  if (!clean) {
+    return;
+  }
+
+  const key =
+    clean.toLocaleLowerCase("es");
+
+  const current =
+    counts.get(key);
+
+  if (current) {
+    current.count += 1;
+  } else {
+    counts.set(key, {
+      name: clean,
+      count: 1
+    });
+  }
+}
+
+function sortedCounts(counts) {
+  return [...counts.values()]
+    .sort((a, b) =>
+      b.count - a.count ||
+      a.name.localeCompare(
+        b.name,
+        "es",
+        {
+          sensitivity: "base"
+        }
+      )
+    );
+}
+
+async function publicTags(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      tags,
+      genre
+    FROM comics
+    WHERE
+      is_published = 1
+      AND (
+        (
+          tags IS NOT NULL
+          AND TRIM(tags) != ''
+        )
+        OR
+        (
+          genre IS NOT NULL
+          AND TRIM(genre) != ''
+        )
+      )
+    `
+  ).all();
+
+  const counts = new Map();
+
+  for (const row of rows.results || []) {
+    const source =
+      String(row.tags || "").trim()
+        ? row.tags
+        : row.genre;
+
+    const seenInComic = new Set();
+
+    for (const item of splitTagList(source)) {
+      const key =
+        item.toLocaleLowerCase("es");
+
+      if (seenInComic.has(key)) {
+        continue;
+      }
+
+      seenInComic.add(key);
+      addCount(counts, item);
+    }
+  }
+
+  return json({
+    ok: true,
+    tags:
+      sortedCounts(counts)
+  });
+}
+
+async function adminComics(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.tags,
+      c.author,
+      c.status,
+      c.cover_key,
+      c.views,
+      c.is_published,
+      c.created_at,
+      c.updated_at,
+
+      (
+        SELECT COUNT(*)
+        FROM chapters ch
+        WHERE ch.comic_id = c.id
+      ) AS part_count,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url
+
+    FROM comics c
+
+    ORDER BY
+      c.updated_at DESC,
+      c.id DESC
+    `
+  ).all();
+
+  return json({
+    ok: true,
+    comics:
+      rows.results || []
+  });
+}
+
+
+const SITE_ORIGIN = "https://erotoonx.com";
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function escapeAttr(value = "") {
+  return escapeHtml(value);
+}
+
+function absoluteUrl(path = "/") {
+  if (!path) {
+    return SITE_ORIGIN + "/";
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  return SITE_ORIGIN + (path.startsWith("/") ? path : `/${path}`);
+}
+
+function isSearchCrawler(request) {
+  const ua =
+    request.headers.get("User-Agent") || "";
+
+  return /Googlebot|Google-InspectionTool|GoogleOther|bingbot|BingPreview|DuckDuckBot|YandexBot/i.test(
+    ua
+  );
+}
+
+async function getSeoHomeComics(env, limit = 15) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.tags,
+      c.author,
+      c.status,
+      c.views,
+      c.updated_at,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url,
+
+      (
+        SELECT COUNT(*)
+        FROM pages p
+        JOIN chapters ch
+          ON ch.id = p.chapter_id
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS page_count
+
+    FROM comics c
+
+    WHERE
+      c.is_published = 1
+
+    ORDER BY
+      c.updated_at DESC,
+      c.id DESC
+
+    LIMIT ?
+    `
+  )
+    .bind(limit)
+    .all();
+
+  return rows.results || [];
+}
+
+async function getSeoComic(env, slug) {
+  const comic = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.tags,
+      c.author,
+      c.status,
+      c.cover_key,
+      c.views,
+      c.is_published,
+      c.created_at,
+      c.updated_at,
+
+      CASE
+        WHEN c.cover_key IS NOT NULL
+        AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url,
+
+      (
+        SELECT COUNT(*)
+        FROM pages p
+        JOIN chapters ch
+          ON ch.id = p.chapter_id
+        WHERE ch.comic_id = c.id
+        AND ch.is_published = 1
+      ) AS page_count
+
+    FROM comics c
+
+    WHERE
+      c.slug = ?
+
+    AND
+      c.is_published = 1
+
+    LIMIT 1
+    `
+  )
+    .bind(slug)
+    .first();
+
+  return comic || null;
+}
+
+function renderSeoComicCards(comics) {
+  if (!comics.length) {
+    return `
+      <div class="empty">
+        Aún no hay cómics publicados.
+      </div>
+    `;
+  }
+
+  return comics.map(comic => {
+    const title =
+      escapeHtml(comic.title || "Cómic");
+
+    const slug =
+      encodeURIComponent(comic.slug || "");
+
+    const genre =
+      escapeHtml(
+        comic.tags || comic.genre || "Sin categoría"
+      );
+
+    const views =
+      Number(comic.views || 0);
+
+    const coverUrl =
+      comic.cover_url
+        ? absoluteUrl(comic.cover_url)
+        : "";
+
+    const coverStyle =
+      coverUrl
+        ? `background-image:url('${escapeAttr(coverUrl)}')`
+        : "";
+
+    const placeholder =
+      coverUrl
+        ? ""
+        : `<div class="cover-placeholder">${title}</div>`;
+
+    return `
+      <a
+        class="comic-card"
+        href="/comic/${slug}"
+        aria-label="Abrir ${escapeAttr(title)}"
+      >
+        <div
+          class="cover"
+          style="${coverStyle}"
+        >
+          ${placeholder}
+          <span class="card-badge">Abrir</span>
+        </div>
+
+        <div class="card-body">
+          <h3 class="card-title">
+            ${title}
+          </h3>
+
+          <div class="card-meta">
+            <span>${genre}</span>
+            <span>${views} vistas</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join("");
+}
+
+function renderHomeStructuredData(comics) {
+  const itemListElement =
+    comics.map((comic, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url:
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+      name:
+        comic.title
+    }));
+
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Últimos cómics de EroToonX",
+    itemListElement
+  }).replace(/</g, "\\u003c");
+}
+
+function renderComicStructuredData(comic) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name:
+      comic.title,
+    url:
+      `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+    description:
+      comic.description || undefined,
+    genre:
+      comic.tags ||
+      comic.genre ||
+      undefined,
+    author:
+      comic.author
+        ? {
+            "@type": "Person",
+            name: comic.author
+          }
+        : undefined,
+    image:
+      comic.cover_url
+        ? absoluteUrl(comic.cover_url)
+        : undefined,
+    dateModified:
+      comic.updated_at || undefined,
+    isFamilyFriendly:
+      false,
+    inLanguage:
+      "es"
+  };
+
+  for (const key of Object.keys(data)) {
+    if (data[key] === undefined) {
+      delete data[key];
+    }
+  }
+
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c");
+}
+
+function replaceHeadMetadata(
+  html,
+  {
+    title,
+    description,
+    canonical,
+    type = "website",
+    image = null
+  }
+) {
+  const safeTitle =
+    escapeHtml(title);
+
+  const safeDescription =
+    escapeAttr(description);
+
+  const safeCanonical =
+    escapeAttr(canonical);
+
+  html = html.replace(
+    /<title>[\s\S]*?<\/title>/i,
+    `<title>${safeTitle}</title>`
+  );
+
+  html = html.replace(
+    /<meta id="metaDescription" name="description" content="[^"]*">/i,
+    `<meta id="metaDescription" name="description" content="${safeDescription}">`
+  );
+
+  html = html.replace(
+    /<link id="canonicalUrl" rel="canonical" href="[^"]*">/i,
+    `<link id="canonicalUrl" rel="canonical" href="${safeCanonical}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:type" id="ogType" content="[^"]*">/i,
+    `<meta property="og:type" id="ogType" content="${escapeAttr(type)}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:title" id="ogTitle" content="[^"]*">/i,
+    `<meta property="og:title" id="ogTitle" content="${safeTitle}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:description" id="ogDescription" content="[^"]*">/i,
+    `<meta property="og:description" id="ogDescription" content="${safeDescription}">`
+  );
+
+  html = html.replace(
+    /<meta property="og:url" id="ogUrl" content="[^"]*">/i,
+    `<meta property="og:url" id="ogUrl" content="${safeCanonical}">`
+  );
+
+  html = html.replace(
+    /<meta name="twitter:title" id="twitterTitle" content="[^"]*">/i,
+    `<meta name="twitter:title" id="twitterTitle" content="${safeTitle}">`
+  );
+
+  html = html.replace(
+    /<meta name="twitter:description" id="twitterDescription" content="[^"]*">/i,
+    `<meta name="twitter:description" id="twitterDescription" content="${safeDescription}">`
+  );
+
+  if (image) {
+    const safeImage =
+      escapeAttr(image);
+
+    html = html.replace(
+      "</head>",
+      `
+<meta property="og:image" content="${safeImage}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${safeImage}">
+</head>`
+    );
+  }
+
+  return html;
+}
+
+function skipAgeGateForCrawler(
+  html,
+  request
+) {
+  if (!isSearchCrawler(request)) {
+    return html;
+  }
+
+  html = html.replace(
+    "async function startEroToonX(){showAgeGate();",
+    "async function startEroToonX(){"
+  );
+
+  html = html.replace(
+    "</head>",
+    `
+<style id="crawler-agegate-bypass">
+#ageGate{display:none!important}
+body.age-locked{overflow:auto!important}
+body.age-locked .site-header,
+body.age-locked .navbar,
+body.age-locked .mobile-site-header,
+body.age-locked .intro-strip,
+body.age-locked main,
+body.age-locked footer{
+  pointer-events:auto!important;
+  filter:none!important;
+  user-select:auto!important
+}
+</style>
+</head>`
+  );
+
+  return html;
+}
+
+async function fetchIndexAsset(
+  request,
+  env
+) {
+  const assetUrl =
+    new URL(
+      "/index.html",
+      request.url
+    );
+
+  const assetRequest =
+    new Request(
+      assetUrl.toString(),
+      {
+        method: "GET",
+        headers: request.headers
+      }
+    );
+
+  return env.ASSETS.fetch(
+    assetRequest
+  );
+}
+
+async function serveSeoHtml(
+  request,
+  env,
+  url
+) {
+  const assetResponse =
+    await fetchIndexAsset(
+      request,
+      env
+    );
+
+  if (!assetResponse.ok) {
+    return assetResponse;
+  }
+
+  let html =
+    await assetResponse.text();
+
+  const path =
+    url.pathname;
+
+  if (
+    path === "/" ||
+    path === "/index.html"
+  ) {
+    const comics =
+      await getSeoHomeComics(
+        env,
+        15
+      );
+
+    const cards =
+      renderSeoComicCards(
+        comics
+      );
+
+    html = html.replace(
+      /<div id="comicGrid" class="comic-grid">[\s\S]*?<\/div><div id="pagination"/i,
+      `<div id="comicGrid" class="comic-grid">${cards}</div><div id="pagination"`
+    );
+
+    const structured =
+      renderHomeStructuredData(
+        comics
+      );
+
+    html = html.replace(
+      "</head>",
+      `
+<script type="application/ld+json">
+${structured}
+</script>
+</head>`
+    );
+
+    html = replaceHeadMetadata(
+      html,
+      {
+        title:
+          "EroToonX | Cómics para adultos +18",
+
+        description:
+          "Explora EroToonX, un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
+
+        canonical:
+          `${SITE_ORIGIN}/`,
+
+        type:
+          "website"
+      }
+    );
+  }
+
+  else {
+    const match =
+      path.match(
+        /^\/comic\/([^/]+)\/?$/
+      );
+
+    if (match) {
+      const slug =
+        decodeURIComponent(
+          match[1]
+        );
+
+      const comic =
+        await getSeoComic(
+          env,
+          slug
+        );
+
+      if (!comic) {
+        return new Response(
+          `<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>EroToonX | Cómics para adultos +18</title>
-<meta id="metaDescription" name="description" content="EroToonX es un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-<meta name="theme-color" content="#0d0f18">
-<meta name="rating" content="adult">
-
-<link id="canonicalUrl" rel="canonical" href="https://erotoonx.com/">
-<link rel="alternate" hreflang="es" href="https://erotoonx.com/">
-<link rel="alternate" hreflang="x-default" href="https://erotoonx.com/">
-
-<meta property="og:type" id="ogType" content="website">
-<meta property="og:site_name" content="EroToonX">
-<meta property="og:title" id="ogTitle" content="EroToonX | Cómics para adultos +18">
-<meta property="og:description" id="ogDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
-<meta property="og:url" id="ogUrl" content="https://erotoonx.com/">
-
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" id="twitterTitle" content="EroToonX | Cómics para adultos +18">
-<meta name="twitter:description" id="twitterDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "EroToonX",
-  "url": "https://erotoonx.com/",
-  "description": "Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
-  "inLanguage": "es",
-  "isFamilyFriendly": false
-}
-</script>
-<style>
-:root{--bg:#0d0f18;--surface:#181c2a;--surface2:#202536;--surface3:#272d42;--border:#343b53;--text:#f5f6fb;--muted:#9da5b9;--pink:#e74ca9;--purple:#7657ed;--orange:#f2a53b;--good:#45c98e;--warning:#edb05c;--danger:#ef6a80}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:radial-gradient(circle at 50% -10%,rgba(118,87,237,.08),transparent 30%),var(--bg);font-family:Arial,Helvetica,sans-serif}body.age-locked,body.reader-locked{overflow:hidden}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:100%}.wrap{width:min(1420px,calc(100% - 26px));margin:auto}.hidden{display:none!important}
-.age-gate{display:none;width:min(1100px,calc(100% - 24px));margin:12px auto 18px}.age-gate.open{display:block}.age-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;width:100%;padding:16px 18px;text-align:left;border:1px solid #4b5272;border-radius:12px;background:linear-gradient(160deg,#1b1f30,#141722);box-shadow:0 12px 34px rgba(0,0,0,.28)}body.age-locked main,body.age-locked footer{pointer-events:none;user-select:none}body.age-locked .comic-cover,body.age-locked .popular-cover,body.age-locked .update-cover,body.age-locked .reader-related-cover{filter:blur(16px) brightness(.35)}body.age-locked .ad-slot{filter:brightness(.65)}.age-badge{width:74px;height:74px;display:grid;place-items:center;margin:0 auto 18px;border-radius:16px;background:linear-gradient(135deg,var(--pink),var(--purple));font-size:22px;font-weight:900}.age-card h1{margin:0 0 12px;font-size:29px}.age-card p{margin:0;color:var(--muted);line-height:1.65}.age-warning{margin:18px 0;padding:13px;border:1px solid #383f5b;border-radius:8px;background:#202436;color:#d9ddea;font-size:12px;line-height:1.6}.age-actions{display:grid;gap:9px}.age-enter,.age-exit{min-height:47px;border-radius:8px;font-weight:800}.age-enter{border:0;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.age-exit{border:1px solid #3d445e;background:#24293a;color:#e8eaf2}.age-note{margin-top:8px;color:#767e94;font-size:10px}.age-gate .age-badge{width:54px;height:54px;margin:0;border-radius:12px;font-size:18px}.age-gate .age-card h1{margin:0 0 4px;font-size:18px}.age-gate .age-card p{font-size:11px}.age-gate .age-warning{margin:6px 0 0;padding:0;border:0;background:transparent;font-size:10px;line-height:1.45}.age-gate .age-actions{display:flex;gap:7px;min-width:270px}.age-gate .age-enter,.age-gate .age-exit{min-height:42px;padding:0 13px}.age-gate .age-note{display:none}.seo-summary{margin:0 auto 12px;padding:14px 18px;border:1px solid #2d3449;border-radius:8px;background:#131722}.seo-summary h2{margin:0 0 6px;font-size:15px}.seo-summary p{margin:0;color:#aeb5c6;font-size:11px;line-height:1.65}.seo-summary a{color:#c9b7ff;text-decoration:none}.seo-summary a:hover{text-decoration:underline}
-.site-header{background:#0b0d15;border-bottom:1px solid #242a3c}.header-main{min-height:78px;display:grid;grid-template-columns:240px minmax(320px,640px) 1fr;align-items:center;gap:22px}.brand{display:flex;align-items:center;gap:11px;font-size:27px;font-weight:900;letter-spacing:-.04em}.brand-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,var(--orange),var(--pink) 48%,var(--purple));font-size:13px}.brand-name small{display:block;margin-top:-2px;color:#858da3;font-size:8px;letter-spacing:.18em}.search-area{display:flex;gap:7px}.search-input{flex:1;height:44px;padding:0 14px;border:1px solid #353c54;border-radius:7px;background:#1b1f2e;color:#fff;outline:none}.search-input:focus{border-color:#6659c7;box-shadow:0 0 0 3px rgba(118,87,237,.08)}.search-button{width:46px;height:44px;border-radius:7px;border:1px solid #3a415b;background:#252a3d;color:#fff;font-weight:900}.header-side{display:flex;justify-content:flex-end;align-items:center;gap:8px}.header-chip{padding:9px 11px;border:1px solid #353b53;border-radius:7px;background:#181c29;color:#bfc4d3;font-size:10px;font-weight:700}.admin-button{height:42px;padding:0 14px;border:0;border-radius:7px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:800}
-.navbar{position:sticky;top:0;z-index:50;background:#171a27;border-bottom:1px solid #30364c;box-shadow:0 4px 18px rgba(0,0,0,.12)}.navbar-inner{display:flex;align-items:center;overflow-x:auto;scrollbar-width:none}.navbar-inner::-webkit-scrollbar{display:none}.nav-link{flex:0 0 auto;position:relative;padding:15px 17px;font-size:13px;font-weight:800;color:#d9dce6}.nav-link:hover,.nav-link.active{background:#202536;color:#fff}.nav-link.active:after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple))}
-.intro-strip{margin:15px auto 18px;min-height:96px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:18px 22px;border:1px solid #323950;border-radius:8px;background:linear-gradient(110deg,rgba(231,76,169,.11),rgba(118,87,237,.08) 48%,transparent 80%),#171b29}.intro-strip h1{margin:0 0 5px;font-size:24px}.intro-strip p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.intro-stat{display:flex;gap:8px}.intro-stat span{min-width:82px;padding:10px 12px;border:1px solid #363d56;border-radius:7px;background:#202436;text-align:center;font-size:10px;color:#b9bfce}.intro-stat strong{display:block;margin-bottom:3px;color:#fff;font-size:16px}
-.btn{padding:9px 12px;border:0;border-radius:6px;font-weight:800}.btn.primary{color:#fff;background:linear-gradient(135deg,var(--pink),var(--purple))}.btn.secondary{color:#fff;background:#252a3c;border:1px solid #3a4159}.btn.danger{color:#ffb2c0;background:#482431;border:1px solid #74364a}.btn.small{padding:6px 8px;font-size:10px}
-.admin-shell{display:none;margin:18px 0;padding:16px;border:1px solid #383f59;border-radius:8px;background:#151925}.admin-shell.visible{display:block}.admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.admin-head h2{margin:0;font-size:20px}.admin-actions{display:flex;gap:7px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.stat{padding:12px;border:1px solid #343b54;border-radius:7px;background:#1e2333}.stat strong{display:block;font-size:21px}.stat small{color:var(--muted);font-size:10px}.admin-list{display:grid;gap:8px}.admin-row{display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid #333a52;border-radius:7px;background:#1c2131}.admin-cover{width:58px;height:76px;border:1px solid #39405a;border-radius:5px;background:#0f1119 center/cover no-repeat}.admin-title{font-weight:900}.admin-meta{margin-top:4px;color:var(--muted);font-size:10px}.ready-badge{display:inline-flex;margin-top:7px;padding:5px 7px;border-radius:5px;font-size:9px;font-weight:900}.ready-badge.ok{color:#75dfb5;border:1px solid rgba(69,201,142,.4);background:rgba(69,201,142,.1)}.ready-badge.warn{color:#ffc879;border:1px solid rgba(237,176,92,.4);background:rgba(237,176,92,.09)}.ready-badge.draft{color:#bac0ce;border:1px solid #444b65;background:#282d3d}.row-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.row-actions button{padding:7px 8px;border:1px solid #3c435d;border-radius:5px;background:#282d40;color:#fff;font-size:10px}
-.portal-layout{display:grid;grid-template-columns:180px minmax(0,1fr) 220px;gap:15px;padding-bottom:42px}.left-rail,.right-rail,.portal-main{min-width:0}.side-panel{margin-bottom:14px;overflow:hidden;border:1px solid #30374e;border-radius:7px;background:#171b28}.side-heading{padding:11px 12px;border-bottom:1px solid #343b54;background:linear-gradient(90deg,#24293b,#1e2232);font-size:13px;font-weight:900}.side-content{padding:10px}.category-list{display:grid;gap:4px}.category-btn{width:100%;padding:9px;border:1px solid transparent;border-radius:5px;background:transparent;color:#d9dce6;text-align:left;font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:8px}.category-btn small{font-size:9px;color:#858ca8;font-weight:800}.category-btn.active small,.category-btn:hover small{color:#d9dcef}.category-btn:hover{background:#22273a;border-color:#343b54}.category-btn.active{background:linear-gradient(90deg,rgba(231,76,169,.16),rgba(118,87,237,.12));border-color:#514b8e;color:#fff;font-weight:800}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{padding:6px 8px;border:1px solid #3a415a;border-radius:4px;background:#22273a;color:#dfe2eb;font-size:10px;cursor:pointer}.tag:hover{border-color:#6259a5;background:#2c2948}.quick-links{display:grid;gap:5px}.quick-link{padding:9px;border-radius:5px;background:#202536;border:1px solid #323950;color:#dfe2ec;font-size:11px}
-.section{margin-bottom:25px}.section-heading{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:0 0 9px;border-bottom:1px solid #353c56}.section-heading:before{content:"";position:absolute;left:0;bottom:-1px;width:100px;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple))}.section-heading h2{margin:0;font-size:22px}.section-heading small{color:var(--muted);font-size:10px}.section-tools{display:flex;gap:6px;flex-wrap:wrap}.tab{padding:7px 10px;border:1px solid #3a415a;border-radius:5px;background:#22273a;color:#dfe2ec;font-size:10px;font-weight:800}.tab.active{border-color:transparent;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.comic-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px}.comic-card{min-width:0;overflow:hidden;border:1px solid #343b52;border-radius:6px;background:#1b1f2d;cursor:pointer;transition:.18s}.comic-card:hover{transform:translateY(-4px);border-color:#6a61a5;box-shadow:0 15px 38px rgba(0,0,0,.28)}.cover{position:relative;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(145deg,#513f86,#26203e 55%,#11131c);background-size:cover;background-position:center}.cover:after{content:"";position:absolute;inset:72% 0 0;background:linear-gradient(transparent,rgba(5,6,10,.55));pointer-events:none}.cover-placeholder{position:absolute;inset:0;display:grid;place-items:center;padding:14px;text-align:center;color:#e2e4ed;font-size:15px;font-weight:900}.card-badge{position:absolute;right:6px;bottom:6px;z-index:2;padding:4px 7px;border:1px solid rgba(255,255,255,.14);border-radius:4px;background:rgba(10,12,19,.9);font-size:9px;font-weight:900}.card-body{padding:9px 10px 10px}.card-title{margin:0;min-height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:13px;font-weight:800;line-height:1.38}.card-meta{display:flex;justify-content:space-between;gap:6px;margin-top:7px;color:var(--muted);font-size:9.5px}.card-meta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.empty{grid-column:1/-1;padding:28px;border:1px dashed #3b425a;border-radius:6px;color:var(--muted);text-align:center}
-.pagination{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:18px}.page-btn{min-width:36px;height:36px;padding:0 10px;border:1px solid #3a415a;border-radius:6px;background:#22273a;color:#fff;font-size:11px;font-weight:800}.page-btn.active{border-color:transparent;background:linear-gradient(135deg,var(--pink),var(--purple))}.page-btn:disabled{opacity:.35;cursor:not-allowed}
-.popular-list{display:grid;gap:7px}.popular-item{display:grid;grid-template-columns:26px 42px minmax(0,1fr);align-items:center;gap:7px;padding:7px;border:1px solid #30374d;border-radius:6px;background:#1e2333;cursor:pointer}.popular-item:hover{border-color:#595f87;background:#24293b}.popular-rank{width:26px;height:30px;display:grid;place-items:center;border-radius:5px;background:#30364d;font-size:10px;font-weight:900}.popular-item:first-child .popular-rank{background:linear-gradient(135deg,var(--pink),var(--purple))}.popular-thumb{width:42px;height:56px;border-radius:4px;border:1px solid #3b425c;background:linear-gradient(145deg,#493875,#171924);background-size:cover;background-position:center}.popular-copy{min-width:0}.popular-copy strong{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10.5px}.popular-copy small{display:block;margin-top:4px;color:var(--muted);font-size:8.5px}
-.updates-list{display:grid;gap:7px}.update-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px;border:1px solid #343b51;border-radius:6px;background:#1c2030;cursor:pointer}.update-item:hover{border-color:#595f86}.update-cover{width:52px;height:68px;border:1px solid #393f59;border-radius:4px;background:#0f1119 center/cover no-repeat}.update-main{min-width:0}.update-title{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;font-weight:900}.update-meta{margin-top:4px;color:var(--muted);font-size:9px}.update-open{padding:6px 8px;border:1px solid #3a415b;border-radius:5px;background:#252a3e;font-size:9px;font-weight:900}
-.modal{display:none;position:fixed;inset:0;z-index:220;align-items:center;justify-content:center;padding:20px;overflow:auto;background:rgba(5,6,10,.87)}.modal.open{display:flex}.panel{width:min(680px,100%);max-height:92vh;overflow:auto;padding:20px;border:1px solid #3a415b;border-radius:9px;background:#171b28}.panel.wide{width:min(1040px,100%)}.panel h2{margin:0 0 14px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{color:#bfc4d2;font-size:10px}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid #3a4159;border-radius:6px;background:#10131d;color:#fff;outline:none}.field textarea{min-height:105px;resize:vertical}.check{display:flex;align-items:center;gap:8px}.check input{width:auto}.modal-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap;margin-top:13px}.msg{min-height:17px;margin-top:7px;font-size:10px}.error{color:#ff8195}.success{color:#72e0ae}
-.upload-box{padding:14px;margin-bottom:14px;border:1px dashed #4b526c;border-radius:7px;background:#1c2131}.upload-box p{margin:0 0 10px;color:var(--muted);font-size:10px;line-height:1.5}.pages-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.page-card{overflow:hidden;border:1px solid #343b52;border-radius:6px;background:#1d2232}.page-thumb{aspect-ratio:3/4;overflow:hidden;background:#0e1017}.page-thumb img{display:block;width:100%;height:100%;object-fit:cover}.page-info{padding:7px}.page-actions{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}.page-actions button{padding:5px;border:1px solid #3a415a;border-radius:4px;background:#272c3f;color:#fff;font-size:9px}.page-actions .delete-page{grid-column:1/-1;background:#43222e;color:#ffb2bf}
-.detail{display:grid;grid-template-columns:210px minmax(0,1fr);gap:18px}.detail-cover{aspect-ratio:3/4;border:1px solid #393f58;border-radius:6px;background:linear-gradient(145deg,#513f86,#26203e 55%,#11131c);background-size:cover;background-position:center}.detail-meta{color:var(--muted);line-height:1.6;font-size:11px}.detail-desc{color:#e2e5ed;line-height:1.7;font-size:12px}
-.reader{display:none;position:fixed;inset:0;z-index:180;overflow-y:auto;background:#000}.reader.open{display:block}.reader-bar{position:sticky;top:0;z-index:8;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #2b3145;background:rgba(10,12,18,.97);backdrop-filter:blur(10px)}.reader-left,.reader-right{display:flex;align-items:center;gap:6px}.reader-title{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:center;font-size:12px}.reader-pages{width:min(880px,100%);margin:auto;background:#000}.reader-pages img{display:block;width:100%;height:auto;margin:0 auto;border:0}.reader-empty{min-height:72vh;display:grid;place-items:center;padding:40px;color:var(--muted);text-align:center}.reader-end{width:min(880px,calc(100% - 24px));margin:18px auto 45px;padding:21px 18px;text-align:center;border:1px solid #2e3449;border-radius:8px;background:#121620}.reader-end h3{margin:0 0 6px;font-size:18px}.reader-end p{margin:0 0 13px;color:var(--muted);font-size:10px}.reader-end .btn{min-width:180px}
-footer{padding:25px 0 38px;border-top:1px solid #292f43;color:#81899d;font-size:10px}
-.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.footer-links{display:flex;align-items:center;gap:7px 12px;flex-wrap:wrap}
-.footer-links a{color:#aeb5c7;text-decoration:none}
-.footer-links a:hover{color:#fff;text-decoration:underline}
-@media(max-width:650px){
-  .footer-inner{display:block;text-align:center}
-  .footer-links{justify-content:center;margin-top:12px;line-height:1.8}
-}
-@media(max-width:1250px){.portal-layout{grid-template-columns:175px minmax(0,1fr) 210px}.comic-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:1000px){.header-main{grid-template-columns:auto minmax(250px,1fr) auto}.header-chip{display:none}.portal-layout{grid-template-columns:185px minmax(0,1fr)}.right-rail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.right-rail .side-panel{margin-bottom:0}.pages-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:760px){.header-main{grid-template-columns:1fr;gap:10px;padding:12px 0}.header-side{justify-content:flex-start}.intro-strip{grid-template-columns:1fr}.portal-layout{grid-template-columns:1fr}.portal-main{order:1}.left-rail{order:2;display:grid;grid-template-columns:1fr 1fr;gap:12px}.right-rail{order:3;grid-column:auto;grid-template-columns:1fr}.comic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.stats{grid-template-columns:repeat(3,1fr)}.pages-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){.wrap{width:min(100% - 18px,1420px)}.brand{font-size:23px}.nav-link{padding:13px 11px;font-size:11px}.intro-strip{padding:15px}.intro-strip h1{font-size:20px}.intro-stat{display:grid;grid-template-columns:repeat(3,1fr)}.intro-stat span{min-width:0}.comic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.section-heading{align-items:flex-start;flex-direction:column}.left-rail{grid-template-columns:1fr}.update-item{grid-template-columns:48px minmax(0,1fr)}.update-open{grid-column:1/-1}.admin-row{grid-template-columns:48px minmax(0,1fr)}.admin-row .row-actions{grid-column:1/-1;justify-content:flex-start}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.pages-grid{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}.detail-cover{max-width:210px}.reader-bar{grid-template-columns:1fr}.reader-title{order:-1}.reader-left,.reader-right{justify-content:center}.reader-pages{width:100%}.reader-end{width:calc(100% - 16px);margin:12px auto 28px;padding:18px 14px}}
-
-
-/* ===== NIGHTINK MOBILE + MONETIZATION LAYOUT ===== */
-.mobile-site-header,.mobile-menu-panel,.mobile-search-panel{display:none}
-.ad-slot{
-  width:100%;min-height:90px;display:flex;align-items:center;justify-content:center;
-  padding:12px;border:1px dashed #46506f;border-radius:9px;
-  background:linear-gradient(135deg,#171b28,#20243a);color:#818aa5;
-  text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase
-}
-.ad-slot strong{display:block;color:#c6cada;font-size:11px;margin-bottom:4px}
-.ad-home-top{margin:0 auto 18px;max-width:970px}
-.ad-main-mid{margin:8px 0 24px;min-height:100px}
-.ad-sidebar{min-height:250px;margin-bottom:14px}
-.reader-ad{width:min(880px,calc(100% - 24px));margin:14px auto;min-height:100px}
-.reader-ad-mid{margin:4px 0 8px;width:100%}
-.reader-extras{width:min(880px,calc(100% - 24px));margin:0 auto 54px}
-.reader-share-block{padding:18px 0 8px}
-.reader-share-title{color:#a9afc2;font-size:12px;font-weight:800;margin-bottom:10px}
-.reader-share-actions{display:flex;gap:8px;flex-wrap:wrap}
-.reader-share-actions button{min-width:105px}
-.reader-related{margin-top:22px}
-.reader-related-heading{position:relative;margin:0 0 14px;padding:0 0 10px;font-size:21px}
-.reader-related-heading:after{content:"";position:absolute;left:0;bottom:0;width:120px;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple))}
-.reader-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.reader-related-card{overflow:hidden;border:1px solid #343b52;border-radius:7px;background:#171b28;cursor:pointer}
-.reader-related-cover{aspect-ratio:3/4;background:linear-gradient(145deg,#4b3a7b,#171925);background-size:cover;background-position:center}
-.reader-related-title{padding:9px;font-size:11px;font-weight:800;line-height:1.35;min-height:48px}
-.reader-float-nav{position:fixed;right:16px;bottom:20px;z-index:210;display:flex;flex-direction:column;gap:9px}
-.reader-float-nav button{width:48px;height:48px;border:1px solid #465074;border-radius:14px;background:#22273a;color:#fff;font-size:18px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
-.reader-float-nav button:hover{background:#2c3249}
-
-@media(max-width:760px){
-  .site-header,.navbar{display:none!important}
-  .mobile-site-header{display:block;position:sticky;top:0;z-index:80;background:#181c2d;border-bottom:2px solid #383f64}
-  .mobile-header-row{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 14px}
-  .mobile-brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:22px}
-  .mobile-brand .brand-icon{width:42px;height:42px}
-  .mobile-actions{display:flex;gap:8px}
-  .mobile-icon-btn{width:48px;height:48px;border:1px solid #454d73;border-radius:13px;background:#22273a;color:#fff;font-size:20px;font-weight:800}
-  .mobile-menu-panel,.mobile-search-panel{position:sticky;top:74px;z-index:79;padding:12px 14px;background:#141827;border-bottom:1px solid #343b58}
-  .mobile-menu-panel.open,.mobile-search-panel.open{display:block}
-  .mobile-menu-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-  .mobile-menu-links a,.mobile-genre-btn{padding:11px;border:1px solid #353d59;border-radius:8px;background:#1e2335;color:#e6e8ef;text-align:left;font-size:12px;font-weight:700}
-  .mobile-genre-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .mobile-search-row{display:flex;gap:8px}
-  .mobile-search-row input{flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid #3d4566;border-radius:8px;background:#0f121c;color:#fff}
-  .mobile-search-row button{width:50px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:900}
-  .intro-strip{margin:12px 9px 10px!important;width:auto!important;padding:14px!important}
-  .intro-strip h1{font-size:20px!important}
-  .intro-stat{display:none!important}
-  .age-gate{width:calc(100% - 18px);margin:8px auto 14px}
-  .age-card{grid-template-columns:48px minmax(0,1fr);gap:12px;padding:13px}
-  .age-gate .age-badge{width:48px;height:48px}
-  .age-gate .age-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;min-width:0;width:100%}
-  .age-gate .age-enter,.age-gate .age-exit{min-height:43px}
-  .seo-summary{margin:0 9px 10px;padding:12px 14px}
-
-  main.wrap{width:100%;padding:0 12px}
-  .ad-home-top{width:calc(100% - 24px);margin:14px auto 18px;min-height:90px}
-  .portal-layout{display:block;padding-bottom:28px}
-  .left-rail,.right-rail{display:none!important}
-  .portal-main{width:100%}
-  .section{margin-bottom:24px}
-  .section-heading{margin-bottom:10px}
-  .section-heading h2{font-size:20px}
-  .comic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .comic-card{border-radius:8px}
-  .card-title{font-size:12px;min-height:34px}
-  .card-meta{font-size:8.5px}
-  .ad-main-mid{min-height:100px}
-
-  /* Reader inspired by a compact mobile comic portal */
-  .reader{background:#0b0e19}
-  .reader-bar{height:70px;grid-template-columns:auto 1fr auto;padding:0 10px;background:#181c2d;border-bottom:2px solid #3b4266}
-  .reader-left,.reader-right{gap:7px}
-  .reader-title{order:0;text-align:left;font-size:15px;padding-left:4px}
-  .reader-bar .btn{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:12px;font-size:0}
-  #closeReader:after{content:"←";font-size:21px}
-  #readerInfo:after{content:"ⓘ";font-size:20px}
-  #readerShare:after{content:"↗";font-size:21px}
-  .reader-pages{width:100%;padding:14px 14px 4px;display:block;background:#0b0e19}
-  .reader-pages img{width:100%;margin:0 0 12px;border-radius:9px;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.2)}
-  .reader-ad{width:calc(100% - 28px);margin:12px auto;min-height:90px}
-  .reader-ad-mid{width:100%;margin:0 0 12px;min-height:100px}
-  .reader-end{width:calc(100% - 28px);margin:10px auto 14px;padding:18px 14px;border-radius:10px}
-  .reader-end h3{font-size:19px}
-  .reader-end .btn{width:auto;height:auto;font-size:13px;padding:11px 16px}
-  .reader-extras{width:calc(100% - 28px);margin:0 auto 72px}
-  .reader-share-block{padding:12px 0 8px}
-  .reader-share-actions{display:grid;grid-template-columns:1fr 1fr}
-  .reader-share-actions button{min-width:0}
-  .reader-related-heading{font-size:22px}
-  .reader-related-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .reader-related-title{font-size:12px;min-height:50px}
-  .reader-float-nav{right:12px;bottom:18px}
-  .reader-float-nav button{width:52px;height:52px;border-radius:15px}
-}
-
-@media(max-width:390px){
-  .mobile-header-row{padding:0 10px}
-  .mobile-actions{gap:6px}.mobile-icon-btn{width:44px;height:44px}
-  .mobile-brand{font-size:19px}.mobile-brand .brand-icon{width:38px;height:38px}
-  main.wrap{padding:0 9px}.comic-grid{gap:8px}
-  .reader-pages{padding-left:10px;padding-right:10px}
-  .reader-ad,.reader-end,.reader-extras{width:calc(100% - 20px)}
-}
-
-
-
-/* ===== EROTOONX CLEAN HOME + RIGHT ADS + FLOATING AGE GATE ===== */
-body{min-height:100vh;overflow-y:auto}
-body.age-locked{overflow:hidden}
-
-/* First-visit floating 18+ confirmation */
-.age-gate{
-  display:none;position:fixed;inset:0;z-index:500;width:auto;margin:0;
-  align-items:center;justify-content:center;padding:20px;
-  background:rgba(3,4,8,.82);backdrop-filter:blur(12px)
-}
-.age-gate.open{display:flex}
-.age-gate .age-card{
-  display:block;width:min(470px,100%);padding:28px 26px;text-align:center;
-  border:1px solid #4a5272;border-radius:16px;
-  background:linear-gradient(160deg,#1c2030,#11141e);
-  box-shadow:0 28px 80px rgba(0,0,0,.55)
-}
-.age-gate .age-badge{width:72px;height:72px;margin:0 auto 18px;border-radius:18px;font-size:22px}
-.age-gate .age-card h1{margin:0 0 10px;font-size:25px}
-.age-gate .age-card p{font-size:12px;line-height:1.65}
-.age-gate .age-warning{margin:18px 0 16px;padding:12px;border:1px solid #363d57;border-radius:8px;background:#1e2332;font-size:11px}
-.age-gate .age-actions{display:grid;grid-template-columns:1fr 110px;gap:9px;min-width:0}
-.age-gate .age-enter,.age-gate .age-exit{min-height:46px;padding:0 13px}
-.age-gate .age-note{display:block;margin-top:10px;font-size:9px}
-body.age-locked .site-header,body.age-locked .navbar,body.age-locked .mobile-site-header,
-body.age-locked .top-ad-wrap,body.age-locked main,body.age-locked footer{pointer-events:none;user-select:none}
-
-/* Cleaner header */
-.header-main{grid-template-columns:240px minmax(320px,680px) 1fr}
-.header-side{gap:8px}
-
-/* Top banner: directly below navigation/search area */
-.top-ad-wrap{padding:14px 0 12px}
-.ad-home-top{max-width:970px;margin:0 auto;min-height:90px}
-
-/* Main content: comics on the left, ads only on the right */
-.portal-layout-clean{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start;padding:4px 0 48px}
-.portal-main{min-width:0}
-.ad-right-rail{min-width:0}
-.ad-right-stack{display:grid;gap:18px}
-.ad-right-square{min-height:250px}
-.ad-right-sticky{min-height:600px;position:sticky;top:64px}
-
-/* Home begins immediately with comics */
-.section{margin:0 0 26px}
-.section-heading{margin-top:0}
-.comic-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-
-/* Categories live on their own route */
-.view-hidden{display:none!important}
-.category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.category-card{min-height:128px;display:flex;flex-direction:column;justify-content:flex-end;gap:7px;padding:16px;border:1px solid #343b52;border-radius:10px;background:linear-gradient(145deg,#252a3d,#171b28);cursor:pointer;transition:.18s}
-.category-card:hover{transform:translateY(-3px);border-color:#6b61a6;background:linear-gradient(145deg,#2d3150,#1b1e31)}
-.category-card strong{font-size:18px;line-height:1.2}
-.category-card span{color:var(--muted);font-size:10px}
-.route-back{display:inline-flex;margin:0 0 12px;padding:8px 10px;border:1px solid #3a415a;border-radius:6px;background:#202536;color:#e5e7ee;font-size:10px;font-weight:800;cursor:pointer}
-
-/* One discreet mobile ad inside the catalog */
-.mobile-inline-ad{display:none;grid-column:1/-1;min-height:90px}
-
-@media(max-width:1250px){
-  .portal-layout-clean{grid-template-columns:minmax(0,1fr) 280px}
-  .comic-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:1000px){
-  .portal-layout-clean{grid-template-columns:minmax(0,1fr) 250px;gap:14px}
-  .comic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ad-right-sticky{min-height:520px}
-}
-@media(max-width:760px){
-  .portal-layout-clean{display:block;padding:8px 0 30px}
-  .ad-right-rail{display:none!important}
-  .top-ad-wrap{padding:10px 12px 8px}
-  .ad-home-top{width:100%;margin:0;min-height:78px}
-  .comic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-  .category-card{min-height:105px;padding:13px}
-  .category-card strong{font-size:15px}
-  .mobile-inline-ad{display:flex}
-  main.wrap{padding-top:0}
-  .section-heading{padding-top:2px}
-  .age-gate{padding:14px}
-  .age-gate .age-card{padding:24px 18px}
-  .age-gate .age-actions{grid-template-columns:1fr}
-}
-@media(max-width:390px){
-  .category-grid{grid-template-columns:1fr 1fr}
-}
-
-
-/* ===== ADMIN PRIVADO /admin1043130208 ===== */
-body.admin-route .navbar,
-body.admin-route .mobile-site-header,
-body.admin-route .top-ad-wrap,
-body.admin-route .portal-layout-clean,
-body.admin-route footer{display:none!important}
-body.admin-route .site-header .search-area,
-body.admin-route .site-header .header-side{display:none!important}
-body.admin-route .header-main{grid-template-columns:1fr;min-height:78px}
-body.admin-route main.wrap{padding-top:24px}
-body.admin-route #adminShell{margin-top:0}
-
-</style>
+<meta name="robots" content="noindex,follow">
+<title>Cómic no encontrado | EroToonX</title>
 </head>
 <body>
-
-<header class="site-header"><div class="wrap header-main"><a href="/" class="brand"><div class="brand-icon">EX</div><div class="brand-name">EroToonX<small>COMICS +18</small></div></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor o cómic..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"></div></div></header>
-<nav class="navbar"><div class="wrap navbar-inner"><a class="nav-link active" data-nav-home href="/">Inicio</a><a class="nav-link" data-nav-categories href="/categorias">Categorías</a></div></nav>
-<div class="mobile-site-header">
-  <div class="mobile-header-row">
-    <a href="/" class="mobile-brand"><div class="brand-icon">EX</div><span>EroToonX</span></a>
-    <div class="mobile-actions">
-      <button id="mobileMenuBtn" class="mobile-icon-btn" aria-label="Menú">☰</button>
-      <button id="mobileSearchBtn" class="mobile-icon-btn" aria-label="Buscar">⌕</button>
-    </div>
-  </div>
-  <div id="mobileMenuPanel" class="mobile-menu-panel">
-    <div class="mobile-menu-links">
-      <a href="/" data-mobile-home>Inicio</a><a href="/categorias" data-mobile-categories>Categorías</a>
-    </div>
-  </div>
-  <div id="mobileSearchPanel" class="mobile-search-panel">
-    <div class="mobile-search-row">
-      <input id="mobileSearchInput" placeholder="Buscar cómic...">
-      <button id="mobileSearchGo">⌕</button>
-    </div>
-  </div>
-</div>
-
-<div id="ageGate" class="age-gate" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
-  <div class="age-card">
-    <div class="age-badge">18+</div>
-    <h1 id="ageTitle">Contenido para adultos</h1>
-    <p>EroToonX está destinado únicamente a personas mayores de edad.</p>
-    <div class="age-warning">Al continuar confirmas que tienes al menos 18 años o la edad legal aplicable en tu jurisdicción para acceder a contenido para adultos.</div>
-    <div class="age-actions"><button id="ageEnter" class="age-enter">Tengo 18 años o más — Entrar</button><button id="ageExit" class="age-exit">Salir</button></div>
-    <div class="age-note">Esta confirmación se guarda únicamente en este navegador.</div>
-  </div>
-</div>
-
-<div class="top-ad-wrap"><div class="wrap"><div class="ad-slot ad-home-top" data-ad-slot="home-top"><div><strong>Publicidad</strong>Banner superior adaptable</div></div></div></div>
-
-<main class="wrap">
-<section id="adminShell" class="admin-shell"><div class="admin-head"><h2>Panel de administración</h2><div class="admin-actions"><button id="newComicBtn" class="btn primary">+ Nuevo cómic</button><button id="refreshAdminBtn" class="btn secondary">Actualizar</button><button id="logoutAdminBtn" class="btn secondary">Cerrar</button></div></div><div id="stats" class="stats"></div><div id="adminList" class="admin-list"></div></section>
-
-<div class="portal-layout-clean">
-  <div class="portal-main">
-    <section id="catalogView" class="section">
-      <button id="categoryBackBtn" class="route-back view-hidden">← Todas las categorías</button>
-      <div class="section-heading"><h2 id="catalogTitle">Últimos cómics</h2><div class="section-tools"><button class="tab active" data-sort="latest">Nuevos</button><button class="tab" data-sort="popular">Más vistos</button></div></div>
-      <div id="comicGrid" class="comic-grid"><div class="empty">Cargando catálogo...</div></div>
-      <div id="pagination" class="pagination"></div>
-    </section>
-
-    <section id="randomSection" class="section">
-      <div class="section-heading"><h2>Cómics al azar</h2><button id="randomRefresh" class="tab">Cambiar selección</button></div>
-      <div id="randomGrid" class="comic-grid"><div class="empty">Cargando...</div></div>
-    </section>
-
-    <section id="categoriesView" class="section view-hidden">
-      <div class="section-heading"><h2>Categorías</h2><small>Explora por etiqueta</small></div>
-      <div id="categoryGrid" class="category-grid"><div class="empty">Cargando categorías...</div></div>
-    </section>
-  </div>
-
-  <aside class="ad-right-rail" aria-label="Publicidad">
-    <div class="ad-right-stack">
-      <div class="ad-slot ad-right-square" data-ad-slot="desktop-right-top"><div><strong>Publicidad</strong>300 × 250</div></div>
-      <div class="ad-slot ad-right-sticky" data-ad-slot="desktop-right-sticky"><div><strong>Publicidad</strong>300 × 600</div></div>
-    </div>
-  </aside>
-</div>
-</main>
-<footer>
-  <div class="wrap footer-inner">
-    <div>EroToonX Comics · Contenido exclusivo para adultos +18</div>
-    <nav class="footer-links" aria-label="Enlaces legales">
-      <a href="/privacy.html">Privacidad</a>
-      <a href="/terms.html">Términos</a>
-      <a href="/legal.html">Aviso legal</a>
-      <a href="/dmca.html">DMCA / Reportar</a>
-      <a href="/contact.html">Contacto</a>
-    </nav>
-  </div>
-</footer>
-<div id="loginModal" class="modal"><div class="panel" style="width:min(410px,100%)"><h2>Administrador</h2><div class="field"><label>Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password"></div><div id="loginMsg" class="msg"></div><div class="modal-actions"><button id="adminCancelBtn" class="btn secondary" data-close="loginModal">Volver al sitio</button><button id="loginBtn" class="btn primary">Entrar</button></div></div></div>
-<div id="comicModal" class="modal"><div class="panel"><h2 id="comicFormTitle">Nuevo cómic</h2><form id="comicForm"><input id="comicId" type="hidden"><div class="form-grid"><div class="field"><label>Título</label><input id="comicTitle" required></div><div class="field"><label>Slug</label><input id="comicSlug" placeholder="Opcional"></div><div class="field"><label>Autor</label><input id="comicAuthor" placeholder="Ej. Milftoon"></div><div class="field full"><label>Etiquetas</label><input id="comicTags" placeholder="Separadas por comas: Milfs, Big ass, Big breasts..."></div><div class="field"><label>Estado</label><select id="comicStatus"><option>En emisión</option><option>Completo</option><option>Pausado</option></select></div><div class="field"><label>Portada</label><input id="comicCover" type="file" accept="image/*"></div><div class="field full"><label>Descripción</label><textarea id="comicDescription"></textarea></div><div class="field full"><label class="check"><input id="comicPublished" type="checkbox"> Publicado</label></div></div><div id="comicMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="comicModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div></div>
-<div id="pagesModal" class="modal"><div class="panel wide"><div class="modal-head"><h2 id="pagesTitle">Páginas del cómic</h2><button class="btn secondary" data-close="pagesModal">Cerrar</button></div><div class="upload-box"><p>Selecciona todas las imágenes del cómic. EroToonX las ordenará por nombre: 001, 002, 003...</p><input id="comicPagesInput" type="file" multiple accept="image/*"><br><button id="uploadComicPagesBtn" class="btn primary" style="margin-top:10px">Subir páginas</button><div id="pagesMsg" class="msg"></div></div><div id="pagesGrid" class="pages-grid"></div></div></div>
-<div id="detailModal" class="modal"><div class="panel" style="width:min(900px,100%)"><div class="modal-head"><h2 id="detailTitle"></h2><button class="btn secondary" data-close="detailModal">Cerrar</button></div><div class="detail"><div id="detailCover" class="detail-cover"></div><div><div id="detailMeta" class="detail-meta"></div><p id="detailDescription" class="detail-desc"></p><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button id="shareComicBtn" class="btn primary">Compartir</button><button id="copyComicBtn" class="btn secondary">Copiar enlace</button></div><div id="shareMessage" class="msg success"></div></div></div></div></div>
-<div id="reader" class="reader">
-  <div class="reader-bar">
-    <div class="reader-left"><button id="closeReader" class="btn secondary small">← Volver</button></div>
-    <strong id="readerTitle" class="reader-title">EroToonX</strong>
-    <div class="reader-right"><button id="readerInfo" class="btn secondary small">Información</button><button id="readerShare" class="btn secondary small">Compartir</button></div>
-  </div>
-  <div class="ad-slot reader-ad" data-ad-slot="reader-top"><div><strong>Publicidad</strong>Banner antes del cómic</div></div>
-  <div id="readerPages" class="reader-pages"></div>
-  <div class="ad-slot reader-ad" data-ad-slot="reader-bottom"><div><strong>Publicidad</strong>Banner al terminar la lectura</div></div>
-  <div id="readerEnd" class="reader-end"><h3 id="readerEndTitle">Fin</h3><p>Has llegado al final del cómic.</p><button id="readerBackHome" class="btn primary">← Volver al catálogo</button></div>
-  <div class="reader-extras">
-    <div class="reader-share-block">
-      <div class="reader-share-title">Compartir este cómic</div>
-      <div class="reader-share-actions"><button id="readerCopyLink" class="btn secondary">Copiar enlace</button><button id="readerShareBottom" class="btn primary">Compartir</button></div>
-    </div>
-    <section class="reader-related">
-      <h2 class="reader-related-heading">Cómics relacionados</h2>
-      <div id="readerRelatedGrid" class="reader-related-grid"><div class="empty">Cargando recomendaciones...</div></div>
-    </section>
-  </div>
-  <div class="reader-float-nav"><button id="readerGoTop" aria-label="Ir arriba">↑</button><button id="readerGoBottom" aria-label="Ir abajo">↓</button></div>
-</div>
-<script>
-const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],AGE_KEY="erotoonx_age_verified_v1";
-let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedTag="",selectedTagSlug="",sortMode="latest",searchQuery="",searchTimer=null,categoryIndex=[],randomPool=[];
-let adminToken=sessionStorage.getItem("nightink_admin_token")||"",currentAdminComics=[],currentManagedComic=null,currentManagedChapter=null,managedPages=[];
-let currentPublicComic=null,currentPublicSlug=null;
-function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function openModal(id){qs("#"+id)?.classList.add("open")}function closeModal(id){qs("#"+id)?.classList.remove("open")}qsa("[data-close]").forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.close)));
-function showAgeGate(){
-  if(localStorage.getItem(AGE_KEY)!=="yes"){
-    qs("#ageGate").classList.add("open");
-    document.body.classList.add("age-locked");
-  }
-}
-qs("#ageEnter").onclick=()=>{
-  localStorage.setItem(AGE_KEY,"yes");
-  qs("#ageGate").classList.remove("open");
-  document.body.classList.remove("age-locked");
-};
-qs("#ageExit").onclick=()=>location.replace("https://www.google.com/");
-async function api(url,options={}){const headers=new Headers(options.headers||{});if(adminToken)headers.set("X-Admin-Token",adminToken);const response=await fetch(url,{...options,headers});let data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.error||"Error del servidor");return data}
-function routeSlug(value=""){return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}
-function getRoute(){const p=location.pathname;if(/^\/admin1043130208\/?$/.test(p))return{type:"admin"};const comic=p.match(/^\/comic\/([^/]+)\/?$/);if(comic)return{type:"comic",slug:decodeURIComponent(comic[1])};if(/^\/categorias\/?$/.test(p))return{type:"categories"};const category=p.match(/^\/categoria\/([^/]+)\/?$/);if(category)return{type:"category",slug:decodeURIComponent(category[1])};return{type:"home"}}
-function comicPath(slug){return "/comic/"+encodeURIComponent(slug)}
-function categoryPath(name){return "/categoria/"+encodeURIComponent(routeSlug(name))}
-function applySeoMetadata(title,description,url,type="website"){
-  document.title=title;
-  qs("#metaDescription").content=description;
-  qs("#canonicalUrl").href=url;
-  qs("#ogType").content=type;
-  qs("#ogTitle").content=title;
-  qs("#ogDescription").content=description;
-  qs("#ogUrl").content=url;
-  qs("#twitterTitle").content=title;
-  qs("#twitterDescription").content=description;
-}
-function setHomeMetadata(){
-  const robots=document.querySelector('meta[name="robots"]');
-  if(robots)robots.content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
-  applySeoMetadata(
-    "EroToonX | Cómics para adultos +18",
-    "EroToonX es un catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.",
-    "https://erotoonx.com/",
-    "website"
-  );
-}
-function setAdminMetadata(){
-  const robots=document.querySelector('meta[name="robots"]');
-  if(robots)robots.content="noindex,nofollow,noarchive";
-  applySeoMetadata(
-    "Administración | EroToonX",
-    "Acceso privado de administración.",
-    "https://erotoonx.com/admin1043130208",
-    "website"
-  );
-}
-function setComicMetadata(c){
-  const description=c.description
-    ? c.description.replace(/\s+/g," ").trim().slice(0,155)
-    : `Lee ${c.title} en EroToonX, con lectura directa y adaptada a móvil.`;
-  applySeoMetadata(
-    `${c.title} | EroToonX`,
-    description,
-    `https://erotoonx.com${comicPath(c.slug)}`,
-    "article"
-  );
-}
-function comicCardHTML(c,dataAttr="data-comic"){const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"",ph=c.cover_url?"":`<div class="cover-placeholder">${esc(c.title)}</div>`,meta=c.author||"EroToonX";return `<article class="comic-card" ${dataAttr}="${esc(c.slug)}"><div class="cover" style="${cover}">${ph}<span class="card-badge">Abrir</span></div><div class="card-body"><h3 class="card-title">${esc(c.title)}</h3><div class="card-meta"><span>${esc(meta)}</span><span>${Number(c.views||0)} vistas</span></div></div></article>`}
-async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"20",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedTag)p.set("tag",selectedTag);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);renderCatalog();renderPagination()}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-function renderCatalog(){const g=qs("#comicGrid");if(!catalog.length){g.innerHTML='<div class="empty">No encontramos cómics.</div>';return}const parts=[];catalog.forEach((c,i)=>{parts.push(comicCardHTML(c));if(i===7)parts.push('<div class="ad-slot mobile-inline-ad" data-ad-slot="mobile-catalog"><div><strong>Publicidad</strong>Banner móvil</div></div>')});g.innerHTML=parts.join("");qsa("[data-comic]").forEach(card=>card.onclick=()=>openComicDirect(card.dataset.comic,true))}
-function renderPagination(){const box=qs("#pagination"),total=Number(pagination.total_pages||1),page=Number(pagination.page||1);if(total<=1){box.innerHTML="";return}let h=`<button class="page-btn" data-page="${page-1}" ${page===1?"disabled":""}>←</button>`,pages=[];for(let i=1;i<=total;i++)if(total<=7||i===1||i===total||Math.abs(i-page)<=2)pages.push(i);let last=0;for(const i of pages){if(last&&i-last>1)h+='<button class="page-btn" disabled>…</button>';h+=`<button class="page-btn ${i===page?"active":""}" data-page="${i}">${i}</button>`;last=i}h+=`<button class="page-btn" data-page="${page+1}" ${page===total?"disabled":""}>→</button>`;box.innerHTML=h;qsa("[data-page]").forEach(b=>b.onclick=()=>{const n=Number(b.dataset.page);if(n>=1&&n<=total){loadCatalog(n);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}})}
-async function loadPopular(){try{const d=await api("/api/comics?page=1&limit=8&sort=popular"),items=d.comics||[];qs("#popularList").innerHTML=items.length?items.map((c,i)=>{const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"";return `<div class="popular-item" data-popular="${esc(c.slug)}"><div class="popular-rank">${i+1}</div><div class="popular-thumb" style="${cover}"></div><div class="popular-copy"><strong>${esc(c.title)}</strong><small>${Number(c.views||0)} vistas</small></div></div>`}).join(""):'<div class="empty">Sin datos.</div>';qsa("[data-popular]").forEach(i=>i.onclick=()=>openComicDirect(i.dataset.popular,true))}catch(e){qs("#popularList").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-async function loadUpdates(){try{const d=await api("/api/updates?limit=8"),u=d.updates||[];qs("#updatesList").innerHTML=u.length?u.map(x=>{const cover=x.cover_url?`background-image:url('${x.cover_url}')`:"";return `<div class="update-item" data-update-slug="${esc(x.slug)}"><div class="update-cover" style="${cover}"></div><div class="update-main"><div class="update-title">${esc(x.comic_title)}</div><div class="update-meta">${Number(x.page_count||0)} páginas · ${esc(x.genre||"Sin categoría")}</div></div><div class="update-open">Abrir</div></div>`}).join(""):'<div class="empty">Todavía no hay actualizaciones con páginas.</div>';qsa("[data-update-slug]").forEach(i=>i.onclick=()=>openComicDirect(i.dataset.updateSlug,true))}catch(e){qs("#updatesList").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-async function loadRandomPool(){try{const d=await api("/api/comics?page=1&limit=30&sort=latest");randomPool=d.comics||[];renderRandom()}catch(e){qs("#randomGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}function renderRandom(){const x=[...randomPool].sort(()=>Math.random()-.5).slice(0,5);qs("#randomGrid").innerHTML=x.length?x.map(c=>comicCardHTML(c,"data-random")).join(""):'<div class="empty">Todavía no hay suficientes cómics.</div>';qsa("[data-random]").forEach(c=>c.onclick=()=>openComicDirect(c.dataset.random,true))}qs("#randomRefresh")?.addEventListener("click",renderRandom);
-function prepareComicInfo(c){qs("#detailTitle").textContent=c.title;qs("#detailMeta").textContent=[c.author,c.status,c.tags,`${c.views} vistas`].filter(Boolean).join(" · ");qs("#detailDescription").textContent=c.description||"";qs("#detailCover").style.backgroundImage=c.cover_url?`url("${c.cover_url}")`:"";qs("#shareMessage").textContent=""}
-function readerAdHtml(){return `<div class="ad-slot reader-ad-mid" data-ad-slot="reader-middle"><div><strong>Publicidad</strong>Anuncio dentro de la lectura</div></div>`}
-function buildReaderPages(pages){
-  if(!pages.length)return "";
-  const middle=Math.floor(pages.length/2);
-  return pages.map((pg,i)=>{
-    const image=`<img src="${pg.url}" alt="Página ${pg.page_number}" loading="lazy">`;
-    if(pages.length>=4 && i===middle)return readerAdHtml()+image;
-    return image;
-  }).join("");
-}
-async function loadReaderRelated(comic){
-  const box=qs("#readerRelatedGrid");
-  if(!box)return;
-  box.innerHTML='<div class="empty">Cargando recomendaciones...</div>';
-  try{
-    const params=new URLSearchParams({page:"1",limit:"12",sort:"popular"});
-    const firstTag=String(comic.tags||comic.genre||"").split(",").map(x=>x.trim()).find(Boolean);
-    if(firstTag)params.set("tag",firstTag);
-    const d=await api("/api/comics?"+params.toString());
-    let items=(d.comics||[]).filter(x=>x.slug!==comic.slug).slice(0,4);
-    if(!items.length){
-      const fallback=await api("/api/comics?page=1&limit=8&sort=latest");
-      items=(fallback.comics||[]).filter(x=>x.slug!==comic.slug).slice(0,4);
-    }
-    box.innerHTML=items.length?items.map(x=>{
-      const cover=x.cover_url?`background-image:url('${x.cover_url}')`:"";
-      return `<article class="reader-related-card" data-related="${esc(x.slug)}"><div class="reader-related-cover" style="${cover}"></div><div class="reader-related-title">${esc(x.title)}</div></article>`;
-    }).join(""):'<div class="empty">No hay recomendaciones todavía.</div>';
-    qsa("[data-related]").forEach(card=>card.onclick=()=>openComicDirect(card.dataset.related,true));
-  }catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
-}
-async function openComicDirect(slug,pushRoute=true){
-  try{
-    const d=await api("/api/comics/"+encodeURIComponent(slug)),c=d.comic,chapters=d.chapters||[];
-    currentPublicComic=c;currentPublicSlug=c.slug;setComicMetadata(c);prepareComicInfo(c);
-    if(pushRoute)history.pushState({type:"comic",slug:c.slug,fromSite:true},"",comicPath(c.slug));
-    const readable=chapters.find(ch=>Number(ch.page_count||0)>0);
-    qs("#readerTitle").textContent=c.title;qs("#readerEndTitle").textContent=`Fin de ${c.title}`;
-    if(!readable){
-      qs("#readerPages").innerHTML=`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;
-      qs("#readerEnd").style.display="none";openReader();loadReaderRelated(c);return;
-    }
-    const p=await api(`/api/chapters/${readable.id}/pages`),pages=p.pages||[];
-    qs("#readerPages").innerHTML=pages.length?buildReaderPages(pages):`<div class="reader-empty"><div><h2>${esc(c.title)}</h2><p>Este cómic todavía no tiene páginas disponibles.</p></div></div>`;
-    qs("#readerEnd").style.display=pages.length?"block":"none";
-    openReader();loadReaderRelated(c);
-  }catch(e){alert(e.message)}
-}
-function openReader(){closeModal("detailModal");qs("#reader").classList.add("open");document.body.classList.add("reader-locked");qs("#reader").scrollTop=0}function comicUrl(){return location.origin+comicPath(currentPublicSlug)}async function shareCurrentComic(){if(!currentPublicComic)return;const url=comicUrl();try{if(navigator.share){await navigator.share({title:currentPublicComic.title,url});return}await navigator.clipboard.writeText(url);alert("Enlace copiado.")}catch(e){if(e?.name!=="AbortError")alert("No se pudo compartir.")}}qs("#readerShare").onclick=shareCurrentComic;qs("#shareComicBtn").onclick=shareCurrentComic;qs("#copyComicBtn").onclick=async()=>{try{await navigator.clipboard.writeText(comicUrl());qs("#shareMessage").textContent="Enlace copiado."}catch{qs("#shareMessage").textContent=comicUrl()}};qs("#readerInfo").onclick=()=>openModal("detailModal");
-function closeReaderOnly(){qs("#reader").classList.remove("open");closeModal("detailModal");document.body.classList.remove("reader-locked");currentPublicComic=null;currentPublicSlug=null}
-function exitComic(){const s=history.state;if(s?.type==="comic"&&s?.fromSite){history.back();return}closeReaderOnly();history.replaceState({type:"home"},"","/");showHomeView();setHomeMetadata();window.scrollTo(0,0)}
-qs("#closeReader").onclick=exitComic;qs("#readerBackHome").onclick=exitComic;
-window.addEventListener("popstate",async()=>{closeReaderOnly();await handleRoute(getRoute(),false)});
-function runSearch(){searchQuery=qs("#searchInput").value.trim();const r=getRoute();if(r.type==="categories"||r.type==="category"){history.pushState({type:"home"},"","/");selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}qs("#searchBtn").onclick=runSearch;qs("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch()});qs("#searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=e.target.value.trim();if(getRoute().type!=="categories")loadCatalog(1)},350)});
-
-async function loadCategoryIndex(){
-  try{
-    const d=await api("/api/tags");
-    categoryIndex=Array.isArray(d.tags)?d.tags:[];
-    const grid=qs("#categoryGrid");
-    if(grid){
-      grid.innerHTML=categoryIndex.length?categoryIndex.map(c=>`<article class="category-card" data-category-name="${esc(c.name)}"><strong>${esc(c.name)}</strong><span>${Number(c.count||0)} cómic${Number(c.count||0)===1?"":"s"}</span></article>`).join(""):'<div class="empty">Todavía no hay categorías disponibles.</div>';
-      qsa("[data-category-name]").forEach(card=>card.onclick=()=>openCategory(card.dataset.categoryName,true));
-    }
-    return categoryIndex;
-  }catch(e){
-    const grid=qs("#categoryGrid");if(grid)grid.innerHTML=`<div class="empty">${esc(e.message)}</div>`;
-    return [];
-  }
-}
-function updateNav(routeType){
-  qs("[data-nav-home]")?.classList.toggle("active",routeType==="home");
-  qs("[data-nav-categories]")?.classList.toggle("active",routeType==="categories"||routeType==="category");
-}
-function showHomeView(){
-  selectedTag="";selectedTagSlug="";
-  qs("#categoriesView")?.classList.add("view-hidden");
-  qs("#catalogView")?.classList.remove("view-hidden");
-  qs("#randomSection")?.classList.remove("view-hidden");
-  qs("#categoryBackBtn")?.classList.add("view-hidden");
-  qs("#catalogTitle").textContent="Últimos cómics";
-  updateNav("home");
-}
-function showCategoriesView(){
-  qs("#catalogView")?.classList.add("view-hidden");
-  qs("#randomSection")?.classList.add("view-hidden");
-  qs("#categoriesView")?.classList.remove("view-hidden");
-  updateNav("categories");
-}
-async function openCategory(name,push=true){
-  selectedTag=name||"";selectedTagSlug=routeSlug(name||"");searchQuery="";
-  qs("#searchInput").value="";if(qs("#mobileSearchInput"))qs("#mobileSearchInput").value="";
-  if(push)history.pushState({type:"category",slug:selectedTagSlug},"",categoryPath(name));
-  qs("#categoriesView")?.classList.add("view-hidden");
-  qs("#catalogView")?.classList.remove("view-hidden");
-  qs("#randomSection")?.classList.add("view-hidden");
-  qs("#categoryBackBtn")?.classList.remove("view-hidden");
-  qs("#catalogTitle").textContent=`Cómics de ${name}`;
-  updateNav("category");
-  await loadCatalog(1);
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-async function handleRoute(route,initial=false){
-  if(route.type==="admin"){
-    closeReaderOnly();
-    document.body.classList.add("admin-route");
-    document.body.classList.remove("age-locked");
-    qs("#ageGate")?.classList.remove("open");
-    setAdminMetadata();
-    if(adminToken){
-      try{await showAdmin();return}
-      catch{adminToken="";sessionStorage.removeItem("nightink_admin_token")}
-    }
-    qs("#adminShell")?.classList.remove("visible");
-    qs("#loginMsg").textContent="";
-    openModal("loginModal");
-    setTimeout(()=>qs("#adminPassword")?.focus(),50);
-    return;
-  }
-  document.body.classList.remove("admin-route");
-  if(route.type==="comic"){await openComicDirect(route.slug,false);return}
-  closeReaderOnly();
-  if(route.type==="categories"){
-    showCategoriesView();
-    await loadCategoryIndex();
-    setHomeMetadata();
-    if(!initial)window.scrollTo(0,0);
-    return;
-  }
-  if(route.type==="category"){
-    if(!categoryIndex.length)await loadCategoryIndex();
-    const match=categoryIndex.find(c=>routeSlug(c.name)===route.slug);
-    if(match){await openCategory(match.name,false);return}
-    history.replaceState({type:"categories"},"","/categorias");
-    showCategoriesView();
-    return;
-  }
-  showHomeView();
-  await Promise.all([loadCatalog(1),loadRandomPool()]);
-  setHomeMetadata();
-  if(!initial)window.scrollTo(0,0);
-}
-qs("#categoryBackBtn")?.addEventListener("click",()=>{history.pushState({type:"categories"},"","/categorias");showCategoriesView();loadCategoryIndex();window.scrollTo({top:0,behavior:"smooth"})});
-qsa("[data-nav-home],[data-mobile-home]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();closeMobilePanels();history.pushState({type:"home"},"","/");handleRoute({type:"home"},false)}));
-qsa("[data-nav-categories],[data-mobile-categories]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();closeMobilePanels();history.pushState({type:"categories"},"","/categorias");handleRoute({type:"categories"},false)}));
-
-qsa(".tab[data-sort]").forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;qsa(".tab[data-sort]").forEach(i=>i.classList.toggle("active",i===b));loadCatalog(1)});
-qs("#loginBtn").onclick=loginAdmin;qs("#adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")loginAdmin()});qs("#adminCancelBtn")?.addEventListener("click",()=>{if(getRoute().type==="admin")location.href="/"});async function loginAdmin(){const password=qs("#adminPassword").value;try{await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});adminToken=password;sessionStorage.setItem("nightink_admin_token",password);closeModal("loginModal");await showAdmin()}catch(e){qs("#loginMsg").className="msg error";qs("#loginMsg").textContent=e.message}}
-async function showAdmin(){qs("#adminShell").classList.add("visible");await Promise.all([loadStats(),loadAdminComics()]);qs("#adminShell").scrollIntoView({behavior:"smooth"})}qs("#logoutAdminBtn").onclick=()=>{adminToken="";sessionStorage.removeItem("nightink_admin_token");qs("#adminShell").classList.remove("visible");if(getRoute().type==="admin"){qs("#adminPassword").value="";qs("#loginMsg").textContent="";openModal("loginModal");setTimeout(()=>qs("#adminPassword")?.focus(),50)}};qs("#refreshAdminBtn").onclick=async()=>{await Promise.all([loadStats(),loadAdminComics(),loadCategoryIndex()]);if(getRoute().type!=="categories")await loadCatalog(currentPage);if(getRoute().type==="home")await loadRandomPool()};
-async function loadStats(){const d=await api("/api/admin/stats"),s=d.stats||{};qs("#stats").innerHTML=`<div class="stat"><strong>${Number(s.comics||0)}</strong><small>Cómics</small></div><div class="stat"><strong>${Number(s.pages||0)}</strong><small>Páginas</small></div><div class="stat"><strong>${Number(s.views||0)}</strong><small>Vistas</small></div>`}
-async function getOrCreateInternalChapter(comicId){const d=await api(`/api/admin/comics/${comicId}/chapters`),arr=d.chapters||[];if(arr.length)return arr[0];await api(`/api/admin/comics/${comicId}/chapters`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chapter_number:1,title:"",is_published:true})});const again=await api(`/api/admin/comics/${comicId}/chapters`),ch=(again.chapters||[])[0];if(!ch)throw new Error("No se pudo preparar el cómic para subir páginas.");return ch}
-async function loadAdminComics(){const d=await api("/api/admin/comics");currentAdminComics=d.comics||[];const box=qs("#adminList");if(!currentAdminComics.length){box.innerHTML='<div class="empty">No hay cómics.</div>';return}box.innerHTML=currentAdminComics.map(c=>{const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"";const meta=[c.author,c.tags||c.genre].filter(Boolean).join(" · ")||"Sin etiquetas";return `<div class="admin-row" id="adminComic-${c.id}"><div class="admin-cover" style="${cover}"></div><div><div class="admin-title">${esc(c.title)}</div><div class="admin-meta">${esc(meta)} · ${c.is_published?"Publicado":"Borrador"}</div><div id="ready-${c.id}"><span class="ready-badge draft">Comprobando...</span></div></div><div class="row-actions"><button data-edit="${c.id}">Editar</button><button data-pages="${c.id}">Páginas</button><button data-delete="${c.id}">Eliminar</button></div></div>`}).join("");qsa("[data-edit]").forEach(b=>b.onclick=()=>editComic(Number(b.dataset.edit)));qsa("[data-pages]").forEach(b=>b.onclick=()=>openComicPages(Number(b.dataset.pages)));qsa("[data-delete]").forEach(b=>b.onclick=()=>deleteComic(Number(b.dataset.delete)));await Promise.all(currentAdminComics.map(async c=>{try{const r=await api(`/api/admin/comics/${c.id}/chapters`),readable=(r.chapters||[]).find(ch=>Number(ch.page_count||0)>0),el=qs(`#ready-${c.id}`);if(!el)return;if(!c.is_published)el.innerHTML='<span class="ready-badge draft">BORRADOR</span>';else if(!readable)el.innerHTML='<span class="ready-badge warn">FALTAN PÁGINAS</span>';else el.innerHTML=`<span class="ready-badge ok">LISTO · ${Number(readable.page_count||0)} páginas</span>`}catch{}}))}
-qs("#newComicBtn").onclick=()=>{qs("#comicForm").reset();qs("#comicId").value="";qs("#comicPublished").checked=true;qs("#comicFormTitle").textContent="Nuevo cómic";qs("#comicMsg").textContent="";openModal("comicModal")};function editComic(id){const c=currentAdminComics.find(x=>Number(x.id)===id);if(!c)return;qs("#comicId").value=c.id;qs("#comicTitle").value=c.title||"";qs("#comicSlug").value=c.slug||"";qs("#comicAuthor").value=c.author||"";qs("#comicTags").value=c.tags||c.genre||"";qs("#comicStatus").value=c.status||"En emisión";qs("#comicDescription").value=c.description||"";qs("#comicPublished").checked=Boolean(c.is_published);qs("#comicCover").value="";qs("#comicFormTitle").textContent="Editar cómic";qs("#comicMsg").textContent="";openModal("comicModal")}
-qs("#comicForm").addEventListener("submit",async e=>{e.preventDefault();const id=Number(qs("#comicId").value||0),tags=qs("#comicTags").value.trim(),payload={title:qs("#comicTitle").value,slug:qs("#comicSlug").value,author:qs("#comicAuthor").value,tags,genre:tags,status:qs("#comicStatus").value,description:qs("#comicDescription").value,is_published:qs("#comicPublished").checked};try{let comicId=id;if(id)await api(`/api/admin/comics/${id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});else{const r=await api("/api/admin/comics",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});comicId=r.id;await getOrCreateInternalChapter(comicId)}const cover=qs("#comicCover").files[0];if(cover){const f=new FormData();f.append("cover",cover);await api(`/api/admin/comics/${comicId}/cover`,{method:"POST",body:f})}closeModal("comicModal");await Promise.all([loadAdminComics(),loadStats(),loadCategoryIndex(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool();if(!id)await openComicPages(comicId)}catch(err){qs("#comicMsg").className="msg error";qs("#comicMsg").textContent=err.message}});
-async function deleteComic(id){if(!confirm("¿Eliminar este cómic y todas sus páginas?"))return;try{await api(`/api/admin/comics/${id}`,{method:"DELETE"});await Promise.all([loadAdminComics(),loadStats(),loadCategoryIndex(),loadCatalog(1)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){alert(e.message)}}
-async function openComicPages(comicId){const c=currentAdminComics.find(x=>Number(x.id)===comicId);currentManagedComic=comicId;try{const ch=await getOrCreateInternalChapter(comicId);currentManagedChapter=Number(ch.id);qs("#pagesTitle").textContent=`Páginas · ${c?.title||"Cómic"}`;qs("#comicPagesInput").value="";qs("#pagesMsg").textContent="";openModal("pagesModal");await loadManagedPages()}catch(e){alert(e.message)}}
-qs("#uploadComicPagesBtn").onclick=async()=>{const input=qs("#comicPagesInput");if(!currentManagedChapter){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="No se pudo preparar el cómic.";return}if(!input.files.length){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent="Selecciona las imágenes del cómic.";return}const files=[...input.files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"})),f=new FormData();files.forEach(file=>f.append("pages",file));try{qs("#pagesMsg").className="msg";qs("#pagesMsg").textContent="Subiendo páginas...";await api(`/api/admin/chapters/${currentManagedChapter}/pages`,{method:"POST",body:f});input.value="";qs("#pagesMsg").className="msg success";qs("#pagesMsg").textContent="Páginas subidas correctamente.";await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){qs("#pagesMsg").className="msg error";qs("#pagesMsg").textContent=e.message}};
-async function loadManagedPages(){const d=await api(`/api/admin/chapters/${currentManagedChapter}/pages`);managedPages=d.pages||[];renderManagedPages()}function renderManagedPages(){qs("#pagesGrid").innerHTML=managedPages.length?managedPages.map((p,i)=>`<div class="page-card"><div class="page-thumb"><img src="${p.url}" alt="Página ${i+1}" loading="lazy"></div><div class="page-info"><strong style="font-size:10px">Página ${i+1}</strong><div class="page-actions"><button data-left="${p.id}" ${i===0?"disabled":""}>←</button><button data-right="${p.id}" ${i===managedPages.length-1?"disabled":""}>→</button><button class="delete-page" data-delpage="${p.id}">Eliminar</button></div></div></div>`).join(""):'<div class="empty">Todavía no hay páginas.</div>';qsa("[data-left]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.left),-1));qsa("[data-right]").forEach(b=>b.onclick=()=>movePage(Number(b.dataset.right),1));qsa("[data-delpage]").forEach(b=>b.onclick=()=>deletePage(Number(b.dataset.delpage)))}
-async function movePage(id,direction){const i=managedPages.findIndex(p=>Number(p.id)===id),j=i+direction;if(i<0||j<0||j>=managedPages.length)return;const copy=[...managedPages];[copy[i],copy[j]]=[copy[j],copy[i]];managedPages=copy;renderManagedPages();try{await api(`/api/admin/chapters/${currentManagedChapter}/pages/reorder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({page_ids:managedPages.map(p=>Number(p.id))})});await loadManagedPages()}catch(e){alert(e.message);await loadManagedPages()}}async function deletePage(id){if(!confirm("¿Eliminar esta página?"))return;try{await api(`/api/admin/pages/${id}`,{method:"DELETE"});await Promise.all([loadManagedPages(),loadAdminComics(),loadStats(),loadCatalog(currentPage)]);if(getRoute().type==="home")await loadRandomPool()}catch(e){alert(e.message)}}
-
-function closeMobilePanels(){qs("#mobileMenuPanel")?.classList.remove("open");qs("#mobileSearchPanel")?.classList.remove("open")}
-qs("#mobileMenuBtn")?.addEventListener("click",()=>{const p=qs("#mobileMenuPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening)p.classList.add("open")});
-qs("#mobileSearchBtn")?.addEventListener("click",()=>{const p=qs("#mobileSearchPanel");const opening=!p.classList.contains("open");closeMobilePanels();if(opening){p.classList.add("open");qs("#mobileSearchInput")?.focus()}});
-function runMobileSearch(){searchQuery=(qs("#mobileSearchInput")?.value||"").trim();if(["categories","category"].includes(getRoute().type)){history.pushState({type:"home"},"","/");selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);closeMobilePanels();setTimeout(()=>qs("#catalogView")?.scrollIntoView({behavior:"smooth"}),100)}
-qs("#mobileSearchGo")?.addEventListener("click",runMobileSearch);
-qs("#mobileSearchInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")runMobileSearch()});
-
-qs("#readerGoTop")?.addEventListener("click",()=>qs("#reader")?.scrollTo({top:0,behavior:"smooth"}));
-qs("#readerGoBottom")?.addEventListener("click",()=>{const r=qs("#reader");if(r)r.scrollTo({top:r.scrollHeight,behavior:"smooth"})});
-qs("#readerShareBottom")?.addEventListener("click",shareCurrentComic);
-qs("#readerCopyLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(comicUrl());alert("Enlace copiado.")}catch{alert(comicUrl())}});
-
-async function startEroToonX(){const r=getRoute();if(r.type!=="admin")showAgeGate();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);if(r.type!=="admin")await loadCategoryIndex();await handleRoute(r,true)}startEroToonX();
-</script>
+<h1>Cómic no encontrado</h1>
+<p>El contenido solicitado no está disponible.</p>
+<p><a href="/">Volver a EroToonX</a></p>
 </body>
-</html>
+</html>`,
+          {
+            status: 404,
+            headers: {
+              "Content-Type":
+                "text/html; charset=utf-8"
+            }
+          }
+        );
+      }
+
+      const title =
+        comic.title ||
+        "Cómic";
+
+      const description =
+        String(
+          comic.description ||
+          `Lee ${title} en EroToonX.`
+        )
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 155);
+
+      const canonical =
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`;
+
+      const image =
+        comic.cover_url
+          ? absoluteUrl(
+              comic.cover_url
+            )
+          : null;
+
+      html = replaceHeadMetadata(
+        html,
+        {
+          title:
+            `${title} | EroToonX`,
+
+          description,
+
+          canonical,
+
+          type:
+            "article",
+
+          image
+        }
+      );
+
+      const structured =
+        renderComicStructuredData(
+          comic
+        );
+
+      html = html.replace(
+        "</head>",
+        `
+<script type="application/ld+json">
+${structured}
+</script>
+</head>`
+      );
+
+      const pageCount =
+        Number(
+          comic.page_count || 0
+        );
+
+      const detail =
+        `
+<section
+  id="serverComicSeo"
+  class="wrap seo-summary"
+  aria-label="Información del cómic"
+>
+  <h1>${escapeHtml(title)}</h1>
+
+  <p>
+    ${escapeHtml(description)}
+  </p>
+
+  <p>
+    ${
+      comic.tags
+        ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.tags)} · `
+        : comic.genre
+          ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.genre)} · `
+          : ""
+    }
+    ${
+      comic.author
+        ? `<strong>Autor:</strong> ${escapeHtml(comic.author)} · `
+        : ""
+    }
+    <strong>Páginas:</strong> ${pageCount}
+  </p>
+</section>
+`;
+
+      html = html.replace(
+        '<div id="reader" class="reader">',
+        `${detail}<div id="reader" class="reader">`
+      );
+    }
+  }
+
+  html =
+    skipAgeGateForCrawler(
+      html,
+      request
+    );
+
+  const headers =
+    new Headers(
+      assetResponse.headers
+    );
+
+  headers.set(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+
+  headers.set(
+    "Cache-Control",
+    "public, max-age=60"
+  );
+
+  headers.set(
+    "Vary",
+    "User-Agent"
+  );
+
+  headers.delete(
+    "Content-Length"
+  );
+
+  headers.delete(
+    "Content-Encoding"
+  );
+
+  headers.delete(
+    "ETag"
+  );
+
+  return new Response(
+    html,
+    {
+      status: 200,
+      headers
+    }
+  );
+}
+
+
+function escapeXml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function sitemapDate(value) {
+  if (!value) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+async function serveDynamicSitemap(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      slug,
+      updated_at
+
+    FROM comics
+
+    WHERE
+      is_published = 1
+
+    ORDER BY
+      updated_at DESC,
+      id DESC
+    `
+  ).all();
+
+  const comics =
+    rows.results || [];
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+  const staticUrls = [
+    {
+      loc: `${SITE_ORIGIN}/`,
+      lastmod: today,
+      changefreq: "daily",
+      priority: "1.0"
+    },
+    {
+      loc: `${SITE_ORIGIN}/privacy.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/terms.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/legal.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/dmca.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/contact.html`,
+      lastmod: today,
+      changefreq: "monthly",
+      priority: "0.3"
+    }
+  ];
+
+  const comicUrls =
+    comics.map(comic => ({
+      loc:
+        `${SITE_ORIGIN}/comic/${encodeURIComponent(comic.slug)}`,
+      lastmod:
+        sitemapDate(comic.updated_at),
+      changefreq:
+        "weekly",
+      priority:
+        "0.8"
+    }));
+
+  const urls =
+    [...staticUrls, ...comicUrls];
+
+  const body =
+    urls.map(item => `
+  <url>
+    <loc>${escapeXml(item.loc)}</loc>
+    <lastmod>${escapeXml(item.lastmod)}</lastmod>
+    <changefreq>${escapeXml(item.changefreq)}</changefreq>
+    <priority>${escapeXml(item.priority)}</priority>
+  </url>`).join("");
+
+  const xml =
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}
+</urlset>`;
+
+  return new Response(
+    xml,
+    {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/xml; charset=utf-8",
+
+        "Cache-Control":
+          "public, max-age=300"
+      }
+    }
+  );
+}
+
+export default {
+  async fetch(
+    request,
+    env
+  ) {
+    const url =
+      new URL(request.url);
+
+    const path =
+      url.pathname;
+
+    const method =
+      request.method.toUpperCase();
+
+    try {
+
+      /*
+      ========================================
+      DYNAMIC SITEMAP
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/sitemap.xml"
+      ) {
+        return serveDynamicSitemap(
+          env
+        );
+      }
+
+
+      /*
+      ========================================
+      SERVER-RENDERED SEO
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        (
+          path === "/" ||
+          path === "/index.html" ||
+          /^\/comic\/[^/]+\/?$/.test(path)
+        )
+      ) {
+        return serveSeoHtml(
+          request,
+          env,
+          url
+        );
+      }
+
+
+      /*
+      ========================================
+      HEALTH
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/health"
+      ) {
+        let databaseConnected =
+          false;
+
+        let mediaConnected =
+          false;
+
+        try {
+          await env.DB.prepare(
+            "SELECT 1 AS ok"
+          ).first();
+
+          databaseConnected =
+            true;
+        } catch {}
+
+        try {
+          await env.MEDIA.list({
+            limit: 1
+          });
+
+          mediaConnected =
+            true;
+        } catch {}
+
+        return json({
+          ok: true,
+
+          app:
+            "nightink-app",
+
+          worker:
+            true,
+
+          databaseConnected,
+
+          mediaConnected,
+
+          adminConfigured:
+            Boolean(env.ADMIN_TOKEN)
+        });
+      }
+
+
+      /*
+      ========================================
+      ADMIN LOGIN
+      ========================================
+      */
+
+      if (
+        method === "POST" &&
+        path === "/api/admin/login"
+      ) {
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        if (
+          !env.ADMIN_TOKEN ||
+          body.password !== env.ADMIN_TOKEN
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Contraseña incorrecta"
+            },
+            401
+          );
+        }
+
+        return json({
+          ok: true
+        });
+      }
+
+
+      /*
+      ========================================
+      PUBLIC COMICS
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/comics"
+      ) {
+        return publicComics(
+          env,
+          url
+        );
+      }
+
+
+      /*
+      ========================================
+      PUBLIC CATEGORIES / TAGS
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/tags"
+      ) {
+        return publicTags(env);
+      }
+
+
+      /*
+      ========================================
+      PUBLIC UPDATES
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/updates"
+      ) {
+        const limit =
+          Math.min(
+            30,
+            Math.max(
+              1,
+              Number(
+                url.searchParams.get("limit") || 8
+              )
+            )
+          );
+
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            ch.id AS chapter_id,
+            ch.chapter_number,
+            ch.title AS chapter_title,
+            ch.updated_at,
+
+            c.id AS comic_id,
+            c.slug,
+            c.title AS comic_title,
+            c.genre,
+            c.tags,
+            c.cover_key,
+
+            CASE
+              WHEN c.cover_key IS NOT NULL
+              AND c.cover_key != ''
+              THEN '/media/' || c.cover_key
+              ELSE NULL
+            END AS cover_url,
+
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
+
+          FROM chapters ch
+
+          JOIN comics c
+            ON c.id = ch.comic_id
+
+          WHERE
+            ch.is_published = 1
+
+          AND
+            c.is_published = 1
+
+          AND EXISTS (
+            SELECT 1
+            FROM pages p2
+            WHERE p2.chapter_id = ch.id
+          )
+
+          ORDER BY
+            ch.updated_at DESC,
+            ch.id DESC
+
+          LIMIT ?
+          `
+        )
+          .bind(limit)
+          .all();
+
+        return json({
+          ok: true,
+          updates:
+            rows.results || []
+        });
+      }
+
+
+      /*
+      ========================================
+      PUBLIC COMIC DETAIL
+      ========================================
+      */
+
+      const comicPublicMatch =
+        path.match(
+          /^\/api\/comics\/([^/]+)$/
+        );
+
+      if (
+        method === "GET" &&
+        comicPublicMatch
+      ) {
+        const slug =
+          decodeURIComponent(
+            comicPublicMatch[1]
+          );
+
+        const comic = await env.DB.prepare(
+          `
+          SELECT
+            c.id,
+            c.slug,
+            c.title,
+            c.description,
+            c.genre,
+            c.tags,
+            c.author,
+            c.status,
+            c.cover_key,
+            c.views,
+            c.is_published,
+            c.created_at,
+            c.updated_at,
+
+            CASE
+              WHEN c.cover_key IS NOT NULL
+              AND c.cover_key != ''
+              THEN '/media/' || c.cover_key
+              ELSE NULL
+            END AS cover_url
+
+          FROM comics c
+
+          WHERE
+            c.slug = ?
+
+          AND
+            c.is_published = 1
+          `
+        )
+          .bind(slug)
+          .first();
+
+        if (!comic) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Cómic no encontrado"
+            },
+            404
+          );
+        }
+
+        await env.DB.prepare(
+          `
+          UPDATE comics
+          SET views = views + 1
+          WHERE id = ?
+          `
+        )
+          .bind(comic.id)
+          .run();
+
+        comic.views =
+          Number(
+            comic.views || 0
+          ) + 1;
+
+        const chapters = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
+
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
+
+          FROM chapters ch
+
+          WHERE
+            ch.comic_id = ?
+
+          AND
+            ch.is_published = 1
+
+          ORDER BY
+            ch.chapter_number ASC,
+            ch.id ASC
+          `
+        )
+          .bind(comic.id)
+          .all();
+
+        return json({
+          ok: true,
+          comic,
+          chapters:
+            chapters.results || []
+        });
+      }
+
+
+      /*
+      ========================================
+      PUBLIC READER
+      ========================================
+      */
+
+      const chapterPagesPublicMatch =
+        path.match(
+          /^\/api\/chapters\/(\d+)\/pages$/
+        );
+
+      if (
+        method === "GET" &&
+        chapterPagesPublicMatch
+      ) {
+        const chapterId =
+          Number(
+            chapterPagesPublicMatch[1]
+          );
+
+        const chapter = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
+            c.title AS comic_title,
+            c.slug AS comic_slug
+
+          FROM chapters ch
+
+          JOIN comics c
+            ON c.id = ch.comic_id
+
+          WHERE
+            ch.id = ?
+
+          AND
+            ch.is_published = 1
+
+          AND
+            c.is_published = 1
+          `
+        )
+          .bind(chapterId)
+          .first();
+
+        if (!chapter) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            chapter_id,
+            page_number,
+            object_key,
+            '/media/' || object_key AS url
+
+          FROM pages
+
+          WHERE
+            chapter_id = ?
+
+          ORDER BY
+            page_number ASC,
+            id ASC
+          `
+        )
+          .bind(chapterId)
+          .all();
+
+        return json({
+          ok: true,
+          chapter,
+          pages:
+            rows.results || []
+        });
+      }
+
+
+      /*
+      ========================================
+      R2 MEDIA
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path.startsWith("/media/")
+      ) {
+        const key =
+          decodeURIComponent(
+            path.slice(
+              "/media/".length
+            )
+          );
+
+        if (!key) {
+          return new Response(
+            "Not found",
+            {
+              status: 404
+            }
+          );
+        }
+
+        const object =
+          await env.MEDIA.get(key);
+
+        if (!object) {
+          return new Response(
+            "Not found",
+            {
+              status: 404
+            }
+          );
+        }
+
+        const headers =
+          new Headers();
+
+        object.writeHttpMetadata(
+          headers
+        );
+
+        headers.set(
+          "ETag",
+          object.httpEtag
+        );
+
+        headers.set(
+          "Cache-Control",
+          "public, max-age=31536000, immutable"
+        );
+
+        return new Response(
+          object.body,
+          {
+            headers
+          }
+        );
+      }
+
+
+      /*
+      ========================================
+      PROTECT ADMIN ROUTES
+      ========================================
+      */
+
+      if (
+        path.startsWith("/api/admin/") &&
+        !isAdmin(request, env)
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "No autorizado"
+          },
+          401
+        );
+      }
+
+
+      /*
+      ========================================
+      ADMIN STATS
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/admin/stats"
+      ) {
+        const row = await env.DB.prepare(
+          `
+          SELECT
+
+            (
+              SELECT COUNT(*)
+              FROM comics
+            ) AS comics,
+
+            (
+              SELECT COUNT(*)
+              FROM chapters
+            ) AS chapters,
+
+            (
+              SELECT COUNT(*)
+              FROM pages
+            ) AS pages,
+
+            (
+              SELECT
+                COALESCE(
+                  SUM(views),
+                  0
+                )
+              FROM comics
+            ) AS views
+          `
+        ).first();
+
+        return json({
+          ok: true,
+
+          stats:
+            row || {
+              comics: 0,
+              chapters: 0,
+              pages: 0,
+              views: 0
+            }
+        });
+      }
+
+
+      /*
+      ========================================
+      ADMIN COMICS
+      ========================================
+      */
+
+      if (
+        method === "GET" &&
+        path === "/api/admin/comics"
+      ) {
+        return adminComics(env);
+      }
+
+
+      /*
+      ========================================
+      CREATE COMIC
+      ========================================
+      */
+
+      if (
+        method === "POST" &&
+        path === "/api/admin/comics"
+      ) {
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        const title =
+          String(
+            body.title || ""
+          ).trim();
+
+        if (!title) {
+          return json(
+            {
+              ok: false,
+              error:
+                "El título es obligatorio"
+            },
+            400
+          );
+        }
+
+        const slug =
+          slugify(
+            body.slug ||
+            title
+          );
+
+        if (!slug) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Slug inválido"
+            },
+            400
+          );
+        }
+
+
+        try {
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO comics (
+              slug,
+              title,
+              description,
+              genre,
+              tags,
+              author,
+              status,
+              is_published,
+              created_at,
+              updated_at
+            )
+
+            VALUES (
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
+            .bind(
+              slug,
+              title,
+              String(
+                body.description || ""
+              ),
+              String(
+                body.genre || body.tags || ""
+              ),
+              String(
+                body.tags || body.genre || ""
+              ),
+              String(
+                body.author || ""
+              ),
+              String(
+                body.status ||
+                "En emisión"
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0
+            )
+            .run();
+
+          return json(
+            {
+              ok: true,
+              id:
+                result.meta.last_row_id,
+              slug
+            },
+            201
+          );
+        }
+
+        catch(error) {
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese slug ya existe"
+              },
+              409
+            );
+          }
+
+          throw error;
+        }
+      }
+
+
+      /*
+      ========================================
+      UPDATE / DELETE COMIC
+      ========================================
+      */
+
+      const adminComicMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)$/
+        );
+
+      if (
+        adminComicMatch &&
+        method === "PUT"
+      ) {
+        const id =
+          Number(
+            adminComicMatch[1]
+          );
+
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        const title =
+          String(
+            body.title || ""
+          ).trim();
+
+        if (!title) {
+          return json(
+            {
+              ok: false,
+              error:
+                "El título es obligatorio"
+            },
+            400
+          );
+        }
+
+        const slug =
+          slugify(
+            body.slug ||
+            title
+          );
+
+
+        try {
+          await env.DB.prepare(
+            `
+            UPDATE comics
+
+            SET
+              slug = ?,
+              title = ?,
+              description = ?,
+              genre = ?,
+              tags = ?,
+              author = ?,
+              status = ?,
+              is_published = ?,
+              updated_at = CURRENT_TIMESTAMP
+
+            WHERE
+              id = ?
+            `
+          )
+            .bind(
+              slug,
+              title,
+              String(
+                body.description || ""
+              ),
+              String(
+                body.genre || body.tags || ""
+              ),
+              String(
+                body.tags || body.genre || ""
+              ),
+              String(
+                body.author || ""
+              ),
+              String(
+                body.status ||
+                "En emisión"
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0,
+              id
+            )
+            .run();
+
+          return json({
+            ok: true,
+            id,
+            slug
+          });
+        }
+
+        catch(error) {
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese slug ya existe"
+              },
+              409
+            );
+          }
+
+          throw error;
+        }
+      }
+
+      if (
+        adminComicMatch &&
+        method === "DELETE"
+      ) {
+        const id =
+          Number(
+            adminComicMatch[1]
+          );
+
+        await deleteComicMedia(
+          env,
+          id
+        );
+
+        await env.DB.prepare(
+          `
+          DELETE FROM comics
+          WHERE id = ?
+          `
+        )
+          .bind(id)
+          .run();
+
+        return json({
+          ok: true
+        });
+      }
+
+
+      /*
+      ========================================
+      COVER
+      ========================================
+      */
+
+      const coverMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)\/cover$/
+        );
+
+      if (
+        coverMatch &&
+        method === "POST"
+      ) {
+        const comicId =
+          Number(
+            coverMatch[1]
+          );
+
+        const comic = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            cover_key
+
+          FROM comics
+
+          WHERE id = ?
+          `
+        )
+          .bind(comicId)
+          .first();
+
+        if (!comic) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Cómic no encontrado"
+            },
+            404
+          );
+        }
+
+        const form =
+          await request.formData();
+
+        const file =
+          form.get("cover");
+
+        if (
+          !file ||
+          typeof file === "string"
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Selecciona una portada"
+            },
+            400
+          );
+        }
+
+        const key =
+          `covers/${comicId}/${crypto.randomUUID()}-${safeName(file.name)}`;
+
+        await env.MEDIA.put(
+          key,
+          file.stream(),
+          {
+            httpMetadata: {
+              contentType:
+                file.type ||
+                "application/octet-stream"
+            }
+          }
+        );
+
+        if (
+          comic.cover_key &&
+          comic.cover_key !== key
+        ) {
+          await env.MEDIA.delete(
+            comic.cover_key
+          );
+        }
+
+        await env.DB.prepare(
+          `
+          UPDATE comics
+          SET
+            cover_key = ?,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+          `
+        )
+          .bind(
+            key,
+            comicId
+          )
+          .run();
+
+        return json({
+          ok: true,
+          cover_url:
+            `/media/${key}`
+        });
+      }
+
+
+      /*
+      ========================================
+      ADMIN COMIC CHAPTERS
+      ========================================
+      */
+
+      const comicChaptersMatch =
+        path.match(
+          /^\/api\/admin\/comics\/(\d+)\/chapters$/
+        );
+
+      if (
+        comicChaptersMatch &&
+        method === "GET"
+      ) {
+        const comicId =
+          Number(
+            comicChaptersMatch[1]
+          );
+
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            ch.*,
+
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
+
+          FROM chapters ch
+
+          WHERE
+            ch.comic_id = ?
+
+          ORDER BY
+            ch.chapter_number ASC,
+            ch.id ASC
+          `
+        )
+          .bind(comicId)
+          .all();
+
+        return json({
+          ok: true,
+          chapters:
+            rows.results || []
+        });
+      }
+
+      if (
+        comicChaptersMatch &&
+        method === "POST"
+      ) {
+        const comicId =
+          Number(
+            comicChaptersMatch[1]
+          );
+
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        const chapterNumber =
+          Number(
+            body.chapter_number
+          );
+
+        if (
+          !Number.isFinite(
+            chapterNumber
+          )
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de parte inválido"
+            },
+            400
+          );
+        }
+
+        try {
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO chapters (
+              comic_id,
+              chapter_number,
+              title,
+              is_published,
+              created_at,
+              updated_at
+            )
+
+            VALUES (
+              ?,
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
+            .bind(
+              comicId,
+              chapterNumber,
+              String(
+                body.title || ""
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0
+            )
+            .run();
+
+          await touchComic(
+            env,
+            comicId
+          );
+
+          return json(
+            {
+              ok: true,
+              id:
+                result.meta.last_row_id
+            },
+            201
+          );
+        }
+
+        catch(error) {
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese número de parte ya existe"
+              },
+              409
+            );
+          }
+
+          throw error;
+        }
+      }
+
+
+      /*
+      ========================================
+      UPDATE / DELETE CHAPTER
+      ========================================
+      */
+
+      const adminChapterMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)$/
+        );
+
+      if (
+        adminChapterMatch &&
+        method === "PUT"
+      ) {
+        const id =
+          Number(
+            adminChapterMatch[1]
+          );
+
+        const old = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(id)
+          .first();
+
+        if (!old) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        const chapterNumber =
+          Number(
+            body.chapter_number
+          );
+
+        if (
+          !Number.isFinite(
+            chapterNumber
+          )
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Número de parte inválido"
+            },
+            400
+          );
+        }
+
+        try {
+          await env.DB.prepare(
+            `
+            UPDATE chapters
+
+            SET
+              chapter_number = ?,
+              title = ?,
+              is_published = ?,
+              updated_at = CURRENT_TIMESTAMP
+
+            WHERE
+              id = ?
+            `
+          )
+            .bind(
+              chapterNumber,
+              String(
+                body.title || ""
+              ),
+              toBool(
+                body.is_published
+              )
+                ? 1
+                : 0,
+              id
+            )
+            .run();
+
+          await touchComic(
+            env,
+            old.comic_id
+          );
+
+          return json({
+            ok: true
+          });
+        }
+
+        catch(error) {
+          if (
+            String(error)
+              .toLowerCase()
+              .includes("unique")
+          ) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "Ese número de parte ya existe"
+              },
+              409
+            );
+          }
+
+          throw error;
+        }
+      }
+
+      if (
+        adminChapterMatch &&
+        method === "DELETE"
+      ) {
+        const id =
+          Number(
+            adminChapterMatch[1]
+          );
+
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(id)
+          .first();
+
+        if (!chapter) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        const pages = await env.DB.prepare(
+          `
+          SELECT object_key
+          FROM pages
+          WHERE chapter_id = ?
+          `
+        )
+          .bind(id)
+          .all();
+
+        const keys =
+          (pages.results || [])
+            .map(
+              row =>
+                row.object_key
+            )
+            .filter(Boolean);
+
+        if (keys.length) {
+          await env.MEDIA.delete(
+            keys
+          );
+        }
+
+        await env.DB.prepare(
+          `
+          DELETE FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(id)
+          .run();
+
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+
+        return json({
+          ok: true
+        });
+      }
+
+
+      /*
+      ========================================
+      ADMIN CHAPTER PAGES
+      ========================================
+      */
+
+      const adminChapterPagesMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)\/pages$/
+        );
+
+      if (
+        adminChapterPagesMatch &&
+        method === "GET"
+      ) {
+        const chapterId =
+          Number(
+            adminChapterPagesMatch[1]
+          );
+
+        const rows = await env.DB.prepare(
+          `
+          SELECT
+            id,
+            chapter_id,
+            page_number,
+            object_key,
+            '/media/' || object_key AS url
+
+          FROM pages
+
+          WHERE
+            chapter_id = ?
+
+          ORDER BY
+            page_number ASC,
+            id ASC
+          `
+        )
+          .bind(chapterId)
+          .all();
+
+        return json({
+          ok: true,
+          pages:
+            rows.results || []
+        });
+      }
+
+      if (
+        adminChapterPagesMatch &&
+        method === "POST"
+      ) {
+        const chapterId =
+          Number(
+            adminChapterPagesMatch[1]
+          );
+
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(chapterId)
+          .first();
+
+        if (!chapter) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Parte no encontrada"
+            },
+            404
+          );
+        }
+
+        const form =
+          await request.formData();
+
+        const files =
+          form.getAll("pages")
+            .filter(
+              file =>
+                file &&
+                typeof file !== "string"
+            );
+
+        if (!files.length) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Selecciona páginas"
+            },
+            400
+          );
+        }
+
+        const maxRow = await env.DB.prepare(
+          `
+          SELECT
+            COALESCE(
+              MAX(page_number),
+              0
+            ) AS max_page
+
+          FROM pages
+
+          WHERE
+            chapter_id = ?
+          `
+        )
+          .bind(chapterId)
+          .first();
+
+        let pageNumber =
+          Number(
+            maxRow?.max_page || 0
+          );
+
+        const uploaded = [];
+
+        for (const file of files) {
+          pageNumber += 1;
+
+          const key =
+            `comics/${chapter.comic_id}/chapters/${chapterId}/${crypto.randomUUID()}-${safeName(file.name)}`;
+
+          await env.MEDIA.put(
+            key,
+            file.stream(),
+            {
+              httpMetadata: {
+                contentType:
+                  file.type ||
+                  "application/octet-stream"
+              }
+            }
+          );
+
+          const result = await env.DB.prepare(
+            `
+            INSERT INTO pages (
+              chapter_id,
+              page_number,
+              object_key,
+              created_at
+            )
+
+            VALUES (
+              ?,
+              ?,
+              ?,
+              CURRENT_TIMESTAMP
+            )
+            `
+          )
+            .bind(
+              chapterId,
+              pageNumber,
+              key
+            )
+            .run();
+
+          uploaded.push({
+            id:
+              result.meta.last_row_id,
+
+            page_number:
+              pageNumber,
+
+            url:
+              `/media/${key}`
+          });
+        }
+
+        await touchChapter(
+          env,
+          chapterId
+        );
+
+        await touchComic(
+          env,
+          chapter.comic_id
+        );
+
+        return json(
+          {
+            ok: true,
+            uploaded
+          },
+          201
+        );
+      }
+
+
+      /*
+      ========================================
+      REORDER PAGES
+      ========================================
+      */
+
+      const reorderMatch =
+        path.match(
+          /^\/api\/admin\/chapters\/(\d+)\/pages\/reorder$/
+        );
+
+      if (
+        reorderMatch &&
+        method === "POST"
+      ) {
+        const chapterId =
+          Number(
+            reorderMatch[1]
+          );
+
+        const body =
+          await request
+            .json()
+            .catch(() => ({}));
+
+        const ids =
+          Array.isArray(
+            body.page_ids
+          )
+            ? body.page_ids
+                .map(Number)
+                .filter(
+                  Number.isFinite
+                )
+            : [];
+
+        const current = await env.DB.prepare(
+          `
+          SELECT id
+          FROM pages
+          WHERE chapter_id = ?
+          ORDER BY page_number ASC
+          `
+        )
+          .bind(chapterId)
+          .all();
+
+        const currentIds =
+          (current.results || [])
+            .map(
+              row =>
+                Number(row.id)
+            );
+
+        const requestedSorted =
+          [...ids]
+            .sort(
+              (a, b) =>
+                a - b
+            )
+            .join(",");
+
+        const currentSorted =
+          [...currentIds]
+            .sort(
+              (a, b) =>
+                a - b
+            )
+            .join(",");
+
+        if (
+          ids.length !== currentIds.length ||
+          requestedSorted !== currentSorted
+        ) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Orden de páginas inválido"
+            },
+            400
+          );
+        }
+
+        for (
+          let i = 0;
+          i < ids.length;
+          i++
+        ) {
+          await env.DB.prepare(
+            `
+            UPDATE pages
+            SET page_number = ?
+            WHERE id = ?
+            AND chapter_id = ?
+            `
+          )
+            .bind(
+              -(i + 1),
+              ids[i],
+              chapterId
+            )
+            .run();
+        }
+
+        for (
+          let i = 0;
+          i < ids.length;
+          i++
+        ) {
+          await env.DB.prepare(
+            `
+            UPDATE pages
+            SET page_number = ?
+            WHERE id = ?
+            AND chapter_id = ?
+            `
+          )
+            .bind(
+              i + 1,
+              ids[i],
+              chapterId
+            )
+            .run();
+        }
+
+        const chapter = await env.DB.prepare(
+          `
+          SELECT comic_id
+          FROM chapters
+          WHERE id = ?
+          `
+        )
+          .bind(chapterId)
+          .first();
+
+        await touchChapter(
+          env,
+          chapterId
+        );
+
+        if (chapter) {
+          await touchComic(
+            env,
+            chapter.comic_id
+          );
+        }
+
+        return json({
+          ok: true
+        });
+      }
+
+
+      /*
+      ========================================
+      DELETE PAGE
+      ========================================
+      */
+
+      const pageDeleteMatch =
+        path.match(
+          /^\/api\/admin\/pages\/(\d+)$/
+        );
+
+      if (
+        pageDeleteMatch &&
+        method === "DELETE"
+      ) {
+        const id =
+          Number(
+            pageDeleteMatch[1]
+          );
+
+        const page = await env.DB.prepare(
+          `
+          SELECT
+            p.object_key,
+            p.chapter_id,
+            ch.comic_id
+
+          FROM pages p
+
+          JOIN chapters ch
+            ON ch.id = p.chapter_id
+
+          WHERE
+            p.id = ?
+          `
+        )
+          .bind(id)
+          .first();
+
+        if (!page) {
+          return json(
+            {
+              ok: false,
+              error:
+                "Página no encontrada"
+            },
+            404
+          );
+        }
+
+        if (page.object_key) {
+          await env.MEDIA.delete(
+            page.object_key
+          );
+        }
+
+        await env.DB.prepare(
+          `
+          DELETE FROM pages
+          WHERE id = ?
+          `
+        )
+          .bind(id)
+          .run();
+
+        await renumberPages(
+          env,
+          page.chapter_id
+        );
+
+        await touchChapter(
+          env,
+          page.chapter_id
+        );
+
+        await touchComic(
+          env,
+          page.comic_id
+        );
+
+        return json({
+          ok: true
+        });
+      }
+
+
+      /*
+      ========================================
+      UNKNOWN API
+      ========================================
+      */
+
+      if (
+        path.startsWith("/api/")
+      ) {
+        return json(
+          {
+            ok: false,
+            error:
+              "Ruta no encontrada"
+          },
+          404
+        );
+      }
+
+
+      /*
+      ========================================
+      STATIC SITE
+      ========================================
+      */
+
+      return env.ASSETS.fetch(
+        request
+      );
+
+    }
+
+    catch(error) {
+      console.error(
+        "EroToonX Worker error:",
+        error
+      );
+
+      return json(
+        {
+          ok: false,
+          error:
+            "Error interno del servidor"
+        },
+        500
+      );
+    }
+  }
+};
+
+// deploy refresh 2026-08-21

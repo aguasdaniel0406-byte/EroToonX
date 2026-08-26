@@ -534,6 +534,46 @@ async function ensureCategoryTable(env) {
       `).bind(slug, name, aliases, mode).run();
     }
   }
+
+  /* Migraciones únicas: añaden vocabulario nuevo sin volver a crear categorías
+     que el administrador elimine voluntariamente después. */
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS category_migrations (
+      migration_key TEXT PRIMARY KEY,
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+
+  const vocabularyMigration = "context-vocabulary-v2";
+  const alreadyApplied = await env.DB.prepare(
+    "SELECT migration_key FROM category_migrations WHERE migration_key = ?"
+  ).bind(vocabularyMigration).first();
+
+  if (!alreadyApplied) {
+    const extraCategories = [
+      ["madre", "Madre", "mamá, mama, mom, mommy, mother, mum, momma", "contexto"],
+      ["padre", "Padre", "papá, papa, dad, daddy, father", "contexto"],
+      ["hijo", "Hijo", "son, hijo", "contexto"],
+      ["hija", "Hija", "daughter, hija", "contexto"],
+      ["hermana", "Hermana", "sister, hermana", "contexto"],
+      ["hermano", "Hermano", "brother, hermano", "contexto"],
+      ["hermanastra", "Hermanastra", "stepsister, hermanastra", "contexto"],
+      ["hermanastro", "Hermanastro", "stepbrother, hermanastro", "contexto"],
+      ["hijastra", "Hijastra", "stepdaughter, hijastra", "contexto"],
+      ["hijastro", "Hijastro", "stepson, hijastro", "contexto"],
+      ["profesora", "Profesora", "female teacher, teacher, profesora, maestra", "contexto"],
+      ["profesor", "Profesor", "male teacher, profesor, maestro", "contexto"]
+    ];
+    for (const [slug, name, aliases, mode] of extraCategories) {
+      await env.DB.prepare(`
+        INSERT OR IGNORE INTO categories (slug, name, aliases, detection_mode, is_active)
+        VALUES (?, ?, ?, ?, 1)
+      `).bind(slug, name, aliases, mode).run();
+    }
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO category_migrations (migration_key) VALUES (?)"
+    ).bind(vocabularyMigration).run();
+  }
 }
 
 function cleanCategoryAliases(value = "") {
@@ -646,6 +686,70 @@ async function deleteAdminCategory(env, id) {
   const affectedComics = await replaceCategoryInComics(env, current, "");
   await env.DB.prepare("DELETE FROM categories WHERE id = ?").bind(id).run();
   return { category: current, affected_comics: affectedComics };
+}
+
+async function ensureAnalysisMemoryTable(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS analysis_memory (
+      series_key TEXT PRIMARY KEY,
+      series_title TEXT NOT NULL DEFAULT '',
+      tags TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+}
+
+function cleanAnalysisMemoryTags(value) {
+  const source = Array.isArray(value) ? value : splitTagList(value || "");
+  const out = [];
+  const seen = new Set();
+  for (const raw of source) {
+    const item = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    const key = item.toLocaleLowerCase("es");
+    if (!item || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+    if (out.length >= 40) break;
+  }
+  return out;
+}
+
+async function getAnalysisMemory(env, seriesKey) {
+  await ensureAnalysisMemoryTable(env);
+  const key = String(seriesKey || "").trim().slice(0, 180);
+  if (!key) return { series_key: "", series_title: "", tags: [] };
+  const row = await env.DB.prepare(`
+    SELECT series_key, series_title, tags, updated_at
+    FROM analysis_memory WHERE series_key = ?
+  `).bind(key).first();
+  if (!row) return { series_key: key, series_title: "", tags: [] };
+  return { ...row, tags: splitTagList(row.tags || "") };
+}
+
+async function saveAnalysisMemory(env, body) {
+  await ensureAnalysisMemoryTable(env);
+  const key = String(body.series_key || "").trim().slice(0, 180);
+  if (!key) throw new Error("Falta el identificador de la serie.");
+  const title = String(body.series_title || "").replace(/\s+/g, " ").trim().slice(0, 180);
+  const tags = cleanAnalysisMemoryTags(body.tags || []);
+  await env.DB.prepare(`
+    INSERT INTO analysis_memory (series_key, series_title, tags, created_at, updated_at)
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ON CONFLICT(series_key) DO UPDATE SET
+      series_title = excluded.series_title,
+      tags = excluded.tags,
+      updated_at = CURRENT_TIMESTAMP
+  `).bind(key, title, tags.join(", ")).run();
+  return getAnalysisMemory(env, key);
+}
+
+async function deleteAnalysisMemory(env, seriesKey) {
+  await ensureAnalysisMemoryTable(env);
+  const key = String(seriesKey || "").trim().slice(0, 180);
+  if (!key) return false;
+  const result = await env.DB.prepare("DELETE FROM analysis_memory WHERE series_key = ?").bind(key).run();
+  return Number(result.meta?.changes || 0) > 0;
 }
 
 async function adminComics(env) {
@@ -2052,6 +2156,32 @@ export default {
       if (adminCategoryMatch && method === "DELETE") {
         const result = await deleteAdminCategory(env, Number(adminCategoryMatch[1]));
         return result ? json({ ok: true, ...result }) : json({ ok: false, error: "Categoría no encontrada." }, 404);
+      }
+
+      /*
+      ========================================
+      ANALYSIS MEMORY · SERIES
+      ========================================
+      */
+
+      if (path === "/api/admin/analysis-memory" && method === "GET") {
+        const seriesKey = url.searchParams.get("series_key") || "";
+        return json({ ok: true, memory: await getAnalysisMemory(env, seriesKey) });
+      }
+
+      if (path === "/api/admin/analysis-memory" && method === "POST") {
+        const body = await request.json().catch(() => ({}));
+        try {
+          return json({ ok: true, memory: await saveAnalysisMemory(env, body) });
+        } catch (error) {
+          return json({ ok: false, error: String(error?.message || error) }, 400);
+        }
+      }
+
+      if (path === "/api/admin/analysis-memory" && method === "DELETE") {
+        const seriesKey = url.searchParams.get("series_key") || "";
+        const deleted = await deleteAnalysisMemory(env, seriesKey);
+        return json({ ok: true, deleted });
       }
 
       /*

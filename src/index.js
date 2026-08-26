@@ -694,10 +694,22 @@ async function ensureAnalysisMemoryTable(env) {
       series_key TEXT PRIMARY KEY,
       series_title TEXT NOT NULL DEFAULT '',
       tags TEXT NOT NULL DEFAULT '',
+      rejected_tags TEXT NOT NULL DEFAULT '',
+      memory_version INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `).run();
+
+  /* Compatibilidad con instalaciones que ya tenían la memoria v2. */
+  const info = await env.DB.prepare("PRAGMA table_info(analysis_memory)").all();
+  const names = new Set((info.results || []).map(x => String(x.name || "")));
+  if (!names.has("rejected_tags")) {
+    await env.DB.prepare("ALTER TABLE analysis_memory ADD COLUMN rejected_tags TEXT NOT NULL DEFAULT ''").run();
+  }
+  if (!names.has("memory_version")) {
+    await env.DB.prepare("ALTER TABLE analysis_memory ADD COLUMN memory_version INTEGER NOT NULL DEFAULT 1").run();
+  }
 }
 
 function cleanAnalysisMemoryTags(value) {
@@ -710,7 +722,7 @@ function cleanAnalysisMemoryTags(value) {
     if (!item || seen.has(key)) continue;
     seen.add(key);
     out.push(item);
-    if (out.length >= 40) break;
+    if (out.length >= 50) break;
   }
   return out;
 }
@@ -718,13 +730,22 @@ function cleanAnalysisMemoryTags(value) {
 async function getAnalysisMemory(env, seriesKey) {
   await ensureAnalysisMemoryTable(env);
   const key = String(seriesKey || "").trim().slice(0, 180);
-  if (!key) return { series_key: "", series_title: "", tags: [] };
+  if (!key) return { series_key: "", series_title: "", tags: [], rejected_tags: [], memory_version: 3 };
   const row = await env.DB.prepare(`
-    SELECT series_key, series_title, tags, updated_at
+    SELECT series_key, series_title, tags, rejected_tags, memory_version, updated_at
     FROM analysis_memory WHERE series_key = ?
   `).bind(key).first();
-  if (!row) return { series_key: key, series_title: "", tags: [] };
-  return { ...row, tags: splitTagList(row.tags || "") };
+  if (!row) return { series_key: key, series_title: "", tags: [], rejected_tags: [], memory_version: 3 };
+
+  /* La memoria v2 se alimentaba también de sugerencias automáticas. No se usa
+     como confirmación en v3 hasta que el administrador vuelva a guardar/corregir. */
+  const trusted = Number(row.memory_version || 0) >= 3;
+  return {
+    ...row,
+    tags: trusted ? splitTagList(row.tags || "") : [],
+    rejected_tags: trusted ? splitTagList(row.rejected_tags || "") : [],
+    legacy_ignored: !trusted
+  };
 }
 
 async function saveAnalysisMemory(env, body) {
@@ -732,15 +753,41 @@ async function saveAnalysisMemory(env, body) {
   const key = String(body.series_key || "").trim().slice(0, 180);
   if (!key) throw new Error("Falta el identificador de la serie.");
   const title = String(body.series_title || "").replace(/\s+/g, " ").trim().slice(0, 180);
-  const tags = cleanAnalysisMemoryTags(body.tags || []);
+  const incomingAccepted = cleanAnalysisMemoryTags(body.tags || []);
+  const incomingRejected = cleanAnalysisMemoryTags(body.rejected_tags || []);
+  const merge = body.merge === undefined ? true : toBool(body.merge);
+
+  const accepted = new Map();
+  const rejected = new Map();
+  if (merge) {
+    const current = await getAnalysisMemory(env, key);
+    for (const tag of current.tags || []) accepted.set(tag.toLocaleLowerCase("es"), tag);
+    for (const tag of current.rejected_tags || []) rejected.set(tag.toLocaleLowerCase("es"), tag);
+  }
+
+  for (const tag of incomingAccepted) {
+    const k = tag.toLocaleLowerCase("es");
+    accepted.set(k, tag);
+    rejected.delete(k);
+  }
+  for (const tag of incomingRejected) {
+    const k = tag.toLocaleLowerCase("es");
+    rejected.set(k, tag);
+    accepted.delete(k);
+  }
+
+  const acceptedList = [...accepted.values()].slice(0, 50);
+  const rejectedList = [...rejected.values()].slice(0, 50);
   await env.DB.prepare(`
-    INSERT INTO analysis_memory (series_key, series_title, tags, created_at, updated_at)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    INSERT INTO analysis_memory (series_key, series_title, tags, rejected_tags, memory_version, created_at, updated_at)
+    VALUES (?, ?, ?, ?, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     ON CONFLICT(series_key) DO UPDATE SET
       series_title = excluded.series_title,
       tags = excluded.tags,
+      rejected_tags = excluded.rejected_tags,
+      memory_version = 3,
       updated_at = CURRENT_TIMESTAMP
-  `).bind(key, title, tags.join(", ")).run();
+  `).bind(key, title, acceptedList.join(", "), rejectedList.join(", ")).run();
   return getAnalysisMemory(env, key);
 }
 

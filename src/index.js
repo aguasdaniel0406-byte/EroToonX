@@ -508,6 +508,146 @@ async function publicTags(env) {
   return json({ ok: true, tags });
 }
 
+
+const DEFAULT_CATEGORY_SEED = [["anal", "Anal", "anal sex, anal_sex", "visual"], ["blowjob", "Blowjob", "oral, fellatio, mamada, sexo oral masculino", "visual"], ["handjob", "Handjob", "hand job, masturbación manual", "visual"], ["cunnilingus", "Cunnilingus", "pussy licking, sexo oral femenino", "visual"], ["doggystyle", "Doggystyle", "doggy style, from behind, perrito", "visual"], ["cowgirl", "Cowgirl", "woman on top, chica arriba", "visual"], ["reverse-cowgirl", "Reverse Cowgirl", "reverse cowgirl, reverse_cowgirl", "visual"], ["misionero", "Misionero", "missionary, missionary position", "visual"], ["deepthroat", "Deepthroat", "deep throat, garganta profunda", "visual"], ["creampie", "Creampie", "internal ejaculation, eyaculación interna", "visual"], ["facial", "Facial", "facial ejaculation, eyaculación facial", "visual"], ["cumshot", "Cumshot", "ejaculation, cum shot", "visual"], ["paizuri", "Paizuri", "titjob, titfuck, breast sex", "visual"], ["fingering", "Fingering", "fingered, masturbación con dedos", "visual"], ["doble-penetracion", "Doble penetración", "double penetration, dp", "visual"], ["threesome", "Threesome", "threesome sex, trío", "visual"], ["gangbang", "Gangbang", "gang bang", "visual"], ["orgia", "Orgía", "orgy, group sex", "visual"], ["rubia", "Rubia", "blonde, blond hair", "visual"], ["morena", "Morena", "brunette, brown hair", "visual"], ["pelirroja", "Pelirroja", "redhead, red hair", "visual"], ["cabello-negro", "Cabello negro", "black hair", "visual"], ["gafas", "Gafas", "glasses, eyewear", "visual"], ["pechos-grandes", "Pechos grandes", "big breasts, large breasts, big boobs", "visual"], ["culo-grande", "Culo grande", "big ass, large ass", "visual"], ["curvilinea", "Curvilínea", "curvy, voluptuous", "visual"], ["musculosa", "Musculosa", "muscular female, muscular woman", "visual"], ["tatuajes", "Tatuajes", "tattoo, tattooed", "visual"], ["piercings", "Piercings", "piercing, pierced", "visual"], ["solo", "Solo", "solo", "visual"], ["pareja", "Pareja", "couple, 1 male 1 female", "visual"], ["trio", "Trío", "three people", "visual"], ["grupo", "Grupo", "group, multiple people", "visual"], ["lesbico", "Lésbico", "lesbian, yuri", "visual"], ["gay", "Gay", "male male, yaoi", "visual"], ["milf", "MILF", "milf", "ambas"], ["dormitorio", "Dormitorio", "bedroom, bed", "visual"], ["bano", "Baño", "bathroom, shower", "visual"], ["oficina", "Oficina", "office, workplace", "visual"], ["cocina", "Cocina", "kitchen", "visual"], ["hotel", "Hotel", "hotel room", "visual"], ["exterior", "Exterior", "outdoors, outside", "visual"], ["playa", "Playa", "beach", "visual"], ["piscina", "Piscina", "pool, swimming pool", "visual"], ["gimnasio", "Gimnasio", "gym", "visual"], ["coche", "Coche", "car, vehicle", "visual"], ["3d", "3D", "3d render, cgi", "visual"], ["hentai", "Hentai", "hentai", "visual"], ["anime", "Anime", "anime", "visual"], ["cartoon", "Cartoon", "cartoon", "visual"], ["comic-occidental", "Cómic occidental", "western comic", "visual"], ["realista", "Realista", "realistic, photorealistic", "visual"], ["incesto", "Incesto", "incest, incestuous", "contexto"], ["madrastra", "Madrastra", "stepmom, stepmother", "contexto"], ["padrastro", "Padrastro", "stepdad, stepfather", "contexto"], ["hermanastros", "Hermanastros", "stepsister, stepbrother, step siblings", "contexto"], ["madre-e-hijo", "Madre e hijo", "mother and son, mom and son", "contexto"], ["padre-e-hija", "Padre e hija", "father and daughter, dad and daughter", "contexto"], ["infidelidad", "Infidelidad", "cheating, cheating wife, cheating husband, affair", "contexto"], ["esposa", "Esposa", "wife, married woman", "contexto"], ["marido", "Marido", "husband", "contexto"], ["jefe", "Jefe", "boss", "contexto"], ["vecina", "Vecina", "neighbor, neighbour", "contexto"], ["chantaje", "Chantaje", "blackmail, threatened", "contexto"], ["voyeurismo", "Voyeurismo", "voyeur, spying, watching secretly", "ambas"]];
+
+async function ensureCategoryTable(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      aliases TEXT NOT NULL DEFAULT '',
+      detection_mode TEXT NOT NULL DEFAULT 'manual',
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+
+  const row = await env.DB.prepare("SELECT COUNT(*) AS total FROM categories").first();
+  if (Number(row?.total || 0) === 0) {
+    for (const [slug, name, aliases, mode] of DEFAULT_CATEGORY_SEED) {
+      await env.DB.prepare(`
+        INSERT OR IGNORE INTO categories (slug, name, aliases, detection_mode, is_active)
+        VALUES (?, ?, ?, ?, 1)
+      `).bind(slug, name, aliases, mode).run();
+    }
+  }
+}
+
+function cleanCategoryAliases(value = "") {
+  const out = [];
+  const seen = new Set();
+  for (const raw of String(value || "").split(",")) {
+    const item = raw.replace(/\s+/g, " ").trim();
+    const key = item.toLocaleLowerCase("es");
+    if (!item || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out.join(", ");
+}
+
+function categoryTokens(category) {
+  return [category?.name, ...splitTagList(category?.aliases || "")]
+    .map(x => String(x || "").trim())
+    .filter(Boolean);
+}
+
+async function listAdminCategories(env) {
+  await ensureCategoryTable(env);
+  const rows = await env.DB.prepare(`
+    SELECT id, slug, name, aliases, detection_mode, is_active, created_at, updated_at
+    FROM categories
+    ORDER BY is_active DESC, name COLLATE NOCASE ASC
+  `).all();
+  return rows.results || [];
+}
+
+async function replaceCategoryInComics(env, oldCategory, newName = "") {
+  const tokens = new Set(categoryTokens(oldCategory).map(x => x.toLocaleLowerCase("es")));
+  if (!tokens.size) return 0;
+  const rows = await env.DB.prepare("SELECT id, tags, genre FROM comics").all();
+  let changed = 0;
+
+  for (const row of rows.results || []) {
+    let touched = false;
+    const rewrite = (value) => {
+      const out = [];
+      const seen = new Set();
+      for (const item of splitTagList(value || "")) {
+        const key = item.toLocaleLowerCase("es");
+        const replacement = tokens.has(key) ? String(newName || "").trim() : item;
+        if (tokens.has(key)) touched = true;
+        if (!replacement) continue;
+        const rkey = replacement.toLocaleLowerCase("es");
+        if (seen.has(rkey)) continue;
+        seen.add(rkey);
+        out.push(replacement);
+      }
+      return out.join(", ");
+    };
+
+    const tags = rewrite(row.tags);
+    const genre = rewrite(row.genre);
+    if (touched) {
+      await env.DB.prepare(`
+        UPDATE comics SET tags = ?, genre = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+      `).bind(tags, genre, row.id).run();
+      changed += 1;
+    }
+  }
+  return changed;
+}
+
+async function createAdminCategory(env, body) {
+  await ensureCategoryTable(env);
+  const name = String(body.name || "").replace(/\s+/g, " ").trim().slice(0, 80);
+  if (!name) throw new Error("El nombre de la categoría es obligatorio.");
+  const slug = slugify(body.slug || name);
+  if (!slug) throw new Error("El nombre no genera un identificador válido.");
+  const aliases = cleanCategoryAliases(body.aliases || "");
+  const mode = ["visual", "contexto", "ambas", "manual"].includes(body.detection_mode) ? body.detection_mode : "manual";
+  const result = await env.DB.prepare(`
+    INSERT INTO categories (slug, name, aliases, detection_mode, is_active)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(slug, name, aliases, mode, toBool(body.is_active ?? true) ? 1 : 0).run();
+  return env.DB.prepare("SELECT * FROM categories WHERE id = ?").bind(result.meta.last_row_id).first();
+}
+
+async function updateAdminCategory(env, id, body) {
+  await ensureCategoryTable(env);
+  const current = await env.DB.prepare("SELECT * FROM categories WHERE id = ?").bind(id).first();
+  if (!current) return null;
+  const name = String(body.name ?? current.name).replace(/\s+/g, " ").trim().slice(0, 80);
+  if (!name) throw new Error("El nombre de la categoría es obligatorio.");
+  const slug = slugify(body.slug || name);
+  const aliases = cleanCategoryAliases(body.aliases ?? current.aliases);
+  const mode = ["visual", "contexto", "ambas", "manual"].includes(body.detection_mode) ? body.detection_mode : current.detection_mode;
+  const active = body.is_active === undefined ? Number(current.is_active || 0) : (toBool(body.is_active) ? 1 : 0);
+
+  if (name.toLocaleLowerCase("es") !== String(current.name).toLocaleLowerCase("es")) {
+    await replaceCategoryInComics(env, current, name);
+  }
+
+  await env.DB.prepare(`
+    UPDATE categories
+    SET slug = ?, name = ?, aliases = ?, detection_mode = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).bind(slug, name, aliases, mode, active, id).run();
+  return env.DB.prepare("SELECT * FROM categories WHERE id = ?").bind(id).first();
+}
+
+async function deleteAdminCategory(env, id) {
+  await ensureCategoryTable(env);
+  const current = await env.DB.prepare("SELECT * FROM categories WHERE id = ?").bind(id).first();
+  if (!current) return null;
+  const affectedComics = await replaceCategoryInComics(env, current, "");
+  await env.DB.prepare("DELETE FROM categories WHERE id = ?").bind(id).run();
+  return { category: current, affected_comics: affectedComics };
+}
+
 async function adminComics(env) {
   const rows = await env.DB.prepare(
     `
@@ -1874,6 +2014,45 @@ export default {
       }
 
 
+
+
+      /*
+      ========================================
+      ADMIN CATEGORIES
+      ========================================
+      */
+
+      if (method === "GET" && path === "/api/admin/categories") {
+        return json({ ok: true, categories: await listAdminCategories(env) });
+      }
+
+      if (method === "POST" && path === "/api/admin/categories") {
+        const body = await request.json().catch(() => ({}));
+        try {
+          const category = await createAdminCategory(env, body);
+          return json({ ok: true, category }, 201);
+        } catch (error) {
+          const message = String(error?.message || error);
+          return json({ ok: false, error: /UNIQUE|constraint/i.test(message) ? "Ya existe una categoría con ese nombre o identificador." : message }, 400);
+        }
+      }
+
+      const adminCategoryMatch = path.match(/^\/api\/admin\/categories\/(\d+)$/);
+      if (adminCategoryMatch && method === "PUT") {
+        const body = await request.json().catch(() => ({}));
+        try {
+          const category = await updateAdminCategory(env, Number(adminCategoryMatch[1]), body);
+          return category ? json({ ok: true, category }) : json({ ok: false, error: "Categoría no encontrada." }, 404);
+        } catch (error) {
+          const message = String(error?.message || error);
+          return json({ ok: false, error: /UNIQUE|constraint/i.test(message) ? "Ya existe una categoría con ese nombre o identificador." : message }, 400);
+        }
+      }
+
+      if (adminCategoryMatch && method === "DELETE") {
+        const result = await deleteAdminCategory(env, Number(adminCategoryMatch[1]));
+        return result ? json({ ok: true, ...result }) : json({ ok: false, error: "Categoría no encontrada." }, 404);
+      }
 
       /*
       ========================================

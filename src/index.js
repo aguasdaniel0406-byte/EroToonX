@@ -59,7 +59,7 @@ function parseAiTags(text = "", existing = []) {
       out.push(tag);
       seen.add(finalKey);
     }
-    if (out.length >= 8) break;
+    if (out.length >= 12) break;
   }
 
   return out;
@@ -1961,22 +1961,33 @@ export default {
           : "No existing categories yet";
 
         const prompt = [
-          "Analyze this contact sheet from an illustrated adult comic and suggest 3 to 8 concise VISUAL category tags.",
-          "Prefer an existing category when it is clearly supported by the image.",
-          "You may propose a new tag only for a directly visible visual theme, body feature, clothing/theme, or adult scene type.",
+          "You are an expert taxonomy assistant for an illustrated adult-comics catalog.",
+          "Study the ENTIRE contact sheet as a sample of the comic, not just one panel.",
+          "Independently identify the strongest visible themes and return 6 to 12 useful category tags.",
+          "IMPORTANT: the existing categories are ONLY a vocabulary reference. They are NOT a closed list and they must NOT limit your analysis.",
+          "If an existing category accurately matches what is visible, reuse its exact spelling so the catalog stays consistent.",
+          "If the comic clearly contains a useful visual theme that is missing from the existing list, CREATE A NEW concise category tag for it.",
+          "Prefer useful searchable categories: visual body features, clothing, setting/theme, composition, number of visible adult characters, and clearly visible adult scene types.",
+          "Use both broad and specific tags when they add different information, but avoid synonyms, duplicates, vague tags such as 'adult', 'comic', 'sexy', or 'NSFW'.",
+          "Only tag something when it is reasonably supported by multiple panels or is unmistakably visible in the sample.",
           "Do NOT infer or output age, family relationships, incest, ethnicity/race, identity, sexual orientation, consent, or whether anyone is a minor.",
-          "Never use family-role or age-related labels based on appearance.",
-          "Return ONLY a comma-separated list of tags. No explanations, sentences, bullets, or safety commentary.",
-          `Comic title (context only, do not infer relationships from it): ${title || "Untitled"}`,
-          `Existing categories: ${existingText}`
+          "Never use family-role or age-related labels based on appearance or title.",
+          "The comic title may help with non-sensitive setting/theme words, but visual evidence should control the final tags.",
+          "Return ONLY a comma-separated list of category tags. No explanations, bullets, prefixes, or commentary.",
+          `Comic title: ${title || "Untitled"}`,
+          `Existing category vocabulary (reference only): ${existingText}`
         ].join("\n");
 
         let result;
         try {
-          result = await env.AI.run("@cf/llava-hf/llava-1.5-7b-hf", {
-            image: Array.from(bytes),
-            prompt,
-            max_tokens: 120
+          result = await env.AI.run("@cf/moondream/moondream3.1-9B-A2B", {
+            task: "query",
+            image: String(body.image || ""),
+            question: prompt,
+            reasoning: true,
+            temperature: 0.2,
+            max_tokens: 420,
+            stream: false
           });
         } catch (error) {
           return json(
@@ -1986,6 +1997,7 @@ export default {
         }
 
         const raw = String(
+          result?.answer ||
           result?.description ||
           result?.response ||
           result?.text ||
@@ -2001,7 +2013,17 @@ export default {
           );
         }
 
-        return json({ ok: true, tags });
+        const existingLookup = new Set(existingTags.map((x) => x.toLocaleLowerCase("es")));
+        const newTags = tags.filter((x) => !existingLookup.has(String(x).toLocaleLowerCase("es")));
+        const reusedTags = tags.filter((x) => existingLookup.has(String(x).toLocaleLowerCase("es")));
+
+        return json({
+          ok: true,
+          tags,
+          new_tags: newTags,
+          reused_tags: reusedTags,
+          model: "moondream3.1"
+        });
       }
 
 

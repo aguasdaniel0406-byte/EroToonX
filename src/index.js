@@ -2071,11 +2071,52 @@ export default {
           .bind(chapterId)
           .all();
 
+        const siblings = await env.DB.prepare(
+          `
+          SELECT
+            ch.id,
+            ch.chapter_number,
+            ch.title,
+            ch.is_published,
+            (
+              SELECT COUNT(*)
+              FROM pages p
+              WHERE p.chapter_id = ch.id
+            ) AS page_count
+          FROM chapters ch
+          WHERE ch.comic_id = ?
+          AND ch.is_published = 1
+          AND EXISTS (
+            SELECT 1
+            FROM pages p2
+            WHERE p2.chapter_id = ch.id
+          )
+          ORDER BY ch.chapter_number ASC, ch.id ASC
+          `
+        )
+          .bind(chapter.comic_id)
+          .all();
+
+        const chapterList = siblings.results || [];
+        const chapterIndex = chapterList.findIndex(
+          item => Number(item.id) === Number(chapterId)
+        );
+
         return json({
           ok: true,
           chapter,
           pages:
-            rows.results || []
+            rows.results || [],
+          chapters: chapterList,
+          previous_chapter:
+            chapterIndex > 0
+              ? chapterList[chapterIndex - 1]
+              : null,
+          next_chapter:
+            chapterIndex >= 0 &&
+            chapterIndex < chapterList.length - 1
+              ? chapterList[chapterIndex + 1]
+              : null
         });
       }
 

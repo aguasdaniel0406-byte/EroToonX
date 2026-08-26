@@ -23,6 +23,61 @@ function toBool(value) {
     value === "true";
 }
 
+let publicationTypeSchemaReady = false;
+
+function normalizeContentType(value) {
+  return String(value || "").toLowerCase() === "series"
+    ? "series"
+    : "single";
+}
+
+async function ensurePublicationTypeSchema(env) {
+  if (publicationTypeSchemaReady) return;
+
+  // IMPORTANT: content_type is an explicit editorial choice.
+  // Never re-infer it on every Worker cold start from the number of internal
+  // chapter rows, because older single-reading comics may contain more than
+  // one internal chapter record.
+  let columnWasAdded = false;
+
+  try {
+    await env.DB.prepare(
+      "ALTER TABLE comics ADD COLUMN content_type TEXT NOT NULL DEFAULT 'single'"
+    ).run();
+    columnWasAdded = true;
+  } catch (error) {
+    const message = String(error || "").toLowerCase();
+    if (!message.includes("duplicate column") && !message.includes("already exists")) {
+      throw error;
+    }
+  }
+
+  // Only on the very first legacy migration, infer obvious multi-part entries.
+  // Once the column exists, the value chosen in Admin is always authoritative.
+  if (columnWasAdded) {
+    await env.DB.prepare(`
+      UPDATE comics
+      SET content_type = 'series'
+      WHERE id IN (
+        SELECT comic_id
+        FROM chapters
+        GROUP BY comic_id
+        HAVING COUNT(*) > 1
+      )
+    `).run();
+  }
+
+  await env.DB.prepare(`
+    UPDATE comics
+    SET content_type = 'single'
+    WHERE content_type IS NULL
+       OR TRIM(content_type) = ''
+       OR content_type NOT IN ('single', 'series')
+  `).run();
+
+  publicationTypeSchemaReady = true;
+}
+
 function slugify(value = "") {
   return String(value)
     .toLowerCase()
@@ -1639,6 +1694,10 @@ export default {
 
     try {
 
+      if (path.startsWith("/api/") || path === "/" || path === "/index.html" || /^\/comic\/[^/]+\/?$/.test(path)) {
+        await ensurePublicationTypeSchema(env);
+      }
+
       /*
       ========================================
       DYNAMIC SITEMAP
@@ -1835,6 +1894,7 @@ export default {
             c.id AS comic_id,
             c.slug,
             c.title AS comic_title,
+            c.content_type,
             c.genre,
             c.tags,
             c.cover_key,
@@ -2293,7 +2353,21 @@ export default {
 
             (
               SELECT COUNT(*)
-              FROM chapters
+              FROM comics
+              WHERE content_type = 'single'
+            ) AS single_comics,
+
+            (
+              SELECT COUNT(*)
+              FROM comics
+              WHERE content_type = 'series'
+            ) AS series,
+
+            (
+              SELECT COUNT(*)
+              FROM chapters ch
+              JOIN comics c ON c.id = ch.comic_id
+              WHERE c.content_type = 'series'
             ) AS chapters,
 
             (
@@ -2318,6 +2392,8 @@ export default {
           stats:
             row || {
               comics: 0,
+              single_comics: 0,
+              series: 0,
               chapters: 0,
               pages: 0,
               views: 0
@@ -2399,12 +2475,14 @@ export default {
               tags,
               author,
               status,
+              content_type,
               is_published,
               created_at,
               updated_at
             )
 
             VALUES (
+              ?,
               ?,
               ?,
               ?,
@@ -2437,6 +2515,7 @@ export default {
                 body.status ||
                 "En emisión"
               ),
+              normalizeContentType(body.content_type),
               toBool(
                 body.is_published
               )
@@ -2537,6 +2616,7 @@ export default {
               tags = ?,
               author = ?,
               status = ?,
+              content_type = COALESCE(?, content_type),
               is_published = ?,
               updated_at = CURRENT_TIMESTAMP
 
@@ -2563,6 +2643,7 @@ export default {
                 body.status ||
                 "En emisión"
               ),
+              body.content_type == null ? null : normalizeContentType(body.content_type),
               toBool(
                 body.is_published
               )
@@ -2861,10 +2942,20 @@ export default {
             )
             .run();
 
-          await touchComic(
-            env,
-            comicId
-          );
+          const chapterCountRow = await env.DB.prepare(
+            "SELECT COUNT(*) AS total FROM chapters WHERE comic_id = ?"
+          ).bind(comicId).first();
+
+          if (Number(chapterCountRow?.total || 0) > 1) {
+            await env.DB.prepare(
+              "UPDATE comics SET content_type = 'series', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+            ).bind(comicId).run();
+          } else {
+            await touchComic(
+              env,
+              comicId
+            );
+          }
 
           return json(
             {

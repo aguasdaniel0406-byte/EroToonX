@@ -16,6 +16,55 @@ function isAdmin(request, env) {
     getAdminToken(request) === env.ADMIN_TOKEN;
 }
 
+function decodeImageDataUrl(value = "") {
+  const match = String(value || "").match(/^data:image\/[a-z0-9.+-]+;base64,([a-z0-9+/=\r\n]+)$/i);
+  if (!match) return null;
+  const binary = atob(match[1].replace(/\s+/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function cleanAiTag(value = "") {
+  return String(value || "")
+    .replace(/^[-*•\d.)\s]+/, "")
+    .replace(/^tags?\s*:\s*/i, "")
+    .replace(/^categor(?:y|ies|ía|ías)\s*:\s*/i, "")
+    .replace(/["'`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 42);
+}
+
+function parseAiTags(text = "", existing = []) {
+  const canonical = new Map(
+    (existing || [])
+      .map((x) => String(x || "").trim())
+      .filter(Boolean)
+      .map((x) => [x.toLocaleLowerCase("es"), x])
+  );
+
+  const blocked = /\b(child|children|kid|minor|underage|teen|teenager|young-looking|boy|girl|madre|hijo|hija|padre|hermana|hermano|mother|son|daughter|father|sister|brother|incest|rape|non[- ]?consensual|ethnicity|race|orientaci[oó]n|sexual orientation)\b/i;
+  const refusal = /\b(cannot|can't|unable|sorry|policy|assist|refuse|inappropriate)\b/i;
+  const out = [];
+  const seen = new Set();
+
+  for (const piece of String(text || "").split(/[,;|\n]+/)) {
+    let tag = cleanAiTag(piece);
+    if (!tag || tag.length < 2 || blocked.test(tag) || refusal.test(tag)) continue;
+    const key = tag.toLocaleLowerCase("es");
+    if (canonical.has(key)) tag = canonical.get(key);
+    const finalKey = tag.toLocaleLowerCase("es");
+    if (!seen.has(finalKey)) {
+      out.push(tag);
+      seen.add(finalKey);
+    }
+    if (out.length >= 8) break;
+  }
+
+  return out;
+}
+
 function toBool(value) {
   return value === true ||
     value === 1 ||
@@ -438,53 +487,74 @@ async function publicTags(env) {
   const rows = await env.DB.prepare(
     `
     SELECT
+      id,
+      title,
       tags,
-      genre
+      genre,
+      views,
+      created_at,
+      cover_key
     FROM comics
     WHERE
       is_published = 1
       AND (
-        (
-          tags IS NOT NULL
-          AND TRIM(tags) != ''
-        )
+        (tags IS NOT NULL AND TRIM(tags) != '')
         OR
-        (
-          genre IS NOT NULL
-          AND TRIM(genre) != ''
-        )
+        (genre IS NOT NULL AND TRIM(genre) != '')
       )
     `
   ).all();
 
-  const counts = new Map();
+  const groups = new Map();
 
   for (const row of rows.results || []) {
-    const source =
-      String(row.tags || "").trim()
-        ? row.tags
-        : row.genre;
-
+    const source = String(row.tags || "").trim() ? row.tags : row.genre;
     const seenInComic = new Set();
 
     for (const item of splitTagList(source)) {
-      const key =
-        item.toLocaleLowerCase("es");
+      const key = item.toLocaleLowerCase("es");
+      if (seenInComic.has(key)) continue;
+      seenInComic.add(key);
 
-      if (seenInComic.has(key)) {
-        continue;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          name: item,
+          count: 0,
+          cover_url: null,
+          top_comic_title: null,
+          _views: -1,
+          _created_at: ""
+        };
+        groups.set(key, group);
       }
 
-      seenInComic.add(key);
-      addCount(counts, item);
+      group.count += 1;
+
+      if (row.cover_key) {
+        const views = Number(row.views || 0);
+        const created = String(row.created_at || "");
+        if (
+          views > group._views ||
+          (views === group._views && created > group._created_at)
+        ) {
+          group._views = views;
+          group._created_at = created;
+          group.cover_url = "/media/" + row.cover_key;
+          group.top_comic_title = row.title || null;
+        }
+      }
     }
   }
 
-  return json({
-    ok: true,
-    tags:
-      sortedCounts(counts)
-  });
+  const tags = [...groups.values()]
+    .sort((a, b) =>
+      b.count - a.count ||
+      a.name.localeCompare(b.name, "es", { sensitivity: "base" })
+    )
+    .map(({ _views, _created_at, ...item }) => item);
+
+  return json({ ok: true, tags });
 }
 
 async function adminComics(env) {
@@ -1850,6 +1920,88 @@ export default {
           },
           401
         );
+      }
+
+
+      /*
+      ========================================
+      AI TAG SUGGESTIONS
+      ========================================
+      */
+
+      if (
+        method === "POST" &&
+        path === "/api/admin/ai-tags"
+      ) {
+        if (!env.AI) {
+          return json(
+            { ok: false, error: "Workers AI no está configurado. Revisa el binding AI de Wrangler." },
+            503
+          );
+        }
+
+        const body = await request.json().catch(() => ({}));
+        const bytes = decodeImageDataUrl(body.image || "");
+
+        if (!bytes || !bytes.length) {
+          return json({ ok: false, error: "La muestra visual enviada a la IA no es válida." }, 400);
+        }
+
+        if (bytes.length > 2_500_000) {
+          return json({ ok: false, error: "La muestra visual es demasiado grande para analizar." }, 413);
+        }
+
+        const existingTags = Array.isArray(body.existing_tags)
+          ? body.existing_tags.slice(0, 120).map((x) => String(x || "").trim()).filter(Boolean)
+          : [];
+
+        const title = String(body.title || "").trim().slice(0, 160);
+        const existingText = existingTags.length
+          ? existingTags.join(", ")
+          : "No existing categories yet";
+
+        const prompt = [
+          "Analyze this contact sheet from an illustrated adult comic and suggest 3 to 8 concise VISUAL category tags.",
+          "Prefer an existing category when it is clearly supported by the image.",
+          "You may propose a new tag only for a directly visible visual theme, body feature, clothing/theme, or adult scene type.",
+          "Do NOT infer or output age, family relationships, incest, ethnicity/race, identity, sexual orientation, consent, or whether anyone is a minor.",
+          "Never use family-role or age-related labels based on appearance.",
+          "Return ONLY a comma-separated list of tags. No explanations, sentences, bullets, or safety commentary.",
+          `Comic title (context only, do not infer relationships from it): ${title || "Untitled"}`,
+          `Existing categories: ${existingText}`
+        ].join("\n");
+
+        let result;
+        try {
+          result = await env.AI.run("@cf/llava-hf/llava-1.5-7b-hf", {
+            image: Array.from(bytes),
+            prompt,
+            max_tokens: 120
+          });
+        } catch (error) {
+          return json(
+            { ok: false, error: "La IA no pudo analizar este cómic. Puedes poner las categorías manualmente." },
+            502
+          );
+        }
+
+        const raw = String(
+          result?.description ||
+          result?.response ||
+          result?.text ||
+          ""
+        ).trim();
+
+        const tags = parseAiTags(raw, existingTags);
+
+        if (!tags.length) {
+          return json(
+            { ok: false, error: "La IA no devolvió categorías utilizables. Puedes escribirlas manualmente." },
+            422
+          );
+        }
+
+        return json({ ok: true, tags });
       }
 
 

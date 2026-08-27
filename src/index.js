@@ -449,211 +449,130 @@ async function deleteComicMedia(env, comicId) {
 }
 
 async function publicComics(env, url) {
-  const page = Math.max(
-    1,
-    Number(
-      url.searchParams.get("page") || 1
-    )
-  );
+  const page = Math.max(1, Number(url.searchParams.get("page") || 1));
+  const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit") || 10)));
 
-  const limit = Math.min(
-    50,
-    Math.max(
-      1,
-      Number(
-        url.searchParams.get("limit") || 10
-      )
-    )
-  );
+  const allowedSorts = new Set(["latest", "popular", "title_az", "title_za"]);
+  const requestedSort = String(url.searchParams.get("sort") || "latest").trim();
+  const sort = allowedSorts.has(requestedSort) ? requestedSort : "latest";
 
-  const sort =
-    url.searchParams.get("sort") === "popular"
-      ? "popular"
-      : "latest";
+  const q = (url.searchParams.get("q") || "").trim();
+  const genre = (url.searchParams.get("genre") || "").trim();
+  const legacyTag = (url.searchParams.get("tag") || "").trim();
+  const type = (url.searchParams.get("type") || "").trim().toLowerCase();
 
-  const q =
-    (url.searchParams.get("q") || "").trim();
+  const cleanTags = values => [...new Set(values
+    .map(v => String(v || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean))];
 
-  const genre =
-    (url.searchParams.get("genre") || "").trim();
+  const includeTags = cleanTags([
+    ...url.searchParams.getAll("include_tag"),
+    ...(legacyTag ? [legacyTag] : [])
+  ]).slice(0, 12);
+  const excludeTags = cleanTags(url.searchParams.getAll("exclude_tag")).slice(0, 12);
 
-  const tag =
-    (url.searchParams.get("tag") || "").trim();
-
-  const where = [
-    "c.is_published = 1"
-  ];
-
+  const where = ["c.is_published = 1"];
   const binds = [];
 
+  // Search every word independently so a query such as "clarence mom" can
+  // match across title, author, tags, description, genre or chapter titles.
   if (q) {
-    where.push(
-      `
-      (
-        LOWER(c.title) LIKE LOWER(?)
-        OR LOWER(c.author) LIKE LOWER(?)
-        OR LOWER(c.description) LIKE LOWER(?)
+    const terms = q.split(/\s+/).map(x => x.trim()).filter(Boolean).slice(0, 8);
+    for (const term of terms) {
+      where.push(`(
+        LOWER(COALESCE(c.title, '')) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.author, '')) LIKE LOWER(?)
+        OR LOWER(COALESCE(c.description, '')) LIKE LOWER(?)
         OR LOWER(COALESCE(c.tags, '')) LIKE LOWER(?)
-      )
-      `
-    );
-
-    const like = `%${q}%`;
-
-    binds.push(
-      like,
-      like,
-      like,
-      like
-    );
+        OR LOWER(COALESCE(c.genre, '')) LIKE LOWER(?)
+        OR EXISTS (
+          SELECT 1 FROM chapters sch
+          WHERE sch.comic_id = c.id
+          AND sch.is_published = 1
+          AND LOWER(COALESCE(sch.title, '')) LIKE LOWER(?)
+        )
+      )`);
+      const like = `%${term}%`;
+      binds.push(like, like, like, like, like, like);
+    }
   }
+
+  const exactTagSql = `
+    INSTR(
+      ',' || LOWER(
+        REPLACE(REPLACE(REPLACE(
+          COALESCE(NULLIF(TRIM(c.tags), ''), c.genre, ''),
+          ',  ', ','), ', ', ','), ' ,', ',')
+      ) || ',',
+      ',' || LOWER(?) || ','
+    ) > 0
+  `;
 
   if (genre) {
-    where.push(
-      `
-      INSTR(
-        ',' || LOWER(
-          REPLACE(
-            REPLACE(
-              REPLACE(
-                COALESCE(c.genre, ''),
-                ',  ', ','
-              ),
-              ', ', ','
-            ),
-            ' ,', ','
-          )
-        ) || ',',
-        ',' || LOWER(?) || ','
-      ) > 0
-      `
-    );
-
-    binds.push(
-      genre
-        .replace(/\s+/g, " ")
-        .trim()
-    );
+    where.push(exactTagSql);
+    binds.push(genre.replace(/\s+/g, " ").trim());
   }
 
-  if (tag) {
-    where.push(
-      `
-      INSTR(
-        ',' || LOWER(
-          REPLACE(
-            REPLACE(
-              REPLACE(
-                COALESCE(
-                  NULLIF(TRIM(c.tags), ''),
-                  c.genre,
-                  ''
-                ),
-                ',  ', ','
-              ),
-              ', ', ','
-            ),
-            ' ,', ','
-          )
-        ) || ',',
-        ',' || LOWER(?) || ','
-      ) > 0
-      `
-    );
-
-    binds.push(
-      tag
-        .replace(/\s+/g, " ")
-        .trim()
-    );
+  for (const tag of includeTags) {
+    where.push(exactTagSql);
+    binds.push(tag);
   }
 
-  const whereSql =
-    where.join(" AND ");
+  for (const tag of excludeTags) {
+    where.push(`NOT (${exactTagSql})`);
+    binds.push(tag);
+  }
 
-  const countRow = await env.DB.prepare(
-    `
+  if (type === "single" || type === "series") {
+    where.push("LOWER(COALESCE(c.content_type, 'single')) = ?");
+    binds.push(type);
+  }
+
+  const whereSql = where.join(" AND ");
+  const countRow = await env.DB.prepare(`
     SELECT COUNT(*) AS total
     FROM comics c
     WHERE ${whereSql}
-    `
-  )
-    .bind(...binds)
-    .first();
+  `).bind(...binds).first();
 
-  const total =
-    Number(
-      countRow?.total || 0
-    );
+  const total = Number(countRow?.total || 0);
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const safePage = Math.min(page, totalPages);
+  const offset = (safePage - 1) * limit;
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(total / limit)
-    );
+  const orderSql = sort === "popular"
+    ? "c.views DESC, c.updated_at DESC, c.id DESC"
+    : sort === "title_az"
+      ? "LOWER(c.title) ASC, c.id DESC"
+      : sort === "title_za"
+        ? "LOWER(c.title) DESC, c.id DESC"
+        : "c.updated_at DESC, c.id DESC";
 
-  const safePage =
-    Math.min(
-      page,
-      totalPages
-    );
-
-  const offset =
-    (safePage - 1) * limit;
-
-  const orderSql =
-    sort === "popular"
-      ? "c.views DESC, c.updated_at DESC, c.id DESC"
-      : "c.updated_at DESC, c.id DESC";
-
-  const rows = await env.DB.prepare(
-    `
+  const rows = await env.DB.prepare(`
     SELECT
       c.*,
-
       (
         SELECT COUNT(*)
         FROM chapters ch
         WHERE ch.comic_id = c.id
         AND ch.is_published = 1
       ) AS part_count,
-
       CASE
-        WHEN c.cover_key IS NOT NULL
-        AND c.cover_key != ''
+        WHEN c.cover_key IS NOT NULL AND c.cover_key != ''
         THEN '/media/' || c.cover_key
         ELSE NULL
       END AS cover_url
-
     FROM comics c
-
     WHERE ${whereSql}
-
     ORDER BY ${orderSql}
-
-    LIMIT ?
-    OFFSET ?
-    `
-  )
-    .bind(
-      ...binds,
-      limit,
-      offset
-    )
-    .all();
+    LIMIT ? OFFSET ?
+  `).bind(...binds, limit, offset).all();
 
   return json({
     ok: true,
-
-    comics:
-      rows.results || [],
-
-    pagination: {
-      page: safePage,
-      limit,
-      total,
-      total_pages: totalPages
-    }
+    comics: rows.results || [],
+    pagination: { page: safePage, limit, total, total_pages: totalPages },
+    filters: { q, sort, type, include_tags: includeTags, exclude_tags: excludeTags }
   });
 }
 

@@ -78,6 +78,270 @@ async function ensurePublicationTypeSchema(env) {
   publicationTypeSchemaReady = true;
 }
 
+
+let seriesGroupingSchemaReady = false;
+
+async function ensureSeriesGroupingSchema(env) {
+  if (seriesGroupingSchemaReady) return;
+
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS series_group_members (
+      chapter_id INTEGER PRIMARY KEY,
+      series_comic_id INTEGER NOT NULL,
+      source_title TEXT NOT NULL DEFAULT '',
+      source_slug TEXT NOT NULL DEFAULT '',
+      source_description TEXT NOT NULL DEFAULT '',
+      source_genre TEXT NOT NULL DEFAULT '',
+      source_tags TEXT NOT NULL DEFAULT '',
+      source_author TEXT NOT NULL DEFAULT '',
+      source_status TEXT NOT NULL DEFAULT '',
+      source_cover_key TEXT NOT NULL DEFAULT '',
+      source_is_published INTEGER NOT NULL DEFAULT 1,
+      source_views INTEGER NOT NULL DEFAULT 0,
+      source_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+
+  await env.DB.prepare(`
+    CREATE INDEX IF NOT EXISTS idx_series_group_members_series
+    ON series_group_members(series_comic_id, source_order)
+  `).run();
+
+  seriesGroupingSchemaReady = true;
+}
+
+function csvValues(value = '') {
+  return String(value || '').split(',').map(v => v.trim()).filter(Boolean);
+}
+
+function mergeCsvValues(...values) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    for (const token of csvValues(value)) {
+      const key = token.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(token);
+    }
+  }
+  return out.join(', ');
+}
+
+async function availableComicSlug(env, desired, reusableComicIds = []) {
+  const base = slugify(desired) || 'serie';
+  const reusable = new Set((reusableComicIds || []).map(Number).filter(Number.isFinite));
+  for (let i = 0; i < 200; i++) {
+    const candidate = i ? `${base}-${i + 1}` : base;
+    const row = await env.DB.prepare('SELECT id FROM comics WHERE slug = ? LIMIT 1').bind(candidate).first();
+    if (!row || reusable.has(Number(row.id))) return candidate;
+  }
+  return `${base}-${Date.now()}`;
+}
+
+async function coverKeyStillReferenced(env, key, exceptComicId = 0, exceptSeriesId = 0) {
+  const coverKey = String(key || '').trim();
+  if (!coverKey) return false;
+  const comic = await env.DB.prepare(`
+    SELECT id FROM comics WHERE cover_key = ? AND id != ? LIMIT 1
+  `).bind(coverKey, Number(exceptComicId || 0)).first();
+  if (comic) return true;
+  const member = await env.DB.prepare(`
+    SELECT chapter_id
+    FROM series_group_members
+    WHERE source_cover_key = ?
+      AND series_comic_id != ?
+    LIMIT 1
+  `).bind(coverKey, Number(exceptSeriesId || 0)).first();
+  return Boolean(member);
+}
+
+async function getSeriesGroupedChapters(env, seriesComicId) {
+  const rows = await env.DB.prepare(`
+    SELECT ch.id, ch.comic_id, ch.chapter_number, ch.title, ch.is_published,
+      gm.source_title, gm.source_slug, gm.source_description, gm.source_genre,
+      gm.source_tags, gm.source_author, gm.source_status, gm.source_cover_key,
+      gm.source_is_published, gm.source_views, gm.source_order
+    FROM chapters ch
+    LEFT JOIN series_group_members gm ON gm.chapter_id = ch.id
+    WHERE ch.comic_id = ?
+    ORDER BY ch.chapter_number ASC, ch.id ASC
+  `).bind(seriesComicId).all();
+  return rows.results || [];
+}
+
+async function groupExistingComicsIntoSeries(env, body = {}) {
+  await ensureSeriesGroupingSchema(env);
+  const ids = Array.from(new Set((Array.isArray(body.comic_ids) ? body.comic_ids : [])
+    .map(Number).filter(id => Number.isInteger(id) && id > 0)));
+  if (ids.length < 2) throw new Error('Selecciona al menos dos cómics para crear una serie.');
+  if (ids.length > 50) throw new Error('Puedes agrupar hasta 50 cómics a la vez.');
+
+  const title = String(body.title || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+  if (!title) throw new Error('Escribe el nombre de la serie.');
+
+  const placeholders = ids.map(() => '?').join(',');
+  const result = await env.DB.prepare(`SELECT * FROM comics WHERE id IN (${placeholders})`).bind(...ids).all();
+  const byId = new Map((result.results || []).map(row => [Number(row.id), row]));
+  if (byId.size !== ids.length) throw new Error('Uno de los cómics seleccionados ya no existe.');
+  const comics = ids.map(id => byId.get(id));
+
+  for (const comic of comics) {
+    if (normalizeContentType(comic.content_type) !== 'single') {
+      throw new Error(`"${comic.title}" ya es una serie. Solo puedes agrupar cómics únicos.`);
+    }
+  }
+
+  const chapterRows = [];
+  for (let i = 0; i < comics.length; i++) {
+    const comic = comics[i];
+    const chapters = await env.DB.prepare(`
+      SELECT id, comic_id, chapter_number, title, is_published
+      FROM chapters WHERE comic_id = ? ORDER BY chapter_number ASC, id ASC
+    `).bind(comic.id).all();
+    const list = chapters.results || [];
+    if (list.length !== 1) {
+      throw new Error(`"${comic.title}" debe tener una sola lectura interna para agruparlo. Ahora tiene ${list.length} partes internas.`);
+    }
+    chapterRows.push({ comic, chapter: list[0], order: i + 1 });
+  }
+
+  const target = comics[0];
+  const targetId = Number(target.id);
+  const slug = await availableComicSlug(env, body.slug || title, ids);
+  const mergedTags = mergeCsvValues(...comics.map(c => c.tags || ''));
+  const mergedGenre = mergeCsvValues(...comics.map(c => c.genre || ''), mergedTags);
+  const totalViews = comics.reduce((sum, c) => sum + Number(c.views || 0), 0);
+  const published = comics.some(c => Number(c.is_published || 0) === 1) ? 1 : 0;
+  const statements = [];
+
+  for (const item of chapterRows) {
+    const c = item.comic, ch = item.chapter;
+    statements.push(env.DB.prepare(`
+      INSERT INTO series_group_members (
+        chapter_id, series_comic_id, source_title, source_slug, source_description,
+        source_genre, source_tags, source_author, source_status, source_cover_key,
+        source_is_published, source_views, source_order, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(chapter_id) DO UPDATE SET
+        series_comic_id = excluded.series_comic_id,
+        source_title = excluded.source_title,
+        source_slug = excluded.source_slug,
+        source_description = excluded.source_description,
+        source_genre = excluded.source_genre,
+        source_tags = excluded.source_tags,
+        source_author = excluded.source_author,
+        source_status = excluded.source_status,
+        source_cover_key = excluded.source_cover_key,
+        source_is_published = excluded.source_is_published,
+        source_views = excluded.source_views,
+        source_order = excluded.source_order
+    `).bind(ch.id, targetId, String(c.title || ''), String(c.slug || ''), String(c.description || ''),
+      String(c.genre || ''), String(c.tags || ''), String(c.author || ''), String(c.status || ''),
+      String(c.cover_key || ''), Number(c.is_published || 0), Number(c.views || 0), item.order));
+
+    statements.push(env.DB.prepare(`
+      UPDATE chapters SET chapter_number = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).bind(-(1000 + item.order), ch.id));
+  }
+
+  for (const item of chapterRows) {
+    statements.push(env.DB.prepare(`UPDATE chapters SET comic_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+      .bind(targetId, item.chapter.id));
+  }
+  for (const item of chapterRows) {
+    statements.push(env.DB.prepare(`
+      UPDATE chapters SET chapter_number = ?, title = ?, is_published = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).bind(item.order, String(item.comic.title || `Parte ${item.order}`), Number(item.comic.is_published || 0), item.chapter.id));
+  }
+  for (const comic of comics.slice(1)) {
+    statements.push(env.DB.prepare('DELETE FROM comics WHERE id = ?').bind(comic.id));
+  }
+  statements.push(env.DB.prepare(`
+    UPDATE comics SET slug = ?, title = ?, tags = ?, genre = ?, content_type = 'series',
+      is_published = ?, views = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+  `).bind(slug, title, mergedTags, mergedGenre, published, totalViews, targetId));
+
+  await env.DB.batch(statements);
+  return { series_id: targetId, slug, title, chapter_count: chapterRows.length };
+}
+
+async function separateSeriesChapter(env, seriesComicId, chapterId) {
+  await ensureSeriesGroupingSchema(env);
+  const series = await env.DB.prepare('SELECT * FROM comics WHERE id = ? LIMIT 1').bind(seriesComicId).first();
+  if (!series || normalizeContentType(series.content_type) !== 'series') throw new Error('La serie no existe.');
+
+  const row = await env.DB.prepare(`
+    SELECT ch.*, gm.source_title, gm.source_slug, gm.source_description, gm.source_genre,
+      gm.source_tags, gm.source_author, gm.source_status, gm.source_cover_key,
+      gm.source_is_published, gm.source_views
+    FROM chapters ch
+    LEFT JOIN series_group_members gm ON gm.chapter_id = ch.id
+    WHERE ch.id = ? AND ch.comic_id = ? LIMIT 1
+  `).bind(chapterId, seriesComicId).first();
+  if (!row) throw new Error('Ese capítulo no pertenece a la serie.');
+
+  const fallbackTitle = String(row.title || '').trim() || `${series.title} ${row.chapter_number}`;
+  const title = String(row.source_title || fallbackTitle).replace(/\s+/g, ' ').trim().slice(0, 180);
+  const slug = await availableComicSlug(env, row.source_slug || title, []);
+
+  const create = await env.DB.prepare(`
+    INSERT INTO comics (
+      slug, title, description, genre, tags, author, status, cover_key,
+      content_type, is_published, views, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'single', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  `).bind(
+    slug, title,
+    String(row.source_description || series.description || ''),
+    String(row.source_genre || row.source_tags || series.genre || series.tags || ''),
+    String(row.source_tags || row.source_genre || series.tags || series.genre || ''),
+    String(row.source_author || series.author || ''),
+    String(row.source_status || series.status || 'Completo'),
+    String(row.source_cover_key || ''),
+    row.source_is_published == null ? Number(row.is_published || 0) : Number(row.source_is_published || 0),
+    Number(row.source_views || 0)
+  ).run();
+  const newComicId = Number(create.meta.last_row_id);
+
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE chapters SET comic_id = ?, chapter_number = 1, title = '', updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+      .bind(newComicId, chapterId),
+    env.DB.prepare('DELETE FROM series_group_members WHERE chapter_id = ?').bind(chapterId),
+    env.DB.prepare('UPDATE comics SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').bind(seriesComicId)
+  ]);
+
+  const remaining = await env.DB.prepare(
+    'SELECT COUNT(*) AS total FROM chapters WHERE comic_id = ?'
+  ).bind(seriesComicId).first();
+
+  if (Number(remaining?.total || 0) === 0) {
+    const oldCover = String(series.cover_key || '');
+    await env.DB.prepare('DELETE FROM comics WHERE id = ?').bind(seriesComicId).run();
+    if (oldCover && !(await coverKeyStillReferenced(env, oldCover, 0, 0))) {
+      await env.MEDIA.delete(oldCover);
+    }
+  }
+
+  return { comic_id: newComicId, slug, title };
+}
+
+async function ungroupEntireSeries(env, seriesComicId) {
+  await ensureSeriesGroupingSchema(env);
+  const series = await env.DB.prepare('SELECT * FROM comics WHERE id = ? LIMIT 1').bind(seriesComicId).first();
+  if (!series || normalizeContentType(series.content_type) !== 'series') throw new Error('La serie no existe.');
+  const chapters = await getSeriesGroupedChapters(env, seriesComicId);
+  if (!chapters.length) throw new Error('La serie no tiene capítulos para separar.');
+
+  const created = [];
+  for (const chapter of chapters) created.push(await separateSeriesChapter(env, seriesComicId, Number(chapter.id)));
+
+  const oldCover = String(series.cover_key || '');
+  await env.DB.prepare('DELETE FROM comics WHERE id = ?').bind(seriesComicId).run();
+  if (oldCover && !(await coverKeyStillReferenced(env, oldCover, 0))) await env.MEDIA.delete(oldCover);
+  return created;
+}
+
 function slugify(value = "") {
   return String(value)
     .toLowerCase()
@@ -148,42 +412,39 @@ async function renumberPages(env, chapterId) {
 }
 
 async function deleteComicMedia(env, comicId) {
-  const comic = await env.DB.prepare(
-    `
+  await ensureSeriesGroupingSchema(env);
+
+  const comic = await env.DB.prepare(`
     SELECT cover_key
     FROM comics
     WHERE id = ?
-    `
-  )
-    .bind(comicId)
-    .first();
+  `).bind(comicId).first();
 
-  const rows = await env.DB.prepare(
-    `
+  const rows = await env.DB.prepare(`
     SELECT p.object_key
     FROM pages p
-    JOIN chapters ch
-      ON ch.id = p.chapter_id
+    JOIN chapters ch ON ch.id = p.chapter_id
     WHERE ch.comic_id = ?
-    `
-  )
-    .bind(comicId)
-    .all();
+  `).bind(comicId).all();
 
-  const keys = [];
+  const groupedCovers = await env.DB.prepare(`
+    SELECT source_cover_key
+    FROM series_group_members
+    WHERE series_comic_id = ?
+  `).bind(comicId).all();
 
-  if (comic?.cover_key) {
-    keys.push(comic.cover_key);
+  const pageKeys = (rows.results || []).map(row => row.object_key).filter(Boolean);
+  if (pageKeys.length) await env.MEDIA.delete(pageKeys);
+
+  const coverKeys = new Set();
+  if (comic?.cover_key) coverKeys.add(comic.cover_key);
+  for (const row of groupedCovers.results || []) {
+    if (row.source_cover_key) coverKeys.add(row.source_cover_key);
   }
 
-  for (const row of rows.results || []) {
-    if (row.object_key) {
-      keys.push(row.object_key);
-    }
-  }
-
-  if (keys.length) {
-    await env.MEDIA.delete(keys);
+  for (const key of coverKeys) {
+    const shared = await coverKeyStillReferenced(env, key, comicId, comicId);
+    if (!shared) await env.MEDIA.delete(key);
   }
 }
 
@@ -1696,6 +1957,7 @@ export default {
 
       if (path.startsWith("/api/") || path === "/" || path === "/index.html" || /^\/comic\/[^/]+\/?$/.test(path)) {
         await ensurePublicationTypeSchema(env);
+        await ensureSeriesGroupingSchema(env);
       }
 
       /*
@@ -2021,6 +2283,8 @@ export default {
           `
           SELECT
             ch.*,
+            gm.source_title AS grouped_source_title,
+            gm.source_order AS grouped_source_order,
 
             (
               SELECT COUNT(*)
@@ -2029,6 +2293,9 @@ export default {
             ) AS page_count
 
           FROM chapters ch
+
+          LEFT JOIN series_group_members gm
+            ON gm.chapter_id = ch.id
 
           WHERE
             ch.comic_id = ?
@@ -2402,6 +2669,43 @@ export default {
       }
 
 
+
+      /*
+      ========================================
+      GROUP EXISTING COMICS / UNGROUP SERIES
+      ========================================
+      */
+
+      if (method === "POST" && path === "/api/admin/series/group") {
+        const body = await request.json().catch(() => ({}));
+        try {
+          const series = await groupExistingComicsIntoSeries(env, body);
+          return json({ ok: true, series }, 201);
+        } catch (error) {
+          return json({ ok: false, error: String(error?.message || error) }, 400);
+        }
+      }
+
+      const ungroupSeriesMatch = path.match(/^\/api\/admin\/series\/(\d+)\/ungroup$/);
+      if (ungroupSeriesMatch && method === "POST") {
+        const seriesId = Number(ungroupSeriesMatch[1]);
+        const body = await request.json().catch(() => ({}));
+        try {
+          if (toBool(body.all)) {
+            const comics = await ungroupEntireSeries(env, seriesId);
+            return json({ ok: true, comics });
+          }
+          const chapterId = Number(body.chapter_id);
+          if (!Number.isInteger(chapterId) || chapterId <= 0) {
+            return json({ ok: false, error: "Selecciona el capítulo que quieres convertir en cómic independiente." }, 400);
+          }
+          const comic = await separateSeriesChapter(env, seriesId, chapterId);
+          return json({ ok: true, comic }, 201);
+        } catch (error) {
+          return json({ ok: false, error: String(error?.message || error) }, 400);
+        }
+      }
+
       /*
       ========================================
       ADMIN COMICS
@@ -2695,6 +2999,10 @@ export default {
         );
 
         await env.DB.prepare(
+          `DELETE FROM series_group_members WHERE series_comic_id = ?`
+        ).bind(id).run();
+
+        await env.DB.prepare(
           `
           DELETE FROM comics
           WHERE id = ?
@@ -2793,9 +3101,10 @@ export default {
           comic.cover_key &&
           comic.cover_key !== key
         ) {
-          await env.MEDIA.delete(
-            comic.cover_key
-          );
+          const reserved = await coverKeyStillReferenced(env, comic.cover_key, comicId);
+          if (!reserved) {
+            await env.MEDIA.delete(comic.cover_key);
+          }
         }
 
         await env.DB.prepare(
@@ -3143,6 +3452,10 @@ export default {
           );
         }
 
+        const groupedSource = await env.DB.prepare(
+          `SELECT source_cover_key, series_comic_id FROM series_group_members WHERE chapter_id = ? LIMIT 1`
+        ).bind(id).first();
+
         const pages = await env.DB.prepare(
           `
           SELECT object_key
@@ -3168,6 +3481,10 @@ export default {
         }
 
         await env.DB.prepare(
+          `DELETE FROM series_group_members WHERE chapter_id = ?`
+        ).bind(id).run();
+
+        await env.DB.prepare(
           `
           DELETE FROM chapters
           WHERE id = ?
@@ -3175,6 +3492,11 @@ export default {
         )
           .bind(id)
           .run();
+
+        if (groupedSource?.source_cover_key) {
+          const shared = await coverKeyStillReferenced(env, groupedSource.source_cover_key, 0, 0);
+          if (!shared) await env.MEDIA.delete(groupedSource.source_cover_key);
+        }
 
         await touchComic(
           env,

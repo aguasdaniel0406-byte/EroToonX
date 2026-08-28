@@ -1,18 +1,33 @@
+const COMMON_SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()"
+};
+
+function applyCommonSecurityHeaders(headers) {
+  for (const [name, value] of Object.entries(COMMON_SECURITY_HEADERS)) {
+    headers.set(name, value);
+  }
+  return headers;
+}
+
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-      "X-Content-Type-Options": "nosniff"
-    }
-  });
+  const headers = applyCommonSecurityHeaders(new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store"
+  }));
+  return new Response(JSON.stringify(data), { status, headers });
 }
 
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const ADMIN_LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const ADMIN_LOGIN_LOCK_MS = 15 * 60 * 1000;
 const ADMIN_LOGIN_MAX_FAILURES = 5;
+const SITE_MESSAGE_WINDOW_MS = 30 * 60 * 1000;
+const SITE_MESSAGE_BLOCK_MS = 60 * 60 * 1000;
+const SITE_MESSAGE_MAX_PER_WINDOW = 5;
+const SITE_MESSAGE_MAX_TEXT = 5000;
 const MAX_COVER_BYTES = 12 * 1024 * 1024;
 const MAX_PAGE_BYTES = 20 * 1024 * 1024;
 const MAX_PAGE_BATCH_BYTES = 25 * 1024 * 1024;
@@ -175,6 +190,131 @@ async function isAdmin(request, env) {
     return false;
   }
   return true;
+}
+
+let siteMessagesSchemaReady = false;
+
+async function ensureSiteMessagesSchema(env) {
+  if (siteMessagesSchemaReady) return;
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS site_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kind TEXT NOT NULL DEFAULT 'general',
+        name TEXT NOT NULL DEFAULT '',
+        email TEXT NOT NULL,
+        subject TEXT NOT NULL DEFAULT '',
+        content_url TEXT NOT NULL DEFAULT '',
+        message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'new',
+        client_hash TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_site_messages_status_created
+      ON site_messages(status, created_at DESC)
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_site_messages_kind_created
+      ON site_messages(kind, created_at DESC)
+    `),
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS site_message_limits (
+        client_hash TEXT PRIMARY KEY,
+        submissions INTEGER NOT NULL DEFAULT 0,
+        window_started_at INTEGER NOT NULL,
+        blocked_until INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      )
+    `)
+  ]);
+  siteMessagesSchemaReady = true;
+}
+
+function normalizeSiteMessageKind(value) {
+  const kind = String(value || '').toLowerCase();
+  return ['general', 'privacy', 'security', 'dmca'].includes(kind) ? kind : 'general';
+}
+
+function normalizeSiteMessageStatus(value) {
+  const status = String(value || '').toLowerCase();
+  return ['new', 'reviewed', 'closed'].includes(status) ? status : '';
+}
+
+function validContactEmail(value) {
+  const email = String(value || '').trim();
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function normalizeReportedUrl(value) {
+  const raw = String(value || '').trim().slice(0, 1000);
+  if (!raw) return '';
+  try {
+    const parsed = new URL(raw);
+    return ['http:', 'https:'].includes(parsed.protocol) ? parsed.toString() : '';
+  } catch {
+    return '';
+  }
+}
+
+async function siteMessageClientHash(request) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  return sha256Hex(ip);
+}
+
+async function checkSiteMessageRate(request, env) {
+  await ensureSiteMessagesSchema(env);
+  const clientHash = await siteMessageClientHash(request);
+  const now = Date.now();
+  await env.DB.prepare("DELETE FROM site_message_limits WHERE updated_at < ?")
+    .bind(now - 30 * 24 * 60 * 60 * 1000).run();
+  const row = await env.DB.prepare(`
+    SELECT submissions, window_started_at, blocked_until
+    FROM site_message_limits
+    WHERE client_hash = ?
+  `).bind(clientHash).first();
+
+  if (row && Number(row.blocked_until || 0) > now) {
+    return { ok: false, clientHash, retryAfterMs: Number(row.blocked_until) - now };
+  }
+
+  let submissions = 0;
+  let windowStartedAt = now;
+  if (row && now - Number(row.window_started_at || 0) <= SITE_MESSAGE_WINDOW_MS) {
+    submissions = Number(row.submissions || 0);
+    windowStartedAt = Number(row.window_started_at || now);
+  }
+
+  if (submissions >= SITE_MESSAGE_MAX_PER_WINDOW) {
+    const blockedUntil = now + SITE_MESSAGE_BLOCK_MS;
+    await env.DB.prepare(`
+      INSERT INTO site_message_limits (client_hash, submissions, window_started_at, blocked_until, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(client_hash) DO UPDATE SET
+        submissions = excluded.submissions,
+        window_started_at = excluded.window_started_at,
+        blocked_until = excluded.blocked_until,
+        updated_at = excluded.updated_at
+    `).bind(clientHash, submissions, windowStartedAt, blockedUntil, now).run();
+    return { ok: false, clientHash, retryAfterMs: SITE_MESSAGE_BLOCK_MS };
+  }
+
+  return { ok: true, clientHash, submissions, windowStartedAt, now };
+}
+
+async function recordSiteMessageSubmission(env, rate) {
+  const submissions = Number(rate.submissions || 0) + 1;
+  await env.DB.prepare(`
+    INSERT INTO site_message_limits (client_hash, submissions, window_started_at, blocked_until, updated_at)
+    VALUES (?, ?, ?, 0, ?)
+    ON CONFLICT(client_hash) DO UPDATE SET
+      submissions = excluded.submissions,
+      window_started_at = excluded.window_started_at,
+      blocked_until = 0,
+      updated_at = excluded.updated_at
+  `).bind(rate.clientHash, submissions, rate.windowStartedAt, rate.now).run();
 }
 
 function validateImageUpload(file, { maxBytes, label = "imagen" } = {}) {
@@ -1601,7 +1741,6 @@ body.age-locked{overflow:auto!important}
 body.age-locked .site-header,
 body.age-locked .navbar,
 body.age-locked .mobile-site-header,
-body.age-locked .intro-strip,
 body.age-locked main,
 body.age-locked footer{
   pointer-events:auto!important;
@@ -1891,6 +2030,8 @@ ${structured}
     "ETag"
   );
 
+  applyCommonSecurityHeaders(headers);
+
   return new Response(
     html,
     {
@@ -2018,19 +2159,12 @@ async function serveDynamicSitemap(env) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}
 </urlset>`;
 
-  return new Response(
-    xml,
-    {
-      status: 200,
-      headers: {
-        "Content-Type":
-          "application/xml; charset=utf-8",
+  const headers = applyCommonSecurityHeaders(new Headers({
+    "Content-Type": "application/xml; charset=utf-8",
+    "Cache-Control": "public, max-age=300"
+  }));
 
-        "Cache-Control":
-          "public, max-age=300"
-      }
-    }
-  );
+  return new Response(xml, { status: 200, headers });
 }
 
 export default {
@@ -2625,6 +2759,64 @@ export default {
 
       /*
       ========================================
+      PUBLIC CONTACT / PRIVACY / DMCA REPORTS
+      ========================================
+      */
+
+      if (method === "POST" && path === "/api/contact") {
+        await ensureSiteMessagesSchema(env);
+        const body = await request.json().catch(() => ({}));
+
+        // Honeypot: los usuarios reales no ven ni completan este campo.
+        if (String(body.website || '').trim()) {
+          return json({ ok: true, received: true });
+        }
+
+        const kind = normalizeSiteMessageKind(body.kind);
+        const name = String(body.name || '').trim().replace(/\s+/g, ' ').slice(0, 160);
+        const email = String(body.email || '').trim().slice(0, 254);
+        const subject = String(body.subject || '').trim().replace(/\s+/g, ' ').slice(0, 200);
+        const message = String(body.message || '').trim().slice(0, SITE_MESSAGE_MAX_TEXT);
+        const rawUrl = String(body.content_url || '').trim();
+        const contentUrl = normalizeReportedUrl(rawUrl);
+
+        if (!validContactEmail(email)) {
+          return json({ ok: false, error: "Introduce un correo electrónico válido." }, 400);
+        }
+        if (kind === 'dmca' && !name) {
+          return json({ ok: false, error: "Indica el nombre del titular o representante." }, 400);
+        }
+        if (message.length < 20) {
+          return json({ ok: false, error: "Explica la solicitud con al menos 20 caracteres." }, 400);
+        }
+        if (rawUrl && !contentUrl) {
+          return json({ ok: false, error: "La URL indicada no es válida." }, 400);
+        }
+
+        const rate = await checkSiteMessageRate(request, env);
+        if (!rate.ok) {
+          const minutes = Math.max(1, Math.ceil(Number(rate.retryAfterMs || 0) / 60000));
+          return json({ ok: false, error: `Demasiados envíos. Inténtalo de nuevo en aproximadamente ${minutes} minuto(s).` }, 429);
+        }
+
+        const result = await env.DB.prepare(`
+          INSERT INTO site_messages (
+            kind, name, email, subject, content_url, message, status, client_hash,
+            created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, 'new', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        `).bind(kind, name, email, subject, contentUrl, message, rate.clientHash).run();
+
+        await recordSiteMessageSubmission(env, rate);
+
+        return json({
+          ok: true,
+          received: true,
+          reference: Number(result.meta.last_row_id || 0)
+        }, 201);
+      }
+
+      /*
+      ========================================
       PROTECT ADMIN ROUTES
       ========================================
       */
@@ -2651,6 +2843,67 @@ export default {
         return json({ ok: true });
       }
 
+
+      /*
+      ========================================
+      ADMIN SITE MESSAGES
+      ========================================
+      */
+
+      if (method === "GET" && path === "/api/admin/messages") {
+        await ensureSiteMessagesSchema(env);
+        const requestedStatus = normalizeSiteMessageStatus(url.searchParams.get('status'));
+        const requestedKindRaw = String(url.searchParams.get('kind') || '').toLowerCase();
+        const requestedKind = ['general', 'privacy', 'security', 'dmca'].includes(requestedKindRaw)
+          ? requestedKindRaw
+          : '';
+        const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') || 100)));
+
+        const conditions = [];
+        const bindings = [];
+        if (requestedStatus) {
+          conditions.push('status = ?');
+          bindings.push(requestedStatus);
+        }
+        if (requestedKind) {
+          conditions.push('kind = ?');
+          bindings.push(requestedKind);
+        }
+        const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        const rows = await env.DB.prepare(`
+          SELECT id, kind, name, email, subject, content_url, message, status, created_at, updated_at
+          FROM site_messages
+          ${where}
+          ORDER BY created_at DESC, id DESC
+          LIMIT ?
+        `).bind(...bindings, limit).all();
+
+        return json({ ok: true, messages: rows.results || [] });
+      }
+
+      const adminMessageMatch = path.match(/^\/api\/admin\/messages\/(\d+)$/);
+      if (adminMessageMatch && method === "PUT") {
+        await ensureSiteMessagesSchema(env);
+        const id = Number(adminMessageMatch[1]);
+        const body = await request.json().catch(() => ({}));
+        const status = normalizeSiteMessageStatus(body.status);
+        if (!status) return json({ ok: false, error: "Estado de mensaje inválido." }, 400);
+        const result = await env.DB.prepare(`
+          UPDATE site_messages
+          SET status = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(status, id).run();
+        if (!Number(result.meta.changes || 0)) return json({ ok: false, error: "Mensaje no encontrado." }, 404);
+        return json({ ok: true });
+      }
+
+      if (adminMessageMatch && method === "DELETE") {
+        await ensureSiteMessagesSchema(env);
+        const id = Number(adminMessageMatch[1]);
+        const result = await env.DB.prepare("DELETE FROM site_messages WHERE id = ?").bind(id).run();
+        if (!Number(result.meta.changes || 0)) return json({ ok: false, error: "Mensaje no encontrado." }, 404);
+        return json({ ok: true });
+      }
 
       /*
       ========================================

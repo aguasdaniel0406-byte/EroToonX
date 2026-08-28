@@ -5,6 +5,7 @@ Allow: /api/comics
 Allow: /api/updates
 Allow: /api/chapters/
 
+Disallow: /admin1043130208
 Disallow: /api/admin/
 Disallow: /api/health
 

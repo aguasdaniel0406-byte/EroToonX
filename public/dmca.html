@@ -339,7 +339,8 @@ footer{
 }
 
 </style>
-
+<link rel="stylesheet" href="/theme.css">
+<script src="/theme.js"></script>
 </head>
 
 
@@ -366,12 +367,15 @@ EroToonX
 </a>
 
 
+<div class="header-tools">
+<button type="button" class="theme-toggle" data-theme-toggle><span data-theme-icon>☀</span><span data-theme-label>Claro</span></button>
 <a
   href="/"
   class="back"
 >
 ← Volver a EroToonX
 </a>
+</div>
 
 </div>
 
@@ -645,17 +649,27 @@ El tratamiento de esta información también está sujeto a la Política de Priv
 </h2>
 
 <p>
-EroToonX habilitará un canal específico para recibir solicitudes de retirada y reportes de contenido.
+EroToonX recibe solicitudes de retirada y reportes de contenido mediante el formulario oficial de esta página.
 </p>
 
 <div class="report-box">
+<strong>Canal de reporte activo</strong>
+Completa el formulario siguiente. La solicitud se registra en el sistema de EroToonX para su revisión administrativa.
+</div>
 
-<strong>
-Canal pendiente de activación
-</strong>
-
-Antes del lanzamiento público definitivo se añadirá aquí una dirección de correo o formulario específico para reportes legales y de derechos de autor.
-
+<div class="report-form">
+<form id="dmcaForm">
+<div class="hp-field" aria-hidden="true"><label>Website<input id="dmcaWebsite" autocomplete="off" tabindex="-1"></label></div>
+<div class="form-grid">
+<div class="field"><label for="dmcaName">Titular o representante autorizado</label><input id="dmcaName" maxlength="160" required></div>
+<div class="field"><label for="dmcaEmail">Correo para responder</label><input id="dmcaEmail" type="email" maxlength="254" required></div>
+<div class="field full"><label for="dmcaSubject">Obra o asunto de la reclamación</label><input id="dmcaSubject" maxlength="200" required></div>
+<div class="field full"><label for="dmcaUrl">URL exacta del contenido reportado</label><input id="dmcaUrl" type="url" maxlength="1000" placeholder="https://erotoonx.com/comic/..." required></div>
+<div class="field full"><label for="dmcaMessage">Explicación y declaraciones relevantes</label><textarea id="dmcaMessage" maxlength="5000" minlength="20" required placeholder="Identifica la obra, explica la reclamación y añade las declaraciones que correspondan..."></textarea></div>
+</div>
+<div class="form-actions"><button id="dmcaSubmit" class="report-submit" type="submit">Enviar reporte</button><div id="dmcaMsg" class="form-msg" role="status" aria-live="polite"></div></div>
+<div class="privacy-hint">Conserva una copia de la información enviada. Los datos del reporte se tratarán conforme a la Política de Privacidad.</div>
+</form>
 </div>
 
 
@@ -715,6 +729,18 @@ EroToonX · Contenido exclusivo para adultos +18
 
 </footer>
 
+
+<script>
+(()=>{
+  const form=document.getElementById("dmcaForm");if(!form)return;
+  const msg=document.getElementById("dmcaMsg"),btn=document.getElementById("dmcaSubmit");
+  form.addEventListener("submit",async e=>{
+    e.preventDefault();msg.className="form-msg";msg.textContent="Enviando...";btn.disabled=true;
+    const payload={kind:"dmca",name:document.getElementById("dmcaName").value.trim(),email:document.getElementById("dmcaEmail").value.trim(),subject:document.getElementById("dmcaSubject").value.trim(),content_url:document.getElementById("dmcaUrl").value.trim(),message:document.getElementById("dmcaMessage").value.trim(),website:document.getElementById("dmcaWebsite").value};
+    try{const r=await fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||"No se pudo enviar el reporte.");form.reset();msg.className="form-msg ok";msg.textContent=d.reference?`Reporte recibido. Referencia #${d.reference}.`:"Reporte recibido correctamente."}catch(err){msg.className="form-msg error";msg.textContent=err.message||"No se pudo enviar el reporte."}finally{btn.disabled=false}
+  });
+})();
+</script>
 
 </body>
 

@@ -13,6 +13,7 @@ run_worker_first = ["/", "/comic/*", "/sitemap.xml", "/api/*", "/media/*"]
 binding = "DB"
 database_name = "nightink-db"
 database_id = "7c0a582e-12ed-4cbb-addb-565f9206b9d4"
+migrations_dir = "migrations"
 
 [[r2_buckets]]
 binding = "MEDIA"

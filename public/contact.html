@@ -332,6 +332,9 @@ footer{
   font-size:10px;
 }
 
+
+.contact-form{margin-top:20px;padding:22px;border:1px solid #343b54;border-radius:10px;background:#151925}.contact-form h2{margin-top:0}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:11px;color:#c8cddd}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid #3a4159;border-radius:7px;background:#0f131d;color:#fff;outline:none}.field textarea{min-height:150px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#8f5cff}.form-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}.submit-btn{padding:11px 16px;border:0;border-radius:7px;background:linear-gradient(135deg,#ff4b84,#8f5cff);color:#fff;font-weight:800;cursor:pointer}.submit-btn:disabled{opacity:.55;cursor:wait}.form-msg{min-height:18px;font-size:11px;color:#b9c0d1}.form-msg.ok{color:#72e0ae}.form-msg.error{color:#ff8195}.hp-field{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;overflow:hidden!important}.privacy-hint{margin-top:10px;color:#8f97aa;font-size:10px;line-height:1.5}
+
 @media(max-width:650px){
 
   .header{
@@ -354,6 +357,14 @@ footer{
     grid-template-columns:1fr;
   }
 
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+
   .card{
     padding:17px;
   }
@@ -365,7 +376,8 @@ footer{
 }
 
 </style>
-
+<link rel="stylesheet" href="/theme.css">
+<script src="/theme.js"></script>
 </head>
 
 
@@ -392,12 +404,15 @@ EroToonX
 </a>
 
 
+<div class="header-tools">
+<button type="button" class="theme-toggle" data-theme-toggle><span data-theme-icon>☀</span><span data-theme-label>Claro</span></button>
 <a
   href="/"
   class="back"
 >
 ← Volver a EroToonX
 </a>
+</div>
 
 </div>
 
@@ -434,7 +449,7 @@ Para consultas generales relacionadas con EroToonX, funcionamiento del sitio o c
 </p>
 
 <span class="status">
-Correo pendiente de activación
+Formulario disponible abajo
 </span>
 
 </div>
@@ -451,7 +466,7 @@ Para consultas relacionadas con datos personales, privacidad o solicitudes vincu
 </p>
 
 <span class="status">
-Canal pendiente de activación
+Formulario disponible abajo
 </span>
 
 </div>
@@ -468,7 +483,7 @@ Para solicitar revisión o retirada de contenido potencialmente infractor, utili
 </p>
 
 <span class="status">
-Canal legal pendiente
+Formulario DMCA disponible
 </span>
 
 </div>
@@ -485,7 +500,7 @@ Para reportar problemas graves de seguridad o contenido que pueda ser ilegal y r
 </p>
 
 <span class="status">
-Canal pendiente de activación
+Formulario disponible abajo
 </span>
 
 </div>
@@ -528,10 +543,28 @@ Documentación relevante si se trata de una reclamación de derechos.
 
 <div class="note">
 
-Antes del lanzamiento definitivo añadiremos aquí las direcciones de correo oficiales de EroToonX. No utilizaremos una dirección inventada o personal.
+El canal oficial de contacto es el formulario de esta página. Las solicitudes de derechos de autor también pueden enviarse mediante el formulario específico de DMCA / Reportar contenido.
 
 </div>
 
+
+<section class="contact-form" id="formulario-contacto">
+<h2>Enviar una solicitud</h2>
+<p>Utiliza este formulario para consultas generales, privacidad o seguridad. Para reclamaciones formales de derechos de autor también puedes usar la página DMCA.</p>
+<form id="contactForm">
+<div class="hp-field" aria-hidden="true"><label>Website<input id="contactWebsite" name="website" autocomplete="off" tabindex="-1"></label></div>
+<div class="form-grid">
+<div class="field"><label for="contactKind">Tipo de solicitud</label><select id="contactKind" required><option value="general">Consulta general</option><option value="privacy">Privacidad / datos personales</option><option value="security">Seguridad o contenido ilegal</option><option value="dmca">Derechos de autor / DMCA</option></select></div>
+<div class="field"><label for="contactName">Nombre (opcional salvo DMCA)</label><input id="contactName" maxlength="160" autocomplete="name"></div>
+<div class="field"><label for="contactEmail">Correo para responder</label><input id="contactEmail" type="email" maxlength="254" autocomplete="email" required></div>
+<div class="field"><label for="contactSubject">Asunto</label><input id="contactSubject" maxlength="200" required></div>
+<div class="field full"><label for="contactUrl">URL relacionada (si corresponde)</label><input id="contactUrl" type="url" maxlength="1000" placeholder="https://erotoonx.com/comic/..."></div>
+<div class="field full"><label for="contactMessage">Mensaje</label><textarea id="contactMessage" maxlength="5000" minlength="20" required placeholder="Describe claramente tu solicitud..."></textarea></div>
+</div>
+<div class="form-actions"><button id="contactSubmit" class="submit-btn" type="submit">Enviar solicitud</button><div id="contactMsg" class="form-msg" role="status" aria-live="polite"></div></div>
+<div class="privacy-hint">La información enviada se utilizará para revisar y responder tu solicitud. Consulta la Política de Privacidad para más detalles.</div>
+</form>
+</section>
 
 <div class="legal-nav">
 
@@ -570,6 +603,28 @@ EroToonX · Contenido exclusivo para adultos +18
 
 </footer>
 
+
+<script>
+(()=>{
+  const form=document.getElementById("contactForm");
+  if(!form)return;
+  const msg=document.getElementById("contactMsg"),btn=document.getElementById("contactSubmit"),kind=document.getElementById("contactKind"),name=document.getElementById("contactName");
+  const q=new URLSearchParams(location.search).get("tipo");
+  if(["general","privacy","security","dmca"].includes(q))kind.value=q;
+  form.addEventListener("submit",async e=>{
+    e.preventDefault();
+    msg.className="form-msg";msg.textContent="Enviando...";btn.disabled=true;
+    const payload={kind:kind.value,name:name.value.trim(),email:document.getElementById("contactEmail").value.trim(),subject:document.getElementById("contactSubject").value.trim(),content_url:document.getElementById("contactUrl").value.trim(),message:document.getElementById("contactMessage").value.trim(),website:document.getElementById("contactWebsite").value};
+    try{
+      const r=await fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.ok)throw new Error(d.error||"No se pudo enviar la solicitud.");
+      form.reset();kind.value=q&&["general","privacy","security","dmca"].includes(q)?q:"general";
+      msg.className="form-msg ok";msg.textContent=d.reference?`Solicitud recibida. Referencia #${d.reference}.`:"Solicitud recibida correctamente.";
+    }catch(err){msg.className="form-msg error";msg.textContent=err.message||"No se pudo enviar la solicitud."}finally{btn.disabled=false}
+  });
+})();
+</script>
 
 </body>
 

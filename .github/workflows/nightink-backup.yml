@@ -34,12 +34,12 @@ jobs:
 
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Preparar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Comprobar secretos de Cloudflare
         shell: bash
@@ -48,7 +48,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Falta el secreto CLOUDFLARE_API_TOKEN" && exit 1)
 
       - name: Instalar Wrangler
-        run: npm install --no-save --no-package-lock wrangler@latest
+        run: npm install --no-save --no-package-lock wrangler@4.127.0
 
       - name: Crear backup rápido
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.full_media != 'true' }}
@@ -69,7 +69,7 @@ jobs:
           echo "Backup verificado: $BACKUP_DIR"
 
       - name: Guardar backup como artefacto de GitHub
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: NightInk-backup-${{ github.run_number }}
           path: backups/NightInk_*/
@@ -122,7 +122,7 @@ jobs:
       - name: Enviar backup por correo con ZIP
         if: ${{ steps.mail_config.outputs.ready == 'true' && steps.email_zip.outputs.attach == 'true' }}
         continue-on-error: true
-        uses: dawidd6/action-send-mail@v18
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59 # v18
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -147,7 +147,7 @@ jobs:
       - name: Enviar aviso por correo sin adjunto
         if: ${{ steps.mail_config.outputs.ready == 'true' && steps.email_zip.outputs.attach == 'false' }}
         continue-on-error: true
-        uses: dawidd6/action-send-mail@v18
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59 # v18
         with:
           server_address: smtp.gmail.com
           server_port: 465

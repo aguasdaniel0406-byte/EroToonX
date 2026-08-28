@@ -2,9 +2,10 @@
 const ORT_VERSION = "1.27.0";
 const ORT_URL = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/ort.min.js`;
 const ORT_WASM_BASE = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
-const WD_MODEL_URL = "https://huggingface.co/KidiXDev/wd-swinv2-tagger-v3-quint8/resolve/main/model.onnx";
-const WD_TAGS_URL = "https://huggingface.co/KidiXDev/wd-swinv2-tagger-v3-quint8/resolve/main/selected_tags.csv";
-const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+const WD_MODEL_REVISION = "4f67de053184529fead3f0e4652b74875696a8eb";
+const WD_MODEL_URL = `https://huggingface.co/KidiXDev/wd-swinv2-tagger-v3-quint8/resolve/${WD_MODEL_REVISION}/model.onnx`;
+const WD_TAGS_URL = `https://huggingface.co/KidiXDev/wd-swinv2-tagger-v3-quint8/resolve/${WD_MODEL_REVISION}/selected_tags.csv`;
+const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
 
 const IMAGE_SIZE = 448;
 const WD_THRESHOLD = 0.18;

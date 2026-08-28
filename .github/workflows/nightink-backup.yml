@@ -1,0 +1,75 @@
+name: NightInk Backup
+
+on:
+  schedule:
+    # Cada domingo a las 04:17 UTC.
+    - cron: '17 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      full_media:
+        description: 'Incluir copia física de todas las imágenes R2'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightink-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Crear backup de NightInk
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Comprobar secretos
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Falta el secreto CLOUDFLARE_ACCOUNT_ID" && exit 1)
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "Falta el secreto CLOUDFLARE_API_TOKEN" && exit 1)
+
+      - name: Instalar Wrangler
+        run: npm install --no-save --no-package-lock wrangler@latest
+
+      - name: Crear backup rápido
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.full_media != 'true' }}
+        run: node backup-nightink.mjs
+
+      - name: Crear backup completo con imágenes
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.full_media == 'true' }}
+        run: node backup-nightink.mjs --full-media
+
+      - name: Verificar resultado
+        shell: bash
+        run: |
+          test -d backups || (echo "No se creó la carpeta backups" && exit 1)
+          BACKUP_DIR="$(find backups -maxdepth 1 -mindepth 1 -type d -name 'NightInk_*' | sort | tail -n 1)"
+          test -n "$BACKUP_DIR" || (echo "No se encontró el backup generado" && exit 1)
+          test -s "$BACKUP_DIR/nightink-db.sql" || (echo "Falta nightink-db.sql" && exit 1)
+          test -s "$BACKUP_DIR/r2-inventory.json" || (echo "Falta r2-inventory.json" && exit 1)
+          echo "Backup verificado: $BACKUP_DIR"
+
+      - name: Guardar backup como artefacto de GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: NightInk-backup-${{ github.run_number }}
+          path: backups/NightInk_*/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0

@@ -2,18 +2,193 @@ function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      "Content-Type": "application/json; charset=utf-8"
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
     }
   });
 }
 
-function getAdminToken(request) {
-  return request.headers.get("X-Admin-Token") || "";
+const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const ADMIN_LOGIN_WINDOW_MS = 10 * 60 * 1000;
+const ADMIN_LOGIN_LOCK_MS = 15 * 60 * 1000;
+const ADMIN_LOGIN_MAX_FAILURES = 5;
+const MAX_COVER_BYTES = 12 * 1024 * 1024;
+const MAX_PAGE_BYTES = 20 * 1024 * 1024;
+const MAX_PAGE_BATCH_BYTES = 25 * 1024 * 1024;
+const MAX_PAGE_FILES_PER_REQUEST = 20;
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif"
+]);
+
+let adminSecuritySchemaReady = false;
+
+async function sha256Hex(value = "") {
+  const bytes = new TextEncoder().encode(String(value));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-function isAdmin(request, env) {
-  return Boolean(env.ADMIN_TOKEN) &&
-    getAdminToken(request) === env.ADMIN_TOKEN;
+async function secureStringEqual(a, b) {
+  const [left, right] = await Promise.all([sha256Hex(a), sha256Hex(b)]);
+  return left === right;
+}
+
+function randomAdminToken() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function getAdminToken(request) {
+  const header = request.headers.get("X-Admin-Token") || "";
+  if (header) return header.trim();
+  const auth = request.headers.get("Authorization") || "";
+  const match = auth.match(/^Bearer\s+(.+)$/i);
+  return match ? String(match[1] || "").trim() : "";
+}
+
+async function ensureAdminSecuritySchema(env) {
+  if (adminSecuritySchemaReady) return;
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS admin_sessions (
+        token_hash TEXT PRIMARY KEY,
+        expires_at INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        client_hash TEXT NOT NULL DEFAULT ''
+      )
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires
+      ON admin_sessions(expires_at)
+    `),
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS admin_login_limits (
+        client_hash TEXT PRIMARY KEY,
+        failures INTEGER NOT NULL DEFAULT 0,
+        window_started_at INTEGER NOT NULL,
+        locked_until INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      )
+    `)
+  ]);
+  adminSecuritySchemaReady = true;
+}
+
+async function adminClientHash(request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  return sha256Hex(ip);
+}
+
+async function getAdminLoginState(request, env) {
+  await ensureAdminSecuritySchema(env);
+  const clientHash = await adminClientHash(request);
+  const now = Date.now();
+  const row = await env.DB.prepare(`
+    SELECT failures, window_started_at, locked_until
+    FROM admin_login_limits
+    WHERE client_hash = ?
+  `).bind(clientHash).first();
+  return { clientHash, now, row };
+}
+
+async function recordAdminLoginFailure(env, clientHash, row, now) {
+  let failures = 1;
+  let windowStartedAt = now;
+  let lockedUntil = 0;
+
+  if (row && now - Number(row.window_started_at || 0) <= ADMIN_LOGIN_WINDOW_MS) {
+    failures = Number(row.failures || 0) + 1;
+    windowStartedAt = Number(row.window_started_at || now);
+  }
+
+  if (failures >= ADMIN_LOGIN_MAX_FAILURES) {
+    lockedUntil = now + ADMIN_LOGIN_LOCK_MS;
+  }
+
+  await env.DB.prepare(`
+    INSERT INTO admin_login_limits (client_hash, failures, window_started_at, locked_until, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(client_hash) DO UPDATE SET
+      failures = excluded.failures,
+      window_started_at = excluded.window_started_at,
+      locked_until = excluded.locked_until,
+      updated_at = excluded.updated_at
+  `).bind(clientHash, failures, windowStartedAt, lockedUntil, now).run();
+
+  return { failures, lockedUntil };
+}
+
+async function clearAdminLoginFailures(env, clientHash) {
+  await env.DB.prepare("DELETE FROM admin_login_limits WHERE client_hash = ?").bind(clientHash).run();
+}
+
+async function createAdminSession(request, env) {
+  await ensureAdminSecuritySchema(env);
+  const token = randomAdminToken();
+  const tokenHash = await sha256Hex(token);
+  const clientHash = await adminClientHash(request);
+  const now = Date.now();
+  const expiresAt = now + ADMIN_SESSION_TTL_MS;
+
+  await env.DB.batch([
+    env.DB.prepare("DELETE FROM admin_sessions WHERE expires_at <= ?").bind(now),
+    env.DB.prepare(`
+      INSERT INTO admin_sessions (token_hash, expires_at, created_at, client_hash)
+      VALUES (?, ?, ?, ?)
+    `).bind(tokenHash, expiresAt, now, clientHash)
+  ]);
+
+  return { token, expiresAt };
+}
+
+async function revokeAdminSession(request, env) {
+  const token = getAdminToken(request);
+  if (!token) return;
+  await ensureAdminSecuritySchema(env);
+  const tokenHash = await sha256Hex(token);
+  await env.DB.prepare("DELETE FROM admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+}
+
+async function isAdmin(request, env) {
+  if (!env.ADMIN_TOKEN) return false;
+  const token = getAdminToken(request);
+  if (!token) return false;
+
+  await ensureAdminSecuritySchema(env);
+  const tokenHash = await sha256Hex(token);
+  const now = Date.now();
+  const row = await env.DB.prepare(`
+    SELECT expires_at
+    FROM admin_sessions
+    WHERE token_hash = ?
+    LIMIT 1
+  `).bind(tokenHash).first();
+
+  if (!row || Number(row.expires_at || 0) <= now) {
+    if (row) await env.DB.prepare("DELETE FROM admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+    return false;
+  }
+  return true;
+}
+
+function validateImageUpload(file, { maxBytes, label = "imagen" } = {}) {
+  if (!file || typeof file === "string") return `Selecciona una ${label}`;
+  const type = String(file.type || "").toLowerCase();
+  if (!ALLOWED_IMAGE_TYPES.has(type)) {
+    return `${label[0].toUpperCase() + label.slice(1)} no válida. Usa JPG, PNG, WebP, AVIF o GIF.`;
+  }
+  if (Number(file.size || 0) <= 0) return `${label[0].toUpperCase() + label.slice(1)} vacía.`;
+  if (Number(file.size || 0) > Number(maxBytes || 0)) {
+    const mb = Math.round(Number(maxBytes || 0) / (1024 * 1024));
+    return `${label[0].toUpperCase() + label.slice(1)} demasiado grande. Máximo ${mb} MB.`;
+  }
+  return "";
 }
 
 function toBool(value) {
@@ -1980,27 +2155,40 @@ export default {
         method === "POST" &&
         path === "/api/admin/login"
       ) {
-        const body =
-          await request
-            .json()
-            .catch(() => ({}));
+        const body = await request.json().catch(() => ({}));
+        const { clientHash, now, row } = await getAdminLoginState(request, env);
 
-        if (
-          !env.ADMIN_TOKEN ||
-          body.password !== env.ADMIN_TOKEN
-        ) {
-          return json(
-            {
-              ok: false,
-              error:
-                "Contraseña incorrecta"
-            },
-            401
-          );
+        if (row && Number(row.locked_until || 0) > now) {
+          const retryAfter = Math.max(1, Math.ceil((Number(row.locked_until) - now) / 1000));
+          return json({
+            ok: false,
+            error: `Demasiados intentos. Intenta de nuevo en ${Math.ceil(retryAfter / 60)} min.`,
+            retry_after: retryAfter
+          }, 429);
         }
 
+        const passwordOk = Boolean(env.ADMIN_TOKEN) &&
+          await secureStringEqual(String(body.password || ""), String(env.ADMIN_TOKEN || ""));
+
+        if (!passwordOk) {
+          const state = await recordAdminLoginFailure(env, clientHash, row, now);
+          if (state.lockedUntil > now) {
+            return json({
+              ok: false,
+              error: "Demasiados intentos incorrectos. Acceso bloqueado temporalmente.",
+              retry_after: Math.ceil((state.lockedUntil - now) / 1000)
+            }, 429);
+          }
+          return json({ ok: false, error: "Contraseña incorrecta" }, 401);
+        }
+
+        await clearAdminLoginFailures(env, clientHash);
+        const session = await createAdminSession(request, env);
         return json({
-          ok: true
+          ok: true,
+          session: session.token,
+          expires_at: session.expiresAt,
+          expires_in: Math.floor(ADMIN_SESSION_TTL_MS / 1000)
         });
       }
 
@@ -2421,6 +2609,10 @@ export default {
           "Cache-Control",
           "public, max-age=31536000, immutable"
         );
+        headers.set(
+          "X-Content-Type-Options",
+          "nosniff"
+        );
 
         return new Response(
           object.body,
@@ -2439,7 +2631,7 @@ export default {
 
       if (
         path.startsWith("/api/admin/") &&
-        !isAdmin(request, env)
+        !(await isAdmin(request, env))
       ) {
         return json(
           {
@@ -2452,6 +2644,12 @@ export default {
       }
 
 
+
+
+      if (method === "POST" && path === "/api/admin/logout") {
+        await revokeAdminSession(request, env);
+        return json({ ok: true });
+      }
 
 
       /*
@@ -3001,6 +3199,12 @@ export default {
           );
         }
 
+        const coverError = validateImageUpload(file, {
+          maxBytes: MAX_COVER_BYTES,
+          label: "portada"
+        });
+        if (coverError) return json({ ok: false, error: coverError }, 400);
+
         const key =
           `covers/${comicId}/${crypto.randomUUID()}-${safeName(file.name)}`;
 
@@ -3527,6 +3731,29 @@ export default {
             },
             400
           );
+        }
+
+        if (files.length > MAX_PAGE_FILES_PER_REQUEST) {
+          return json({
+            ok: false,
+            error: `Demasiadas páginas en una sola petición. Máximo ${MAX_PAGE_FILES_PER_REQUEST}.`
+          }, 400);
+        }
+
+        let totalUploadBytes = 0;
+        for (const file of files) {
+          const pageError = validateImageUpload(file, {
+            maxBytes: MAX_PAGE_BYTES,
+            label: "página"
+          });
+          if (pageError) return json({ ok: false, error: `${safeName(file.name)}: ${pageError}` }, 400);
+          totalUploadBytes += Number(file.size || 0);
+        }
+        if (totalUploadBytes > MAX_PAGE_BATCH_BYTES) {
+          return json({
+            ok: false,
+            error: `El lote de páginas es demasiado grande. Máximo ${Math.round(MAX_PAGE_BATCH_BYTES / (1024 * 1024))} MB por envío.`
+          }, 400);
         }
 
         const maxRow = await env.DB.prepare(

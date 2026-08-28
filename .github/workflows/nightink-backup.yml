@@ -28,6 +28,9 @@ jobs:
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      BACKUP_EMAIL_TO: ${{ secrets.BACKUP_EMAIL_TO }}
 
     steps:
       - name: Descargar repositorio
@@ -38,7 +41,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Comprobar secretos
+      - name: Comprobar secretos de Cloudflare
         shell: bash
         run: |
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Falta el secreto CLOUDFLARE_ACCOUNT_ID" && exit 1)
@@ -73,3 +76,94 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
+
+      # A partir de aquí solo se prepara/notifica por correo.
+      # Si esta parte falla, el backup principal de GitHub NO se pierde.
+      - name: Comprobar configuración de correo
+        id: mail_config
+        shell: bash
+        run: |
+          if [ -n "$MAIL_USERNAME" ] && [ -n "$MAIL_PASSWORD" ] && [ -n "$BACKUP_EMAIL_TO" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Correo configurado."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Correo no configurado: se conserva únicamente el Artifact de GitHub."
+          fi
+
+      - name: Crear ZIP para correo y comprobar tamaño
+        id: email_zip
+        continue-on-error: true
+        if: ${{ steps.mail_config.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          BACKUP_DIR="$(find backups -maxdepth 1 -mindepth 1 -type d -name 'NightInk_*' | sort | tail -n 1)"
+          test -n "$BACKUP_DIR" || (echo "No se encontró el backup para crear el ZIP" && exit 1)
+
+          ZIP_NAME="NightInk-backup-${{ github.run_number }}.zip"
+          zip -rq "$ZIP_NAME" "$BACKUP_DIR"
+
+          ZIP_BYTES="$(stat -c%s "$ZIP_NAME")"
+          ZIP_MB="$(awk -v b="$ZIP_BYTES" 'BEGIN { printf "%.2f", b/1024/1024 }')"
+          MAX_BYTES=$((20 * 1024 * 1024))
+
+          echo "path=$ZIP_NAME" >> "$GITHUB_OUTPUT"
+          echo "bytes=$ZIP_BYTES" >> "$GITHUB_OUTPUT"
+          echo "mb=$ZIP_MB" >> "$GITHUB_OUTPUT"
+
+          if [ "$ZIP_BYTES" -le "$MAX_BYTES" ]; then
+            echo "attach=true" >> "$GITHUB_OUTPUT"
+            echo "ZIP de $ZIP_MB MB: se enviará adjunto."
+          else
+            echo "attach=false" >> "$GITHUB_OUTPUT"
+            echo "ZIP de $ZIP_MB MB: supera 20 MB; se enviará solo el enlace al run."
+          fi
+
+      - name: Enviar backup por correo con ZIP
+        if: ${{ steps.mail_config.outputs.ready == 'true' && steps.email_zip.outputs.attach == 'true' }}
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v18
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: 'NightInk Backup #${{ github.run_number }} completado'
+          to: ${{ secrets.BACKUP_EMAIL_TO }}
+          from: 'NightInk Backup <${{ secrets.MAIL_USERNAME }}>'
+          body: |
+            Backup de NightInk completado correctamente.
+
+            Repositorio: ${{ github.repository }}
+            Ejecución: #${{ github.run_number }}
+            Tamaño del ZIP: ${{ steps.email_zip.outputs.mb }} MB
+            El ZIP va adjunto a este correo.
+
+            El backup también permanece guardado como Artifact de GitHub durante 90 días.
+            Ver ejecución: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          attachments: ${{ steps.email_zip.outputs.path }}
+
+      - name: Enviar aviso por correo sin adjunto
+        if: ${{ steps.mail_config.outputs.ready == 'true' && steps.email_zip.outputs.attach == 'false' }}
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v18
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: 'NightInk Backup #${{ github.run_number }} completado'
+          to: ${{ secrets.BACKUP_EMAIL_TO }}
+          from: 'NightInk Backup <${{ secrets.MAIL_USERNAME }}>'
+          body: |
+            Backup de NightInk completado correctamente.
+
+            Repositorio: ${{ github.repository }}
+            Ejecución: #${{ github.run_number }}
+            El ZIP pesa ${{ steps.email_zip.outputs.mb }} MB y supera el límite de 20 MB configurado para adjuntos.
+
+            El backup está guardado como Artifact de GitHub durante 90 días.
+            Descárgalo desde la ejecución:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

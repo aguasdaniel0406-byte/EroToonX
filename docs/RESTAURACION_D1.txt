@@ -1,0 +1,41 @@
+NIGHTINK / EROTOONX - RESTAURACION D1
+======================================
+
+El repositorio incluye ahora un esquema inicial reproducible en:
+
+  migrations/0001_initial_schema.sql
+
+Ese archivo crea las tablas, relaciones e índices necesarios para levantar una
+base D1 nueva. También usa CREATE ... IF NOT EXISTS, por lo que puede marcarse
+como migración en la base actual sin borrar datos existentes.
+
+BASE ACTUAL
+-----------
+Para aplicar migraciones pendientes a la base remota configurada en
+wrangler.toml:
+
+  npx wrangler d1 migrations apply nightink-db --remote
+
+Antes de hacerlo, mantén un backup D1 reciente. El sistema automático de
+NightInk ya genera ese backup.
+
+BASE NUEVA / RECUPERACION TOTAL
+-------------------------------
+1. Crear o seleccionar una base D1 nueva.
+2. Actualizar temporalmente database_id en wrangler.toml si corresponde.
+3. Ejecutar:
+
+   npx wrangler d1 migrations apply nightink-db --remote
+
+4. Si se restaura un backup SQL de producción, importar el SQL siguiendo el
+   procedimiento de restauración del backup.
+5. Confirmar que /api/health informa databaseConnected=true.
+6. Confirmar acceso al admin, catálogo, un cómic único y una serie.
+
+IMPORTANTE
+----------
+- No guardar tokens ni contraseñas dentro de este archivo o de wrangler.toml.
+- Las categorías base siguen siendo sembradas por la aplicación cuando la
+  tabla está vacía; la migración define la estructura, no una copia de datos.
+- Los mensajes enviados desde Contacto/DMCA quedan dentro de D1 y por tanto
+  quedan incluidos en el export completo de D1.

@@ -1,0 +1,28 @@
+NIGHTINK - VALIDACION AUTOMATICA
+===============================
+
+Workflow:
+  .github/workflows/nightink-validate.yml
+
+Se ejecuta:
+- en cada push a main;
+- en pull requests;
+- manualmente desde GitHub;
+- automáticamente el día 1 de cada mes a las 05:23 UTC.
+
+Entorno:
+- Node 24 LTS.
+- Wrangler 4.127.0 fijado explícitamente.
+
+Pruebas:
+1. Instala Wrangler 4.127.0.
+2. Ejecuta npm run check.
+3. Aplica migrations/ en una D1 local con npm run db:migrate:local.
+4. Ejecuta npx wrangler deploy --dry-run --outdir dist.
+
+El dry-run compila el Worker y sus assets pero NO publica cambios en Cloudflare.
+La prueba de migraciones usa D1 local y tampoco modifica la base de producción.
+
+Además, .github/dependabot.yml revisa mensualmente npm y GitHub Actions. Dependabot
+abre PRs para revisión; no se deben fusionar actualizaciones sin dejar NightInk
+Validate en verde.

@@ -1,13 +1,14 @@
 NIGHTINK / EROTOONX - RESTAURACION D1
 ======================================
 
-El repositorio incluye ahora un esquema inicial reproducible en:
+El repositorio incluye un esquema D1 reproducible mediante migraciones numeradas:
 
   migrations/0001_initial_schema.sql
+  migrations/0002_catalog_display_order.sql
 
-Ese archivo crea las tablas, relaciones e índices necesarios para levantar una
-base D1 nueva. También usa CREATE ... IF NOT EXISTS, por lo que puede marcarse
-como migración en la base actual sin borrar datos existentes.
+Wrangler aplica las migraciones pendientes en orden. La primera crea la base
+funcional y la segunda añade el orden visual del catálogo. Ambas usan creaciones
+seguras y la segunda no modifica las fechas ni los datos de los cómics.
 
 BASE ACTUAL
 -----------

@@ -1,6 +1,6 @@
 # Mantenimiento de NightInk
 
-La versión 1.2.1 está preparada como release de bajo mantenimiento, no como software que deba ignorarse indefinidamente.
+La versión 1.3.0 está preparada como release de bajo mantenimiento, no como software que deba ignorarse indefinidamente.
 
 ## Rutina recomendada
 

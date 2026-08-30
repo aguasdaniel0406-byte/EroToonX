@@ -1651,6 +1651,140 @@ async function getSeoComic(env, slug) {
   return comic || null;
 }
 
+async function getSeoCategoryIndex(env) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.title,
+      c.slug,
+      c.tags,
+      c.genre,
+      c.views,
+      c.updated_at,
+      c.cover_key
+    FROM comics c
+    WHERE c.is_published = 1
+      AND (
+        (c.tags IS NOT NULL AND TRIM(c.tags) != '')
+        OR
+        (c.genre IS NOT NULL AND TRIM(c.genre) != '')
+      )
+    ORDER BY c.updated_at DESC, c.id DESC
+    `
+  ).all();
+
+  const groups = new Map();
+
+  for (const comic of rows.results || []) {
+    const source = String(comic.tags || '').trim() ? comic.tags : comic.genre;
+    const seen = new Set();
+
+    for (const raw of splitTagList(source || '')) {
+      const name = String(raw || '').trim();
+      if (!name) continue;
+      const slug = slugify(name);
+      if (!slug || seen.has(slug)) continue;
+      seen.add(slug);
+
+      let item = groups.get(slug);
+      if (!item) {
+        item = {
+          slug,
+          name,
+          count: 0,
+          latest_updated_at: comic.updated_at || null,
+          cover_url: null,
+          top_comic_title: null,
+          _views: -1
+        };
+        groups.set(slug, item);
+      }
+
+      item.count += 1;
+      if (!item.latest_updated_at || String(comic.updated_at || '') > String(item.latest_updated_at || '')) {
+        item.latest_updated_at = comic.updated_at || item.latest_updated_at;
+      }
+
+      const views = Number(comic.views || 0);
+      if (comic.cover_key && views >= item._views) {
+        item._views = views;
+        item.cover_url = '/media/' + comic.cover_key;
+        item.top_comic_title = comic.title || null;
+      }
+    }
+  }
+
+  return [...groups.values()]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }))
+    .map(({ _views, ...item }) => item);
+}
+
+async function getSeoCategoryComics(env, categorySlug, limit = 20) {
+  const rows = await env.DB.prepare(
+    `
+    SELECT
+      c.id,
+      c.slug,
+      c.title,
+      c.description,
+      c.genre,
+      c.tags,
+      c.author,
+      c.status,
+      c.views,
+      c.created_at,
+      c.updated_at,
+      c.cover_key,
+      CASE
+        WHEN c.cover_key IS NOT NULL AND c.cover_key != ''
+        THEN '/media/' || c.cover_key
+        ELSE NULL
+      END AS cover_url
+    FROM comics c
+    WHERE c.is_published = 1
+    ORDER BY c.updated_at DESC, c.id DESC
+    `
+  ).all();
+
+  const out = [];
+  for (const comic of rows.results || []) {
+    const source = String(comic.tags || '').trim() ? comic.tags : comic.genre;
+    const match = splitTagList(source || '').some(tag => slugify(tag) === categorySlug);
+    if (!match) continue;
+    out.push(comic);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+function renderSeoCategoryCards(categories) {
+  if (!categories.length) {
+    return '<div class="empty">Todavía no hay categorías disponibles.</div>';
+  }
+
+  return categories.map(category => {
+    const name = escapeHtml(category.name || 'Categoría');
+    const slug = encodeURIComponent(category.slug || slugify(category.name || ''));
+    const count = Number(category.count || 0);
+    const image = category.cover_url ? absoluteUrl(category.cover_url) : '';
+    const imageHtml = image
+      ? `<img class="category-card-cover" src="${escapeAttr(image)}" alt="Portada de ${escapeAttr(category.name || 'categoría')}" loading="lazy">`
+      : '';
+
+    return `
+      <a class="category-card" href="/categoria/${slug}" aria-label="Ver categoría ${escapeAttr(category.name || '')}">
+        ${imageHtml}
+        <div class="category-card-shade"></div>
+        <div class="category-card-copy">
+          <strong>${name}</strong>
+          <span>${count} cómic${count === 1 ? '' : 's'}</span>
+        </div>
+      </a>
+    `;
+  }).join('');
+}
+
 function renderSeoComicCards(comics) {
   if (!comics.length) {
     return `
@@ -1700,6 +1834,7 @@ function renderSeoComicCards(comics) {
           class="cover"
           style="${coverStyle}"
         >
+          ${coverUrl ? `<img src="${escapeAttr(coverUrl)}" alt="Portada de ${escapeAttr(comic.title || "Cómic")}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : ""}
           ${placeholder}
           <span class="card-badge">Abrir</span>
         </div>
@@ -1719,7 +1854,7 @@ function renderSeoComicCards(comics) {
   }).join("");
 }
 
-function renderHomeStructuredData(comics) {
+function renderHomeStructuredData(comics, listName = "Últimos cómics de EroToonX") {
   const itemListElement =
     comics.map((comic, index) => ({
       "@type": "ListItem",
@@ -1733,7 +1868,7 @@ function renderHomeStructuredData(comics) {
   return JSON.stringify({
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Últimos cómics de EroToonX",
+    name: listName,
     itemListElement
   }).replace(/</g, "\\u003c");
 }
@@ -1763,6 +1898,8 @@ function renderComicStructuredData(comic) {
       comic.cover_url
         ? absoluteUrl(comic.cover_url)
         : undefined,
+    datePublished:
+      comic.created_at || undefined,
     dateModified:
       comic.updated_at || undefined,
     isFamilyFriendly:
@@ -1958,7 +2095,7 @@ async function serveSeoHtml(
       );
 
     html = html.replace(
-      /<div id="comicGrid" class="comic-grid">[\s\S]*?<\/div><div id="pagination"/i,
+      /<div id="comicGrid" class="comic-grid">[\s\S]*?<\/div>\s*<div id="pagination"/i,
       `<div id="comicGrid" class="comic-grid">${cards}</div><div id="pagination"`
     );
 
@@ -1992,6 +2129,104 @@ ${structured}
           "website"
       }
     );
+  }
+
+  else if (path === "/categorias" || path === "/categorias/") {
+    const categories = await getSeoCategoryIndex(env);
+    const cards = renderSeoCategoryCards(categories);
+
+    html = html.replace(
+      '<section id="catalogView" class="section">',
+      '<section id="catalogView" class="section view-hidden">'
+    );
+    html = html.replace(
+      '<div id="betweenSectionsAd" class="ad-slot ad-between-sections"',
+      '<div id="betweenSectionsAd" class="ad-slot ad-between-sections view-hidden"'
+    );
+    html = html.replace(
+      '<section id="randomSection" class="section">',
+      '<section id="randomSection" class="section view-hidden">'
+    );
+    html = html.replace(
+      '<section id="categoriesView" class="section view-hidden">',
+      '<section id="categoriesView" class="section">'
+    );
+    html = html.replace(
+      '<div id="categoryGrid" class="category-grid"><div class="empty">Cargando categorías...</div></div>',
+      `<div id="categoryGrid" class="category-grid">${cards}</div>`
+    );
+
+    html = replaceHeadMetadata(html, {
+      title: "Categorías de cómics +18 | EroToonX",
+      description: "Explora las categorías de cómics para adultos +18 disponibles en EroToonX.",
+      canonical: `${SITE_ORIGIN}/categorias`,
+      type: "website"
+    });
+
+    const structured = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Categorías de EroToonX",
+      itemListElement: categories.slice(0, 100).map((category, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: category.name,
+        url: `${SITE_ORIGIN}/categoria/${encodeURIComponent(category.slug)}`
+      }))
+    }).replace(/</g, "\\u003c");
+
+    html = html.replace("</head>", `\n<script type="application/ld+json">\n${structured}\n</script>\n</head>`);
+  }
+
+  else if (/^\/categoria\/[^/]+\/?$/.test(path)) {
+    const match = path.match(/^\/categoria\/([^/]+)\/?$/);
+    const requestedSlug = decodeURIComponent(match[1]);
+    const categories = await getSeoCategoryIndex(env);
+    const category = categories.find(item => item.slug === requestedSlug);
+
+    if (!category) {
+      return new Response(
+        `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,follow"><title>Categoría no encontrada | EroToonX</title></head><body><h1>Categoría no encontrada</h1><p><a href="/categorias">Ver categorías</a></p></body></html>`,
+        { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
+    }
+
+    const comics = await getSeoCategoryComics(env, requestedSlug, 20);
+    const cards = renderSeoComicCards(comics);
+    const canonical = `${SITE_ORIGIN}/categoria/${encodeURIComponent(category.slug)}`;
+    const description = `Explora ${category.count} cómic${Number(category.count) === 1 ? "" : "s"} +18 de la categoría ${category.name} en EroToonX.`;
+
+    html = html.replace(
+      /<div id="comicGrid" class="comic-grid">[\s\S]*?<\/div>\s*<div id="pagination"/i,
+      `<div id="comicGrid" class="comic-grid">${cards}</div><div id="pagination"`
+    );
+    html = html.replace(
+      '<button id="categoryBackBtn" class="route-back view-hidden">',
+      '<button id="categoryBackBtn" class="route-back">'
+    );
+    html = html.replace(
+      '<h2 id="catalogTitle">Últimos cómics</h2>',
+      `<h2 id="catalogTitle">Cómics de ${escapeHtml(category.name)}</h2>`
+    );
+    html = html.replace(
+      '<section id="randomSection" class="section">',
+      '<section id="randomSection" class="section view-hidden">'
+    );
+    html = html.replace(
+      '<div id="betweenSectionsAd" class="ad-slot ad-between-sections"',
+      '<div id="betweenSectionsAd" class="ad-slot ad-between-sections view-hidden"'
+    );
+
+    html = replaceHeadMetadata(html, {
+      title: `${category.name} · Cómics +18 | EroToonX`,
+      description,
+      canonical,
+      type: "website",
+      image: category.cover_url ? absoluteUrl(category.cover_url) : null
+    });
+
+    const structured = renderHomeStructuredData(comics, `Cómics de ${category.name} en EroToonX`);
+    html = html.replace("</head>", `\n<script type="application/ld+json">\n${structured}\n</script>\n</head>`);
   }
 
   else {
@@ -2042,10 +2277,17 @@ ${structured}
         comic.title ||
         "Cómic";
 
+      const fallbackDescription = [
+        `Lee ${title}`,
+        comic.author ? `de ${comic.author}` : "",
+        (comic.tags || comic.genre) ? `· categorías: ${comic.tags || comic.genre}` : "",
+        "en EroToonX, con lectura directa y adaptada a móvil."
+      ].filter(Boolean).join(" ");
+
       const description =
         String(
           comic.description ||
-          `Lee ${title} en EroToonX.`
+          fallbackDescription
         )
           .replace(/\s+/g, " ")
           .trim()
@@ -2112,11 +2354,9 @@ ${structured}
 
   <p>
     ${
-      comic.tags
-        ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.tags)} · `
-        : comic.genre
-          ? `<strong>Etiquetas:</strong> ${escapeHtml(comic.genre)} · `
-          : ""
+      (comic.tags || comic.genre)
+        ? `<strong>Etiquetas:</strong> ${splitTagList(comic.tags || comic.genre).map(tag => `<a href="/categoria/${encodeURIComponent(slugify(tag))}">${escapeHtml(tag)}</a>`).join(", ")} · `
+        : ""
     }
     ${
       comic.author
@@ -2213,6 +2453,10 @@ async function serveDynamicSitemap(env) {
     `
     SELECT
       slug,
+      title,
+      tags,
+      genre,
+      cover_key,
       updated_at
 
     FROM comics
@@ -2270,8 +2514,36 @@ async function serveDynamicSitemap(env) {
       lastmod: today,
       changefreq: "monthly",
       priority: "0.3"
+    },
+    {
+      loc: `${SITE_ORIGIN}/categorias`,
+      lastmod: today,
+      changefreq: "daily",
+      priority: "0.7"
     }
   ];
+
+  const categoryMap = new Map();
+  for (const comic of comics) {
+    const source = String(comic.tags || '').trim() ? comic.tags : comic.genre;
+    const seen = new Set();
+    for (const tag of splitTagList(source || '')) {
+      const categorySlug = slugify(tag);
+      if (!categorySlug || seen.has(categorySlug)) continue;
+      seen.add(categorySlug);
+      const existing = categoryMap.get(categorySlug);
+      if (!existing || String(comic.updated_at || '') > String(existing.lastmod || '')) {
+        categoryMap.set(categorySlug, {
+          loc: `${SITE_ORIGIN}/categoria/${encodeURIComponent(categorySlug)}`,
+          lastmod: comic.updated_at,
+          changefreq: "weekly",
+          priority: "0.6"
+        });
+      }
+    }
+  }
+
+  const categoryUrls = [...categoryMap.values()];
 
   const comicUrls =
     comics.map(comic => ({
@@ -2282,24 +2554,29 @@ async function serveDynamicSitemap(env) {
       changefreq:
         "weekly",
       priority:
-        "0.8"
+        "0.8",
+      image:
+        comic.cover_key ? `${SITE_ORIGIN}/media/${encodeURIComponent(comic.cover_key).replace(/%2F/g, "/")}` : null
     }));
 
   const urls =
-    [...staticUrls, ...comicUrls];
+    [...staticUrls, ...categoryUrls, ...comicUrls];
 
   const body =
     urls.map(item => `
   <url>
     <loc>${escapeXml(item.loc)}</loc>
-    <lastmod>${escapeXml(item.lastmod)}</lastmod>
+    <lastmod>${escapeXml(sitemapDate(item.lastmod))}</lastmod>
     <changefreq>${escapeXml(item.changefreq)}</changefreq>
-    <priority>${escapeXml(item.priority)}</priority>
+    <priority>${escapeXml(item.priority)}</priority>${item.image ? `
+    <image:image>
+      <image:loc>${escapeXml(item.image)}</image:loc>
+    </image:image>` : ""}
   </url>`).join("");
 
   const xml =
 `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${body}
 </urlset>`;
 
   const headers = applyCommonSecurityHeaders(new Headers({
@@ -2358,6 +2635,9 @@ export default {
         (
           path === "/" ||
           path === "/index.html" ||
+          path === "/categorias" ||
+          path === "/categorias/" ||
+          /^\/categoria\/[^/]+\/?$/.test(path) ||
           /^\/comic\/[^/]+\/?$/.test(path)
         )
       ) {

@@ -338,6 +338,144 @@ function toBool(value) {
     value === "true";
 }
 
+let catalogDisplayOrderSchemaReady = false;
+
+async function ensureCatalogDisplayOrderSchema(env) {
+  if (catalogDisplayOrderSchemaReady) return;
+
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS catalog_display_order (
+        comic_id INTEGER PRIMARY KEY,
+        sort_key INTEGER NOT NULL,
+        shuffled_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (comic_id) REFERENCES comics(id) ON DELETE CASCADE
+      )
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_catalog_display_order_sort
+      ON catalog_display_order(sort_key DESC)
+    `)
+  ]);
+
+  catalogDisplayOrderSchemaReady = true;
+}
+
+function catalogBaseSortKeySql(alias = "c") {
+  return `(CAST(strftime('%s', ${alias}.updated_at) AS INTEGER) * 1000000 + ${alias}.id)`;
+}
+
+function catalogMixGroupKey(row) {
+  const author = String(row?.author || "").trim().toLowerCase();
+  if (author) return `author:${author}`;
+
+  const firstTag = csvValues(row?.tags || row?.genre || "")[0];
+  if (firstTag) return `tag:${String(firstTag).trim().toLowerCase()}`;
+
+  return `comic:${Number(row?.id || 0)}`;
+}
+
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function mixRecentComicRows(rows) {
+  const groups = new Map();
+  for (const row of shuffleArray(rows)) {
+    const key = catalogMixGroupKey(row);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+
+  // Greedy equilibrado: mientras exista una alternativa, nunca repite el
+  // mismo autor/categoría dos veces seguidas. Si un grupo domina tanto que
+  // la separación es matemáticamente imposible, solo entonces repite.
+  const mixed = [];
+  let previousKey = "";
+
+  while (mixed.length < rows.length) {
+    let candidates = [...groups.entries()]
+      .filter(([, items]) => items.length && (!previousKey || catalogMixGroupKey(items[items.length - 1]) !== previousKey));
+
+    if (!candidates.length) {
+      candidates = [...groups.entries()].filter(([, items]) => items.length);
+    }
+
+    const maxRemaining = Math.max(...candidates.map(([, items]) => items.length));
+    const strongest = candidates.filter(([, items]) => items.length === maxRemaining);
+    const [key, items] = strongest[Math.floor(Math.random() * strongest.length)];
+    mixed.push(items.pop());
+    previousKey = key;
+  }
+
+  return mixed;
+}
+
+async function shuffleRecentCatalog(env, requestedLimit) {
+  await ensureCatalogDisplayOrderSchema(env);
+  const limit = Math.min(100, Math.max(5, Number(requestedLimit || 30)));
+  const baseKey = catalogBaseSortKeySql("c");
+  const rows = await env.DB.prepare(`
+    SELECT
+      c.id,
+      c.author,
+      c.genre,
+      c.tags,
+      c.updated_at,
+      ${baseKey} AS base_sort_key
+    FROM comics c
+    WHERE c.is_published = 1
+    ORDER BY c.updated_at DESC, c.id DESC
+    LIMIT ?
+  `).bind(limit).all();
+
+  const recent = rows.results || [];
+  if (recent.length < 2) {
+    throw new Error("Necesitas al menos dos cómics publicados para mezclar el catálogo.");
+  }
+
+  const sortKeys = recent
+    .map(row => Number(row.base_sort_key || 0))
+    .sort((a, b) => b - a);
+  const mixed = mixRecentComicRows(recent);
+
+  const statements = [env.DB.prepare("DELETE FROM catalog_display_order")];
+  mixed.forEach((row, index) => {
+    statements.push(
+      env.DB.prepare(`
+        INSERT INTO catalog_display_order (comic_id, sort_key, shuffled_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+      `).bind(Number(row.id), sortKeys[index])
+    );
+  });
+  await env.DB.batch(statements);
+
+  return { count: mixed.length, limit };
+}
+
+async function resetCatalogDisplayOrder(env) {
+  await ensureCatalogDisplayOrderSchema(env);
+  const result = await env.DB.prepare("DELETE FROM catalog_display_order").run();
+  return Number(result.meta?.changes || 0);
+}
+
+async function catalogDisplayOrderStatus(env) {
+  await ensureCatalogDisplayOrderSchema(env);
+  const row = await env.DB.prepare(`
+    SELECT COUNT(*) AS count, MAX(shuffled_at) AS shuffled_at
+    FROM catalog_display_order
+  `).first();
+  return {
+    count: Number(row?.count || 0),
+    shuffled_at: row?.shuffled_at || ""
+  };
+}
+
 let publicationTypeSchemaReady = false;
 
 function normalizeContentType(value) {
@@ -764,6 +902,7 @@ async function deleteComicMedia(env, comicId) {
 }
 
 async function publicComics(env, url) {
+  await ensureCatalogDisplayOrderSchema(env);
   const page = Math.max(1, Number(url.searchParams.get("page") || 1));
   const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit") || 10)));
 
@@ -861,7 +1000,7 @@ async function publicComics(env, url) {
       ? "LOWER(c.title) ASC, c.id DESC"
       : sort === "title_za"
         ? "LOWER(c.title) DESC, c.id DESC"
-        : "c.updated_at DESC, c.id DESC";
+        : "COALESCE(cdo.sort_key, (CAST(strftime('%s', c.updated_at) AS INTEGER) * 1000000 + c.id)) DESC, c.updated_at DESC, c.id DESC";
 
   const rows = await env.DB.prepare(`
     SELECT
@@ -878,6 +1017,7 @@ async function publicComics(env, url) {
         ELSE NULL
       END AS cover_url
     FROM comics c
+    LEFT JOIN catalog_display_order cdo ON cdo.comic_id = c.id
     WHERE ${whereSql}
     ORDER BY ${orderSql}
     LIMIT ? OFFSET ?
@@ -1421,6 +1561,7 @@ function isSearchCrawler(request) {
 }
 
 async function getSeoHomeComics(env, limit = 15) {
+  await ensureCatalogDisplayOrderSchema(env);
   const rows = await env.DB.prepare(
     `
     SELECT
@@ -1452,11 +1593,13 @@ async function getSeoHomeComics(env, limit = 15) {
       ) AS page_count
 
     FROM comics c
+    LEFT JOIN catalog_display_order cdo ON cdo.comic_id = c.id
 
     WHERE
       c.is_published = 1
 
     ORDER BY
+      COALESCE(cdo.sort_key, (CAST(strftime('%s', c.updated_at) AS INTEGER) * 1000000 + c.id)) DESC,
       c.updated_at DESC,
       c.id DESC
 
@@ -2967,6 +3110,31 @@ export default {
         const seriesKey = url.searchParams.get("series_key") || "";
         const deleted = await deleteAnalysisMemory(env, seriesKey);
         return json({ ok: true, deleted });
+      }
+
+      /*
+      ========================================
+      ADMIN CATALOG DISPLAY ORDER
+      ========================================
+      */
+
+      if (method === "GET" && path === "/api/admin/catalog-order") {
+        return json({ ok: true, ...(await catalogDisplayOrderStatus(env)) });
+      }
+
+      if (method === "POST" && path === "/api/admin/catalog-order/shuffle") {
+        const body = await request.json().catch(() => ({}));
+        try {
+          const result = await shuffleRecentCatalog(env, body.limit);
+          return json({ ok: true, ...result, ...(await catalogDisplayOrderStatus(env)) });
+        } catch (error) {
+          return json({ ok: false, error: String(error?.message || error) }, 400);
+        }
+      }
+
+      if (method === "POST" && path === "/api/admin/catalog-order/reset") {
+        const restored = await resetCatalogDisplayOrder(env);
+        return json({ ok: true, restored, ...(await catalogDisplayOrderStatus(env)) });
       }
 
       /*

@@ -1,0 +1,44 @@
+name: NightInk Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 5 1 * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightink-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validar código y dry-run
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '24'
+
+      - name: Instalar Wrangler comprobado
+        run: npm install --no-save --no-package-lock wrangler@4.127.0
+
+      - name: Validar sintaxis
+        run: npm run check
+
+      - name: Probar migraciones D1 en local
+        run: npm run db:migrate:local
+
+      - name: Compilar con Wrangler sin desplegar
+        run: npx wrangler deploy --dry-run --outdir dist

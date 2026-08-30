@@ -1,6 +1,6 @@
 # NightInk / EroToonX
 
-**Release estable: 1.3.0**
+**Release estable: 1.3.1**
 
 Proyecto Cloudflare Workers + D1 + R2 con catálogo/lector de cómics para adultos, administración privada, categorías, series/capítulos, carga individual/masiva, clasificación local en navegador, modo claro/oscuro y backups automáticos.
 
@@ -102,6 +102,10 @@ npm run dry-run
 
 `dry-run` compila el Worker con Wrangler y genera la salida en `dist/` sin
 publicarla en Cloudflare.
+
+## Release 1.3.1
+
+SEO de descubrimiento: categorías renderizadas por el Worker, URLs canónicas por categoría, categorías e imágenes de portada incluidas en el sitemap y portadas SSR mediante elementos `<img>`.
 
 ## Release 1.3.0
 

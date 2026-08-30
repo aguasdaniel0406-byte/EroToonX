@@ -1,5 +1,14 @@
 # Changelog NightInk / EroToonX
 
+## 1.3.0 — Mezcla editorial de recientes
+
+- Nuevo control en Admin para mezclar los últimos 20/30/50/75/100 cómics publicados.
+- La mezcla usa un orden visual separado y no modifica `created_at` ni `updated_at`.
+- Los cómics subidos después de una mezcla siguen apareciendo por encima como nuevos.
+- Se intenta reducir la repetición consecutiva del mismo autor/categoría.
+- Botón para restaurar inmediatamente el orden normal por fecha.
+- Nueva migración `0002_catalog_display_order.sql`.
+
 ## 1.2.1 — Release estable
 
 - Dependencias del clasificador fijadas a versiones/revisión exactas.

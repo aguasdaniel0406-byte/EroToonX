@@ -1,6 +1,6 @@
 # NightInk / EroToonX
 
-**Release estable: 1.2.1**
+**Release estable: 1.3.0**
 
 Proyecto Cloudflare Workers + D1 + R2 con catálogo/lector de cómics para adultos, administración privada, categorías, series/capítulos, carga individual/masiva, clasificación local en navegador, modo claro/oscuro y backups automáticos.
 
@@ -64,7 +64,7 @@ Consulta `docs/BACKUPS.txt`, `docs/CHANGELOG.md` y `docs/MANTENIMIENTO.md`.
 
 ## Esquema D1 reproducible
 
-El esquema inicial está versionado en `migrations/0001_initial_schema.sql`.
+El esquema inicial está versionado en `migrations/0001_initial_schema.sql` y las mejoras posteriores se añaden como migraciones numeradas, actualmente `0002_catalog_display_order.sql`.
 Cloudflare Wrangler usa la carpeta `migrations/` configurada en `wrangler.toml`.
 
 Comandos útiles:
@@ -103,6 +103,6 @@ npm run dry-run
 `dry-run` compila el Worker con Wrangler y genera la salida en `dist/` sin
 publicarla en Cloudflare.
 
-## Release 1.2.1
+## Release 1.3.0
 
-La release mantiene las funciones de v1.2 y añade endurecimiento de mantenimiento: dependencias externas fijadas, Node 24 en CI, validación mensual, Dependabot y headers de seguridad. No introduce cambios de comportamiento en el lector, series, uploads o backups.
+La release mantiene todo el endurecimiento de v1.2.1 y añade una herramienta editorial de **Mezclar recientes** en el Admin. El orden visual se guarda separado de las fechas reales, puede restaurarse por fecha en cualquier momento y no modifica lector, series, uploads, categorías ni backups.

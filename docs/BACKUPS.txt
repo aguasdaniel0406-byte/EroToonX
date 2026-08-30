@@ -1,0 +1,70 @@
+NIGHTINK / EROTOONX - BACKUPS
+=============================
+
+ESTADO
+------
+Sistema probado y funcionando.
+No modificar CLOUDFLARE_API_TOKEN ni el flujo principal mientras siga funcionando.
+
+WORKFLOW
+--------
+.github/workflows/nightink-backup.yml
+
+Frecuencia automática:
+Domingo 04:17 UTC
+
+Ejecución manual:
+GitHub > Actions > NightInk Backup > Run workflow
+
+Modo normal:
+node backup-nightink.mjs
+
+Modo con copia física de los objetos R2 referenciados:
+node backup-nightink.mjs --full-media
+
+CONTENIDO
+---------
+- nightink-db.sql
+- d1-info.json, si Wrangler lo permite
+- d1-time-travel.json, si Wrangler lo permite
+- r2-inventory.json
+- r2-inventory.csv
+- backup-manifest.json
+- LEEME_RESTAURACION.txt
+- media/, solo en full-media
+
+GITHUB SECRETS
+--------------
+- CLOUDFLARE_ACCOUNT_ID
+- CLOUDFLARE_API_TOKEN
+- MAIL_USERNAME
+- MAIL_PASSWORD
+- BACKUP_EMAIL_TO
+
+PERMISOS DEL TOKEN CLOUDFLARE PROBADOS
+--------------------------------------
+- Account > D1 > Edit
+- Account > Workers R2 Storage > Read
+- User > User Details > Read
+- User > Memberships > Read
+
+CORREO
+------
+Si el ZIP es de 20 MB o menos, se intenta enviar adjunto.
+Si supera 20 MB, se envía un enlace a la ejecución de GitHub.
+Los pasos de correo usan continue-on-error para no invalidar el Artifact ya creado.
+
+RETENCION
+---------
+El workflow solicita 90 días para el Artifact. GitHub aplica además los límites de retención configurados para el repositorio/organización.
+
+IMPORTANTE
+----------
+No guardar contraseñas, tokens ni secretos en el repositorio.
+No restaurar nightink-db.sql directamente sobre producción sin revisar antes el procedimiento.
+
+ENDURECIMIENTO DEL WORKFLOW
+---------------------------
+Las acciones externas del workflow están fijadas a SHA completo para evitar que
+un tag móvil cambie el código ejecutado sin revisión. Wrangler también se fija
+a la versión 4.127.0, que es la versión comprobada con este proyecto.

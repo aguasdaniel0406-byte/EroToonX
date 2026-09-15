@@ -9,6 +9,9 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="theme-color" content="#0d0f18">
 <meta name="rating" content="adult">
+<link rel="icon" href="/branding/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/branding/icon-dark.png" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="/branding/icon-light.png" media="(prefers-color-scheme: light)">
 
 <link id="canonicalUrl" rel="canonical" href="https://erotoonx.com/">
 <link rel="alternate" hreflang="es" href="https://erotoonx.com/">
@@ -19,10 +22,12 @@
 <meta property="og:title" id="ogTitle" content="EroToonX | Cómics para adultos +18">
 <meta property="og:description" id="ogDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
 <meta property="og:url" id="ogUrl" content="https://erotoonx.com/">
+<meta property="og:image" content="https://erotoonx.com/branding/icon-dark.png">
 
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" id="twitterTitle" content="EroToonX | Cómics para adultos +18">
 <meta name="twitter:description" id="twitterDescription" content="Catálogo de cómics para adultos +18 con lectura directa, vertical y adaptada a móvil.">
+<meta name="twitter:image" content="https://erotoonx.com/branding/icon-dark.png">
 
 <script type="application/ld+json">
 {
@@ -315,16 +320,26 @@ body.admin-route #adminShell{margin-top:0}
 @media(max-width:760px){.section-heading{align-items:flex-start}.section-tools{flex-wrap:wrap;justify-content:flex-end}.catalog-filters{padding:10px}.catalog-filter-top{grid-template-columns:1fr}.catalog-category-picker,.catalog-filter-clear{grid-column:auto}.catalog-filter-options{position:fixed;left:12px;right:12px;top:auto;bottom:12px;max-height:50vh}.catalog-result-count{display:block;margin-top:2px}}
 
 </style>
+<style id="erotoonx-branding">
+.brand-logo-link,.mobile-brand{min-width:0;line-height:0}
+.brand-logo{display:block;width:auto;height:62px;max-width:220px;object-fit:contain;object-position:left center}
+.brand-logo-light{display:none}
+html[data-theme="light"] .brand-logo-dark{display:none}
+html[data-theme="light"] .brand-logo-light{display:block}
+.mobile-brand .brand-logo{height:48px;max-width:150px}
+@media(max-width:390px){.mobile-brand .brand-logo{height:44px;max-width:138px}}
+@media(max-width:330px){.mobile-brand .brand-logo{height:40px;max-width:126px}}
+</style>
 <link rel="stylesheet" href="/theme.css">
 <script src="/theme.js"></script>
 </head>
 <body>
 
-<header class="site-header"><div class="wrap header-main"><a href="/" class="brand"><div class="brand-icon">EX</div><div class="brand-name">EroToonX<small>COMICS +18</small></div></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor, capítulo o categoría..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"><button type="button" class="theme-toggle" data-theme-toggle><span data-theme-icon>☀</span><span data-theme-label>Claro</span></button></div></div></header>
+<header class="site-header"><div class="wrap header-main"><a href="/" class="brand brand-logo-link" aria-label="EroToonX - Inicio"><img class="brand-logo brand-logo-dark" src="/branding/logo-dark.png" alt="EroToonX"><img class="brand-logo brand-logo-light" src="/branding/logo-light.png" alt="EroToonX"></a><div class="search-area"><input id="searchInput" class="search-input" placeholder="Buscar título, autor, capítulo o categoría..."><button id="searchBtn" class="search-button">⌕</button></div><div class="header-side"><button type="button" class="theme-toggle" data-theme-toggle><span data-theme-icon>☀</span><span data-theme-label>Claro</span></button></div></div></header>
 <nav class="navbar"><div class="wrap navbar-inner"><a class="nav-link active" data-nav-home href="/">Inicio</a><a class="nav-link" data-nav-categories href="/categorias">Categorías</a></div></nav>
 <div class="mobile-site-header">
   <div class="mobile-header-row">
-    <a href="/" class="mobile-brand"><div class="brand-icon">EX</div><span>EroToonX</span></a>
+    <a href="/" class="mobile-brand" aria-label="EroToonX - Inicio"><img class="brand-logo brand-logo-dark" src="/branding/logo-dark.png" alt="EroToonX"><img class="brand-logo brand-logo-light" src="/branding/logo-light.png" alt="EroToonX"></a>
     <div class="mobile-actions">
       <button type="button" class="theme-toggle theme-toggle-mobile" data-theme-toggle><span data-theme-icon>☀</span><span class="hidden" data-theme-label>Claro</span></button>
       <button id="mobileMenuBtn" class="mobile-icon-btn" aria-label="Menú">☰</button>
@@ -461,8 +476,7 @@ const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)],A
 let catalog=[],pagination={page:1,total_pages:1,total:0},currentPage=1,selectedTag="",selectedTagSlug="",sortMode="latest",searchQuery="",searchTimer=null,categoryIndex=[],randomPool=[],includedCatalogTags=[],excludedCatalogTags=[],catalogTypeFilter="";
 let adminToken=sessionStorage.getItem("nightink_admin_token")||"",currentAdminComics=[],currentManagedComic=null,currentManagedChapter=null,managedPages=[],managedLastAnalysisSignature="";
 let currentPublicComic=null,currentPublicSlug=null,currentPublicChapter=null,currentPublicChapters=[],currentPrevChapter=null,currentNextChapter=null;
-const READER_MEMORY_KEY="nightink_reader_memory_v1";
-let currentReaderPages=[],readerSaveTimer=null,readerRestoring=false;
+let currentReaderPages=[];
 let adminCategories=[];
 let lastAnalysisResult=null;
 let editingOriginalTags="";
@@ -564,13 +578,9 @@ function setComicMetadata(c){
     "article"
   );
 }
-function readerMemoryStore(){try{return JSON.parse(localStorage.getItem(READER_MEMORY_KEY)||"{}")||{}}catch{return{}}}
-function getReaderMemory(slug=currentPublicSlug){if(!slug)return null;return readerMemoryStore()[slug]||null}
-function setReaderMemory(data){if(!currentPublicSlug)return;const store=readerMemoryStore();store[currentPublicSlug]={...(store[currentPublicSlug]||{}),...data,updated_at:Date.now()};try{localStorage.setItem(READER_MEMORY_KEY,JSON.stringify(store))}catch{}}
-function currentReaderImageIndex(){const reader=qs("#reader"),imgs=qsa("#readerPages img[data-reader-page]");if(!reader||!imgs.length)return 0;const target=reader.scrollTop+Math.max(80,reader.clientHeight*.18);let best=0,bestDist=Infinity;imgs.forEach((img,i)=>{const d=Math.abs(img.offsetTop-target);if(d<bestDist){bestDist=d;best=i}});return best}
-function saveReaderProgressNow(){if(readerRestoring||!currentPublicComic||!currentPublicChapter||!currentReaderPages.length)return;clearTimeout(readerSaveTimer);const idx=Math.max(0,Math.min(currentReaderPages.length-1,currentReaderImageIndex())),page=currentReaderPages[idx]||{},done=idx>=currentReaderPages.length-1;setReaderMemory({chapter_id:Number(currentPublicChapter.id||0),chapter_number:Number(currentPublicChapter.chapter_number||0),page_index:idx,page_number:Number(page.page_number||idx+1),total_pages:currentReaderPages.length,completed:done})}
-function scheduleReaderSave(){clearTimeout(readerSaveTimer);readerSaveTimer=setTimeout(saveReaderProgressNow,250)}
-function restoreReaderPosition(){if(!currentReaderPages.length)return;const saved=getReaderMemory();let idx=0;if(saved&&Number(saved.chapter_id||0)===Number(currentPublicChapter?.id||0)&&!saved.completed)idx=Math.max(0,Math.min(currentReaderPages.length-1,Number(saved.page_index||0)));readerRestoring=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{const img=qs(`#readerPages img[data-reader-page="${idx}"]`);if(img)qs("#reader").scrollTop=Math.max(0,img.offsetTop-8);setTimeout(()=>{readerRestoring=false},100)}))}
+function catalogPageFromHistory(){const n=Number(history.state?.catalogPage||1);return Number.isFinite(n)&&n>0?Math.floor(n):1}
+function rememberCatalogPage(page=currentPage){const route=getRoute();if(route.type!=="home"&&route.type!=="category")return;const state={...(history.state||{}),type:route.type,catalogPage:Math.max(1,Number(page)||1)};if(route.type==="category")state.slug=route.slug;history.replaceState(state,"",location.pathname+location.search+location.hash)}
+function jumpCatalogTop(){const el=qs("#catalogView"),top=el?Math.max(0,el.getBoundingClientRect().top+window.scrollY):0,root=document.documentElement,previous=root.style.scrollBehavior;root.style.scrollBehavior="auto";window.scrollTo(0,top);requestAnimationFrame(()=>{root.style.scrollBehavior=previous})}
 function isSeriesComic(c=currentPublicComic){return String(c?.content_type||"single").toLowerCase()==="series"}
 function comicCardHTML(c,dataAttr="data-comic"){const cover=c.cover_url?`background-image:url('${c.cover_url}')`:"",ph=c.cover_url?"":`<div class="cover-placeholder">${esc(c.title)}</div>`,meta=c.author||"EroToonX",parts=Number(c.part_count||0),series=isSeriesComic(c);return `<a class="comic-card" href="${comicPath(c.slug)}" ${dataAttr}="${esc(c.slug)}"><div class="cover" style="${cover}">${ph}<span class="card-badge">Abrir</span>${series?`<span class="series-badge" style="position:absolute;left:7px;bottom:7px">Serie · ${parts} cap.</span>`:""}</div><div class="card-body"><h3 class="card-title">${esc(c.title)}</h3><div class="card-meta"><span>${esc(meta)}</span><span>${Number(c.views||0)} vistas</span></div></div></a>`}
 function normalizeCatalogTag(value=""){return String(value||"").replace(/\s+/g," ").trim()}
@@ -581,9 +591,9 @@ function catalogFilterCount(){return includedCatalogTags.length+excludedCatalogT
 function renderCatalogFilterOptions(){const box=qs("#catalogFilterOptions"),query=normalizeCatalogTag(qs("#catalogCategorySearch")?.value).toLowerCase();if(!box)return;const rows=categoryIndex.filter(c=>!query||String(c.name||"").toLowerCase().includes(query)).slice(0,40);box.innerHTML=rows.length?rows.map(c=>`<div class="catalog-filter-option"><div><strong>${esc(c.name)}</strong><small>${Number(c.count||0)} cómic${Number(c.count||0)===1?"":"s"}</small></div><button class="include" type="button" data-filter-include="${esc(c.name)}">+ Incluir</button><button class="exclude" type="button" data-filter-exclude="${esc(c.name)}">− Excluir</button></div>`).join(""):'<div class="empty">No encontramos esa categoría.</div>';qsa("[data-filter-include]").forEach(b=>b.onclick=()=>{addCatalogTag("include",b.dataset.filterInclude);qs("#catalogCategorySearch").value="";box.classList.remove("open")});qsa("[data-filter-exclude]").forEach(b=>b.onclick=()=>{addCatalogTag("exclude",b.dataset.filterExclude);qs("#catalogCategorySearch").value="";box.classList.remove("open")})}
 function renderCatalogFilterUI(){const active=qs("#catalogActiveFilters"),count=catalogFilterCount(),badge=qs("#catalogFilterCount");if(badge){badge.textContent=String(count);badge.classList.toggle("show",count>0)}if(qs("#catalogTypeFilter"))qs("#catalogTypeFilter").value=catalogTypeFilter;if(qs("#catalogSortFilter"))qs("#catalogSortFilter").value=sortMode;qsa(".tab[data-sort]").forEach(b=>b.classList.toggle("active",b.dataset.sort===sortMode));if(active){const chips=[];if(catalogTypeFilter)chips.push(`<button class="catalog-filter-chip type" data-clear-type type="button">${catalogTypeFilter==="series"?"Series":"Cómics únicos"} <span class="x">×</span></button>`);includedCatalogTags.forEach(t=>chips.push(`<button class="catalog-filter-chip" data-remove-include="${esc(t)}" type="button">${esc(t)} <span class="x">×</span></button>`));excludedCatalogTags.forEach(t=>chips.push(`<button class="catalog-filter-chip exclude" data-remove-exclude="${esc(t)}" type="button">Sin ${esc(t)} <span class="x">×</span></button>`));active.innerHTML=chips.join("");qsa("[data-remove-include]").forEach(b=>b.onclick=()=>removeCatalogTag("include",b.dataset.removeInclude));qsa("[data-remove-exclude]").forEach(b=>b.onclick=()=>removeCatalogTag("exclude",b.dataset.removeExclude));qs("[data-clear-type]")?.addEventListener("click",()=>{catalogTypeFilter="";renderCatalogFilterUI();loadCatalog(1)})}renderCatalogFilterOptions()}
 function clearCatalogFilters({keepSearch=false,keepRouteTag=false}={}){includedCatalogTags=[];excludedCatalogTags=[];catalogTypeFilter="";sortMode="latest";if(!keepSearch){searchQuery="";if(qs("#searchInput"))qs("#searchInput").value="";if(qs("#mobileSearchInput"))qs("#mobileSearchInput").value=""}if(!keepRouteTag){selectedTag="";selectedTagSlug=""}renderCatalogFilterUI()}
-async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"20",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedTag)p.append("include_tag",selectedTag);includedCatalogTags.forEach(t=>{if(!selectedTag||t.toLowerCase()!==selectedTag.toLowerCase())p.append("include_tag",t)});excludedCatalogTags.forEach(t=>p.append("exclude_tag",t));if(catalogTypeFilter)p.set("type",catalogTypeFilter);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);renderCatalog();renderPagination();renderCatalogFilterUI();const count=Number(pagination.total||0),label=qs("#catalogResultCount");if(label)label.textContent=`${count} resultado${count===1?"":"s"}`;}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+async function loadCatalog(page=1){try{const p=new URLSearchParams({page:String(page),limit:"20",sort:sortMode});if(searchQuery)p.set("q",searchQuery);if(selectedTag)p.append("include_tag",selectedTag);includedCatalogTags.forEach(t=>{if(!selectedTag||t.toLowerCase()!==selectedTag.toLowerCase())p.append("include_tag",t)});excludedCatalogTags.forEach(t=>p.append("exclude_tag",t));if(catalogTypeFilter)p.set("type",catalogTypeFilter);const d=await api("/api/comics?"+p);catalog=d.comics||[];pagination=d.pagination||{page:1,total_pages:1,total:catalog.length};currentPage=Number(pagination.page||1);rememberCatalogPage(currentPage);renderCatalog();renderPagination();renderCatalogFilterUI();const count=Number(pagination.total||0),label=qs("#catalogResultCount");if(label)label.textContent=`${count} resultado${count===1?"":"s"}`;}catch(e){qs("#comicGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 function renderCatalog(){const g=qs("#comicGrid");if(!catalog.length){const active=catalogFilterCount()||searchQuery||selectedTag;g.innerHTML=`<div class="empty">No encontramos cómics.${active?'<div class="catalog-empty-actions"><button id="emptyClearFilters" type="button">Quitar filtros</button></div>':""}</div>`;qs("#emptyClearFilters")?.addEventListener("click",()=>{clearCatalogFilters({keepRouteTag:Boolean(selectedTag)});loadCatalog(1)});return}const parts=[];catalog.forEach((c,i)=>{parts.push(comicCardHTML(c));if(i===7)parts.push('<div class="ad-slot mobile-inline-ad" data-ad-slot="mobile-catalog"><div><strong>Publicidad</strong>Banner móvil</div></div>')});g.innerHTML=parts.join("");qsa("[data-comic]").forEach(card=>card.onclick=e=>{e.preventDefault();openComicDirect(card.dataset.comic,true)})}
-function renderPagination(){const box=qs("#pagination"),total=Number(pagination.total_pages||1),page=Number(pagination.page||1);if(total<=1){box.innerHTML="";return}let h=`<button class="page-btn" data-page="${page-1}" ${page===1?"disabled":""}>←</button>`,pages=[];for(let i=1;i<=total;i++)if(total<=7||i===1||i===total||Math.abs(i-page)<=2)pages.push(i);let last=0;for(const i of pages){if(last&&i-last>1)h+='<button class="page-btn" disabled>…</button>';h+=`<button class="page-btn ${i===page?"active":""}" data-page="${i}">${i}</button>`;last=i}h+=`<button class="page-btn" data-page="${page+1}" ${page===total?"disabled":""}>→</button>`;box.innerHTML=h;qsa("[data-page]").forEach(b=>b.onclick=()=>{const n=Number(b.dataset.page);if(n>=1&&n<=total){loadCatalog(n);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}})}
+function renderPagination(){const box=qs("#pagination"),total=Number(pagination.total_pages||1),page=Number(pagination.page||1);if(total<=1){box.innerHTML="";return}let h=`<button class="page-btn" data-page="${page-1}" ${page===1?"disabled":""}>←</button>`,pages=[];for(let i=1;i<=total;i++)if(total<=7||i===1||i===total||Math.abs(i-page)<=2)pages.push(i);let last=0;for(const i of pages){if(last&&i-last>1)h+='<button class="page-btn" disabled>…</button>';h+=`<button class="page-btn ${i===page?"active":""}" data-page="${i}">${i}</button>`;last=i}h+=`<button class="page-btn" data-page="${page+1}" ${page===total?"disabled":""}>→</button>`;box.innerHTML=h;qsa("[data-page]").forEach(b=>b.onclick=async()=>{const n=Number(b.dataset.page);if(n>=1&&n<=total){await loadCatalog(n);jumpCatalogTop()}})}
 async function loadRandomPool(){try{const d=await api("/api/comics?page=1&limit=30&sort=latest");randomPool=d.comics||[];renderRandom()}catch(e){qs("#randomGrid").innerHTML=`<div class="empty">${esc(e.message)}</div>`}}function renderRandom(){const x=[...randomPool].sort(()=>Math.random()-.5).slice(0,5);qs("#randomGrid").innerHTML=x.length?x.map(c=>comicCardHTML(c,"data-random")).join(""):'<div class="empty">Todavía no hay suficientes cómics.</div>';qsa("[data-random]").forEach(c=>c.onclick=e=>{e.preventDefault();openComicDirect(c.dataset.random,true)})}qs("#randomRefresh")?.addEventListener("click",renderRandom);
 function chapterLabel(ch){const n=Number(ch?.chapter_number??0);const title=String(ch?.title||"").trim();return title?`Capítulo ${n} · ${title}`:`Capítulo ${n}`}
 function renderDetailChapters(){
@@ -674,8 +684,8 @@ async function openComicDirect(slug,pushRoute=true,requestedChapter=null){
   try{
     const d=await api("/api/comics/"+encodeURIComponent(slug)),c=d.comic,chapters=d.chapters||[];
     currentPublicComic=c;currentPublicSlug=c.slug;currentPublicChapters=chapters;setComicMetadata(c);
-    const readable=chapters.filter(ch=>Number(ch.page_count||0)>0),saved=getReaderMemory(c.slug),savedChapter=!requestedChapter&&isSeriesComic(c)?Number(saved?.chapter_id||0):0;
-    let target=readable.find(ch=>Number(ch.id)===Number(requestedChapter||savedChapter||0))||readable[0]||null;
+    const readable=chapters.filter(ch=>Number(ch.page_count||0)>0);
+    let target=readable.find(ch=>Number(ch.id)===Number(requestedChapter||0))||readable[0]||null;
     if(pushRoute){const routeChapter=isSeriesComic(c)?target?.id||null:null;history.pushState({type:"comic",slug:c.slug,chapter:routeChapter,fromSite:true},"",comicPath(c.slug,routeChapter))}
     prepareComicInfo(c);
     if(!target){
@@ -685,19 +695,17 @@ async function openComicDirect(slug,pushRoute=true,requestedChapter=null){
       qs("#readerEnd").style.display="none";updateReaderChapterControls();openReader();loadReaderRelated(c);return;
     }
     await loadPublicChapter(Number(target.id),false);
-    openReader();restoreReaderPosition();loadReaderRelated(c);
+    openReader();loadReaderRelated(c);
   }catch(e){alert(e.message)}
 }
 function openReader(){closeModal("detailModal");qs("#reader").classList.add("open");document.body.classList.add("reader-locked");qs("#reader").scrollTop=0}
 function comicUrl(){return location.origin+comicPath(currentPublicSlug,isSeriesComic()?currentPublicChapter?.id||null:null)}
 async function shareCurrentComic(){if(!currentPublicComic)return;const url=comicUrl();try{if(navigator.share){await navigator.share({title:currentPublicComic.title,url});return}await navigator.clipboard.writeText(url);alert("Enlace copiado.")}catch(e){if(e?.name!=="AbortError")alert("No se pudo compartir.")}}
 qs("#readerShare").onclick=shareCurrentComic;qs("#shareComicBtn").onclick=shareCurrentComic;qs("#copyComicBtn").onclick=async()=>{try{await navigator.clipboard.writeText(comicUrl());qs("#shareMessage").textContent="Enlace copiado."}catch{qs("#shareMessage").textContent=comicUrl()}};qs("#readerInfo").onclick=()=>{renderDetailChapters();openModal("detailModal")};qs("#readerChapterSelect")?.addEventListener("change",e=>loadPublicChapter(Number(e.target.value),true));
-function closeReaderOnly(){if(currentPublicComic)saveReaderProgressNow();qs("#reader").classList.remove("open");closeModal("detailModal");document.body.classList.remove("reader-locked");currentPublicComic=null;currentPublicSlug=null;currentPublicChapter=null;currentPublicChapters=[];currentPrevChapter=null;currentNextChapter=null;currentReaderPages=[]}
+function closeReaderOnly(){qs("#reader").classList.remove("open");closeModal("detailModal");document.body.classList.remove("reader-locked");currentPublicComic=null;currentPublicSlug=null;currentPublicChapter=null;currentPublicChapters=[];currentPrevChapter=null;currentNextChapter=null;currentReaderPages=[]}
 function exitComic(){const s=history.state;if(s?.type==="comic"&&s?.fromSite){history.back();return}closeReaderOnly();history.replaceState({type:"home"},"","/");showHomeView();setHomeMetadata();window.scrollTo(0,0)}
 qs("#closeReader").onclick=exitComic;qs("#readerBackHome").onclick=exitComic;
 window.addEventListener("popstate",async()=>{closeReaderOnly();await handleRoute(getRoute(),false)});
-qs("#reader")?.addEventListener("scroll",()=>{if(currentPublicComic)scheduleReaderSave()},{passive:true});
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&currentPublicComic)saveReaderProgressNow()});
 function runSearch(){searchQuery=qs("#searchInput").value.trim();const r=getRoute();if(r.type==="categories"||r.type==="category"){history.pushState({type:"home"},"","/");selectedTag="";selectedTagSlug="";showHomeView()}loadCatalog(1);qs("#catalogView")?.scrollIntoView({behavior:"smooth"})}qs("#searchBtn").onclick=runSearch;qs("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch()});qs("#searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=e.target.value.trim();if(getRoute().type!=="categories")loadCatalog(1)},350)});
 
 async function loadCategoryIndex(){
@@ -737,10 +745,10 @@ function showCategoriesView(){
   qs("#categoriesView")?.classList.remove("view-hidden");
   updateNav("categories");
 }
-async function openCategory(name,push=true){
+async function openCategory(name,push=true,page=1){
   selectedTag=name||"";selectedTagSlug=routeSlug(name||"");searchQuery="";
   qs("#searchInput").value="";if(qs("#mobileSearchInput"))qs("#mobileSearchInput").value="";
-  if(push)history.pushState({type:"category",slug:selectedTagSlug},"",categoryPath(name));
+  if(push)history.pushState({type:"category",slug:selectedTagSlug,catalogPage:1},"",categoryPath(name));
   qs("#categoriesView")?.classList.add("view-hidden");
   qs("#catalogView")?.classList.remove("view-hidden");
   qs("#randomSection")?.classList.add("view-hidden");
@@ -749,7 +757,7 @@ async function openCategory(name,push=true){
   qs("#catalogTitle").textContent=`Cómics de ${name}`;
   updateNav("category");
   setCategoryMetadata(name);
-  await loadCatalog(1);
+  await loadCatalog(Math.max(1,Number(page)||1));
   window.scrollTo({top:0,behavior:"smooth"});
 }
 async function handleRoute(route,initial=false){
@@ -782,14 +790,14 @@ async function handleRoute(route,initial=false){
   if(route.type==="category"){
     if(!categoryIndex.length)await loadCategoryIndex();
     const match=categoryIndex.find(c=>routeSlug(c.name)===route.slug);
-    if(match){await openCategory(match.name,false);return}
+    if(match){await openCategory(match.name,false,catalogPageFromHistory());return}
     history.replaceState({type:"categories"},"","/categorias");
     showCategoriesView();
     setCategoriesMetadata();
     return;
   }
   showHomeView();
-  await Promise.all([loadCatalog(1),loadRandomPool()]);
+  await Promise.all([loadCatalog(catalogPageFromHistory()),loadRandomPool()]);
   setHomeMetadata();
   if(!initial)window.scrollTo(0,0);
 }
@@ -1132,7 +1140,7 @@ qs("#readerGoBottom")?.addEventListener("click",()=>{const r=qs("#reader");if(r)
 qs("#readerShareBottom")?.addEventListener("click",shareCurrentComic);
 qs("#readerCopyLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(comicUrl());alert("Enlace copiado.")}catch{alert(comicUrl())}});
 
-async function startEroToonX(){const r=getRoute();if(r.type!=="admin")showAgeGate();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r},"",location.pathname+location.search+location.hash);if(r.type!=="admin")await loadCategoryIndex();await handleRoute(r,true)}startEroToonX();
+async function startEroToonX(){try{localStorage.removeItem("nightink_reader_memory_v1")}catch{}const r=getRoute();if(r.type!=="admin")showAgeGate();history.replaceState(r.type==="comic"?{type:"comic",slug:r.slug,fromSite:false}:{...r,...((r.type==="home"||r.type==="category")?{catalogPage:1}:{})},"",location.pathname+location.search+location.hash);if(r.type!=="admin")await loadCategoryIndex();await handleRoute(r,true)}startEroToonX();
 </script>
 </body>
 </html>

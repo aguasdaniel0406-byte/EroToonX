@@ -6,14 +6,13 @@ compatibility_date = "2026-08-21"
 directory = "./public"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/", "/comic/*", "/categorias*", "/categoria/*", "/sitemap.xml", "/api/*", "/media/*"]
+run_worker_first = ["/", "/comic/*", "/categorias", "/categorias/*", "/categoria/*", "/sitemap.xml", "/api/*", "/media/*"]
 
 
 [[d1_databases]]
 binding = "DB"
 database_name = "nightink-db"
 database_id = "7c0a582e-12ed-4cbb-addb-565f9206b9d4"
-migrations_dir = "migrations"
 
 [[r2_buckets]]
 binding = "MEDIA"

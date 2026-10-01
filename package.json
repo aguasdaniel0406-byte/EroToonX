@@ -12,7 +12,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply nightink-db --remote"
   },
   "devDependencies": {
-    "wrangler": "4.127.0"
+    "wrangler": "4.142.0"
   },
   "engines": {
     "node": ">=24 <25"
